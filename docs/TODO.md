@@ -1,15 +1,5 @@
 # Enforma — TODO
 
-## Task 1: Hierarchical scopes
-
-A `scope` prop on container components so child inputs bind relative paths.
-
-```tsx
-<Enforma.Scope path="address">
-  <Enforma.TextInput bind="city" />   {/* resolves to address.city */}
-</Enforma.Scope>
-```
-
 ## Task 2: Reactive attributes
 
 Props as functions evaluated against the current form state.
