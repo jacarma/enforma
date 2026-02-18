@@ -20,6 +20,10 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"

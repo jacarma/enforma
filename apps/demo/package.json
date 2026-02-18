@@ -9,6 +9,10 @@
     "lint": "eslint src",
     "test": "echo 'No tests in demo'"
   },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
   "dependencies": {
     "enforma": "workspace:*"
   },
