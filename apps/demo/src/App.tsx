@@ -7,6 +7,9 @@ const INITIAL_VALUES: FormValues = {
   email: '',
   address: {
     city: '',
+    street: {
+      line1: '',
+    },
   },
 }
 
@@ -20,7 +23,16 @@ export function App() {
       <Enforma.Form values={values} onChange={setValues} aria-label="demo form">
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
-        <Enforma.TextInput bind="address.city" label="City" placeholder="City" />
+
+        <fieldset>
+          <legend>Address</legend>
+          <Enforma.Scope path="address">
+            <Enforma.TextInput bind="city" label="City" placeholder="City" />
+            <Enforma.Scope path="street">
+              <Enforma.TextInput bind="line1" label="Street line 1" placeholder="123 Main St" />
+            </Enforma.Scope>
+          </Enforma.Scope>
+        </fieldset>
       </Enforma.Form>
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
