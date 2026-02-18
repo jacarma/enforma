@@ -1,11 +1,5 @@
 # Enforma — TODO
 
-## Task 0: ESLint + coverage
-
-- Add `eslint-plugin-react-hooks` to `packages/enforma` and `apps/demo` ESLint configs
-- Wire up Vitest coverage with the `v8` provider
-- Add a `coverage` script to `packages/enforma/package.json`
-
 ## Task 1: Hierarchical scopes
 
 A `scope` prop on container components so child inputs bind relative paths.
