@@ -5,31 +5,31 @@
 
 ---
 
-## Objetivo
+## Goal
 
-Construir el esqueleto inicial de **enforma**, una librería React de componentes de formulario con un runtime declarativo y reactivo. Esta primera iteración cubre exclusivamente la infraestructura base: monorepo, tooling, store, y los dos primeros componentes.
+Build the initial skeleton of **enforma**, a React form component library with a declarative and reactive runtime. This first iteration covers exclusively the base infrastructure: monorepo, tooling, store, and the first two components.
 
 ---
 
-## Estructura del monorepo
+## Monorepo structure
 
-pnpm workspaces con dos paquetes:
+pnpm workspaces with two packages:
 
 ```
 enforma/
 ├── pnpm-workspace.yaml
-├── package.json            # scripts raíz: lint, test, build, dev
+├── package.json            # root scripts: lint, test, build, dev
 ├── .gitignore
 ├── CLAUDE.md
 ├── docs/
 │   └── plans/
 │
 ├── packages/
-│   └── enforma/            # librería publicable
+│   └── enforma/            # publishable library
 │       ├── src/
 │       │   ├── index.ts             # export default Enforma (namespace)
 │       │   ├── store/
-│       │   │   └── FormStore.ts     # store ref-based + pub-sub
+│       │   │   └── FormStore.ts     # ref-based store + pub-sub
 │       │   ├── context/
 │       │   │   └── FormContext.ts   # React context + provider
 │       │   └── components/
@@ -37,10 +37,10 @@ enforma/
 │       │       └── TextInput.tsx
 │       ├── package.json
 │       ├── tsconfig.json
-│       └── vite.config.ts           # modo library
+│       └── vite.config.ts           # library mode
 │
 └── apps/
-    └── demo/               # playground Vite React
+    └── demo/               # Vite React playground
         ├── src/
         │   └── main.tsx
         ├── package.json
@@ -52,9 +52,9 @@ enforma/
 ## Tooling
 
 ### Package manager
-pnpm con workspaces. Sin npm ni yarn.
+pnpm with workspaces. No npm or yarn.
 
-### TypeScript — configuración estricta
+### TypeScript — strict configuration
 
 ```json
 {
@@ -70,18 +70,18 @@ pnpm con workspaces. Sin npm ni yarn.
 
 ### ESLint — flat config (ESLint 9+)
 
-- `typescript-eslint/strict-type-checked` — preset más estricto disponible
-- `eslint-plugin-react-hooks` — reglas de hooks
-- Reglas adicionales: `no-explicit-any`, `no-unsafe-*`, `consistent-type-imports`
+- `typescript-eslint/strict-type-checked` — strictest available preset
+- `eslint-plugin-react-hooks` — hooks rules
+- Additional rules: `no-explicit-any`, `no-unsafe-*`, `consistent-type-imports`
 
 ### Testing
 
-- **Vitest** — integración nativa con Vite
-- **@testing-library/react** — tests de componentes
-- Tests en `src/**/*.test.ts(x)`
-- Coverage con provider `v8`
+- **Vitest** — native Vite integration
+- **@testing-library/react** — component tests
+- Tests in `src/**/*.test.ts(x)`
+- Coverage with `v8` provider
 
-### Scripts raíz
+### Root scripts
 
 ```json
 {
@@ -96,40 +96,40 @@ pnpm con workspaces. Sin npm ni yarn.
 
 ## CLAUDE.md
 
-Reglas mínimas que fuerzan calidad en cada paso:
+Minimum rules that enforce quality at every step:
 
-- Ejecutar `pnpm lint` antes de cualquier commit — debe pasar sin errores ni warnings.
-- Ejecutar `pnpm test` antes de cualquier commit — todos los tests deben pasar.
-- Un paso no se considera completo hasta que ambos comandos pasen.
+- Run `pnpm lint` before any commit — must pass with no errors or warnings.
+- Run `pnpm test` before any commit — all tests must pass.
+- A step is not considered complete until both commands pass.
 
 ---
 
-## Arquitectura: FormStore
+## Architecture: FormStore
 
-El estado del formulario vive **fuera de React**, en una ref mutable. Los componentes se suscriben mediante `useSyncExternalStore` con un selector por path, consiguiendo re-renderizado granular: solo el componente cuyo `bind` coincide con el campo modificado se re-renderiza.
+The form state lives **outside React**, in a mutable ref. Components subscribe via `useSyncExternalStore` with a per-path selector, achieving granular re-rendering: only the component whose `bind` matches the modified field re-renders.
 
-### Interfaz pública del store
+### Public store interface
 
 ```ts
 interface FormStore {
-  // Para useSyncExternalStore
+  // For useSyncExternalStore
   getSnapshot(): Record<string, unknown>
   subscribe(callback: () => void): () => void
 
-  // Lectura y escritura por dot-path ("user.name" → state.user.name)
+  // Read and write by dot-path ("user.name" → state.user.name)
   getField(path: string): unknown
   setField(path: string, value: unknown): void
 }
 ```
 
-### Comportamiento
+### Behavior
 
-- **Estado interno:** objeto mutable en una ref, nunca expuesto directamente.
-- **Pub-sub:** `Set<() => void>` de suscriptores. Cada `setField` llama a todos los callbacks.
-- **Re-renderizado granular:** cada componente crea un snapshot con `() => store.getField(path)`. React solo re-renderiza si ese valor cambió.
-- **Dot-path:** `"user.name"` resuelve a `state.user.name`. Soporta anidamiento arbitrario.
+- **Internal state:** mutable object in a ref, never directly exposed.
+- **Pub-sub:** `Set<() => void>` of subscribers. Each `setField` calls all callbacks.
+- **Granular re-rendering:** each component creates a snapshot with `() => store.getField(path)`. React only re-renders if that value changed.
+- **Dot-path:** `"user.name"` resolves to `state.user.name`. Supports arbitrary nesting.
 
-### Hook interno
+### Internal hook
 
 ```ts
 function useFieldValue(store: FormStore, path: string): unknown {
@@ -140,22 +140,22 @@ function useFieldValue(store: FormStore, path: string): unknown {
 }
 ```
 
-### Complejidad estimada
+### Estimated complexity
 
-~70 líneas. Sin dependencias externas. Sin librerías de estado.
+~70 lines. No external dependencies. No state libraries.
 
 ---
 
-## API de componentes
+## Component API
 
 ### Enforma.Form
 
-Crea el `FormStore`, lo provee vía contexto React, y renderiza un `<form>` HTML nativo.
+Creates the `FormStore`, provides it via React context, and renders a native HTML `<form>`.
 
 ```tsx
 <Enforma.Form
-  values={{ name: '', email: '' }}   // estado inicial
-  onChange={(values) => void}        // callback en cada cambio
+  values={{ name: '', email: '' }}   // initial state
+  onChange={(values) => void}        // callback on every change
 >
   {children}
 </Enforma.Form>
@@ -163,17 +163,17 @@ Crea el `FormStore`, lo provee vía contexto React, y renderiza un `<form>` HTML
 
 ### Enforma.TextInput
 
-Lee y escribe en el store mediante `bind`. Renderiza solo HTML nativo (`<label>` + `<input>`). Sin dependencias externas.
+Reads and writes to the store via `bind`. Renders only native HTML (`<label>` + `<input>`). No external dependencies.
 
 ```tsx
 <Enforma.TextInput
   bind="name"
-  label="Nombre"
-  placeholder="Escribe tu nombre"
+  label="Name"
+  placeholder="Enter your name"
 />
 ```
 
-Internamente:
+Internally:
 
 ```ts
 const value = useFieldValue(store, resolvedPath)
@@ -182,7 +182,7 @@ const handleChange = (e) => store.setField(resolvedPath, e.target.value)
 
 ---
 
-## Namespace de exportación
+## Export namespace
 
 ```ts
 // packages/enforma/src/index.ts
@@ -193,36 +193,36 @@ const Enforma = { Form, TextInput }
 export default Enforma
 ```
 
-Uso del consumidor:
+Consumer usage:
 
 ```tsx
 import Enforma from 'enforma'
 
 <Enforma.Form values={state} onChange={setState}>
-  <Enforma.TextInput bind="name" label="Nombre" />
+  <Enforma.TextInput bind="name" label="Name" />
 </Enforma.Form>
 ```
 
 ---
 
-## Fuera de scope (primera iteración)
+## Out of scope (first iteration)
 
-Los siguientes conceptos están diseñados pero **no se implementan** en este paso:
+The following concepts are designed but **not implemented** in this step:
 
-- Scopes jerárquicos (`scope` prop en contenedores)
-- Atributos reactivos (props como funciones evaluadas contra el estado)
-- Validaciones y errores
-- Otros componentes (Select, Checkbox, Textarea, etc.)
-- Soporte a arrays / listas
+- Hierarchical scopes (`scope` prop on containers)
+- Reactive attributes (props as functions evaluated against state)
+- Validations and errors
+- Other components (Select, Checkbox, Textarea, etc.)
+- Array / list support
 
 ---
 
-## Decisiones de diseño
+## Design decisions
 
-| Decisión | Alternativa descartada | Razón |
+| Decision | Discarded alternative | Reason |
 |---|---|---|
-| Store custom | Zustand / Jotai / Valtio | Enforma es una librería; imponer dependencias a los consumidores es un coste alto. El store necesario son ~70 líneas. |
-| `useSyncExternalStore` | Context con valores | Context re-renderiza todos los consumidores en cada cambio. `useSyncExternalStore` con selector por path da granularidad real. |
-| ESLint flat config | `.eslintrc` legacy | ESLint 9+ deprecó el formato legacy. Flat config es el estándar actual. |
-| pnpm workspaces | Turborepo / Nx | El scope del monorepo no justifica la complejidad de Turborepo por ahora. |
-| Namespace `Enforma.Form` | Named exports | Agrupa la API bajo un objeto, evita colisiones con otras librerías, documenta la procedencia. |
+| Custom store | Zustand / Jotai / Valtio | Enforma is a library; imposing dependencies on consumers is a high cost. The required store is ~70 lines. |
+| `useSyncExternalStore` | Context with values | Context re-renders all consumers on every change. `useSyncExternalStore` with a per-path selector provides real granularity. |
+| ESLint flat config | `.eslintrc` legacy | ESLint 9+ deprecated the legacy format. Flat config is the current standard. |
+| pnpm workspaces | Turborepo / Nx | The monorepo scope does not justify Turborepo complexity for now. |
+| Namespace `Enforma.Form` | Named exports | Groups the API under an object, avoids collisions with other libraries, documents the origin. |

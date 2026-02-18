@@ -1,20 +1,20 @@
 # Enforma
 
-## Reglas obligatorias en cada paso
+## Mandatory rules at every step
 
-- Ejecutar `pnpm lint` antes de cualquier commit. Debe pasar sin errores ni warnings.
-- Ejecutar `pnpm test` antes de cualquier commit. Todos los tests deben pasar.
-- Un paso no se considera completo hasta que ambos comandos pasen sin errores.
+- Run `pnpm lint` before any commit. It must pass with no errors or warnings.
+- Run `pnpm test` before any commit. All tests must pass.
+- A step is not considered complete until both commands pass with no errors.
 
 ## Stack
 
 - pnpm workspaces (monorepo)
 - TypeScript strict
-- Vite (library mode en packages/enforma, app en apps/demo)
+- Vite (library mode in packages/enforma, app in apps/demo)
 - Vitest + @testing-library/react
-- ESLint 9 flat config con typescript-eslint strict-type-checked
+- ESLint 9 flat config with typescript-eslint strict-type-checked
 
-## Estructura
+## Structure
 
-- `packages/enforma` — librería publicable
-- `apps/demo` — playground de desarrollo
+- `packages/enforma` — publishable library
+- `apps/demo` — development playground
