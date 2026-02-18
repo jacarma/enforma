@@ -2,6 +2,7 @@
 import { useRef, type ReactNode } from 'react'
 import { FormStore, type FormValues } from '../store/FormStore'
 import { FormContext } from '../context/FormContext'
+import { ScopeContext, makeScopeValue } from '../context/ScopeContext'
 
 interface FormProps {
   values: FormValues
@@ -28,9 +29,14 @@ export function Form({
     storeRef.current = store
   }
 
+  const store = storeRef.current
+  const scopeValue = makeScopeValue(store, '')
+
   return (
-    <FormContext.Provider value={storeRef.current}>
-      <form aria-label={ariaLabel}>{children}</form>
+    <FormContext.Provider value={store}>
+      <ScopeContext.Provider value={scopeValue}>
+        <form aria-label={ariaLabel}>{children}</form>
+      </ScopeContext.Provider>
     </FormContext.Provider>
   )
 }
