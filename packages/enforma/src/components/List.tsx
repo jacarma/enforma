@@ -1,6 +1,7 @@
 // packages/enforma/src/components/List.tsx
-import { useContext, useSyncExternalStore, type ReactNode } from 'react'
-import { ScopeContext, extendPrefix } from '../context/ScopeContext'
+import { type ReactNode } from 'react'
+import { useArrayField } from '../context/ScopeContext'
+import { Scope } from './Scope'
 
 interface ListProps {
   bind: string
@@ -9,34 +10,21 @@ interface ListProps {
 }
 
 export function List({ bind, defaultItem, children }: ListProps) {
-  const parent = useContext(ScopeContext)
-  if (parent === null) {
-    throw new Error('<Enforma.List> must be used within <Enforma.Form>')
-  }
-  const { store } = parent
-  const fullPath = parent.prefix === '' ? bind : `${parent.prefix}.${bind}`
-
-  const length = useSyncExternalStore(
-    (cb) => store.subscribe(cb),
-    () => {
-      const val = store.getField(fullPath)
-      return Array.isArray(val) ? val.length : 0
-    },
-  )
+  const [arr, setArr] = useArrayField(bind)
 
   return (
-    <>
-      {Array.from({ length }, (_, index) => (
-        <ScopeContext.Provider key={index} value={extendPrefix(parent, `${bind}.${String(index)}`)}>
+    <Scope path={bind}>
+      {arr.map((_, index) => (
+        <Scope key={index} path={String(index)}>
           {children}
-          <button type="button" onClick={() => { store.removeItem(fullPath, index) }}>
+          <button type="button" onClick={() => { setArr(arr.filter((__, i) => i !== index)) }}>
             Remove
           </button>
-        </ScopeContext.Provider>
+        </Scope>
       ))}
-      <button type="button" onClick={() => { store.appendItem(fullPath, defaultItem) }}>
+      <button type="button" onClick={() => { setArr([...arr, defaultItem]) }}>
         Add
       </button>
-    </>
+    </Scope>
   )
 }

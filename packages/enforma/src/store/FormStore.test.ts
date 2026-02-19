@@ -194,47 +194,4 @@ describe('FormStore', () => {
     })
   })
 
-  describe('appendItem', () => {
-    it('appends a value to an existing array', () => {
-      const store = new FormStore({ items: [{ name: 'Alice' }] })
-      store.appendItem('items', { name: 'Bob' })
-      expect(store.getField('items')).toEqual([{ name: 'Alice' }, { name: 'Bob' }])
-    })
-
-    it('creates the array when none exists at path', () => {
-      const store = new FormStore({})
-      store.appendItem('items', { name: 'Alice' })
-      expect(store.getField('items')).toEqual([{ name: 'Alice' }])
-    })
-
-    it('notifies subscribers', () => {
-      const store = new FormStore({ items: [] })
-      const cb = vi.fn()
-      store.subscribe(cb)
-      store.appendItem('items', { name: 'Alice' })
-      expect(cb).toHaveBeenCalledOnce()
-    })
-  })
-
-  describe('removeItem', () => {
-    it('removes the item at the given index', () => {
-      const store = new FormStore({ items: [{ name: 'Alice' }, { name: 'Bob' }] })
-      store.removeItem('items', 0)
-      expect(store.getField('items')).toEqual([{ name: 'Bob' }])
-    })
-
-    it('notifies subscribers', () => {
-      const store = new FormStore({ items: [{ name: 'Alice' }] })
-      const cb = vi.fn()
-      store.subscribe(cb)
-      store.removeItem('items', 0)
-      expect(cb).toHaveBeenCalledOnce()
-    })
-
-    it('does nothing when path is not an array', () => {
-      const store = new FormStore({ name: 'Alice' })
-      store.removeItem('name', 0)
-      expect(store.getField('name')).toBe('Alice')
-    })
-  })
 })

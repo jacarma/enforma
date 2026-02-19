@@ -22,6 +22,27 @@ function joinPath(prefix: string, bind: string): string {
   return prefix === '' ? bind : `${prefix}.${bind}`
 }
 
+export function useArrayField(
+  bind: string,
+): [unknown[], (value: unknown[]) => void] {
+  const { store, prefix } = useScopeValue()
+  const fullPath = joinPath(prefix, bind)
+
+  const value = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => {
+      const fieldValue = store.getField(fullPath)
+      return Array.isArray(fieldValue) ? (fieldValue as unknown[]) : []
+    },
+  )
+
+  const setValue = (newValue: unknown[]) => {
+    store.setField(fullPath, newValue)
+  }
+
+  return [value, setValue]
+}
+
 export function useFormValue(
   bind: string,
 ): [string, (value: string) => void] {
