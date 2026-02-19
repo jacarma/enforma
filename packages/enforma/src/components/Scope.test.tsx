@@ -49,7 +49,8 @@ describe('Scope', () => {
   })
 
   it('passes scoped values as first arg and all values as second arg to reactive props', () => {
-    const receivedArgs: [unknown, unknown][] = []
+    let capturedScope: unknown
+    let capturedAll: unknown
 
     render(
       <Form
@@ -61,7 +62,8 @@ describe('Scope', () => {
             bind="city"
             label="City"
             placeholder={(scopeValues, allValues) => {
-              receivedArgs.push([scopeValues, allValues])
+              capturedScope = scopeValues
+              capturedAll = allValues
               return 'placeholder'
             }}
           />
@@ -69,16 +71,16 @@ describe('Scope', () => {
       </Form>,
     )
 
-    expect(receivedArgs.length).toBeGreaterThan(0)
-    const [scopeValues, allValues] = receivedArgs[0]
+    expect(capturedScope).toBeDefined()
     // scopeValues is the object at the 'address' prefix
-    expect(scopeValues).toEqual({ city: 'London' })
+    expect(capturedScope).toEqual({ city: 'London' })
     // allValues is the full form root
-    expect(allValues).toEqual({ name: 'Alice', address: { city: 'London' } })
+    expect(capturedAll).toEqual({ name: 'Alice', address: { city: 'London' } })
   })
 
   it('receives allValues equal to scopeValues at form root (no Scope)', () => {
-    const receivedArgs: [unknown, unknown][] = []
+    let capturedScope: unknown
+    let capturedAll: unknown
 
     render(
       <Form values={{ name: 'Alice' }} onChange={vi.fn()}>
@@ -86,16 +88,16 @@ describe('Scope', () => {
           bind="name"
           label="Name"
           placeholder={(scopeValues, allValues) => {
-            receivedArgs.push([scopeValues, allValues])
+            capturedScope = scopeValues
+            capturedAll = allValues
             return 'placeholder'
           }}
         />
       </Form>,
     )
 
-    expect(receivedArgs.length).toBeGreaterThan(0)
-    const [scopeValues, allValues] = receivedArgs[0]
-    expect(scopeValues).toEqual(allValues)
+    expect(capturedScope).toBeDefined()
+    expect(capturedScope).toEqual(capturedAll)
   })
 
   it('does not affect sibling inputs outside the Scope', async () => {
