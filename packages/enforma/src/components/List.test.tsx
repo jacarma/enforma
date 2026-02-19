@@ -1,0 +1,96 @@
+// packages/enforma/src/components/List.test.tsx
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Form } from './Form'
+import { List } from './List'
+import { Scope } from './Scope'
+import { TextInput } from './TextInput'
+
+describe('List', () => {
+  it('renders one scoped item per array element', () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    )
+    const inputs = screen.getAllByLabelText('Name')
+    expect(inputs).toHaveLength(2)
+    expect(inputs[0]).toHaveValue('Alice')
+    expect(inputs[1]).toHaveValue('Bob')
+  })
+
+  it('renders nothing when the array is empty', () => {
+    render(
+      <Form values={{ items: [] }} onChange={vi.fn()}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    )
+    expect(screen.queryAllByLabelText('Name')).toHaveLength(0)
+  })
+
+  it('scopes each item to its own index so edits do not bleed', async () => {
+    const onChange = vi.fn()
+    render(
+      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    )
+    const first: HTMLElement | undefined = screen.getAllByLabelText('Name')[0]
+    if (first === undefined) throw new Error('Expected at least one Name input')
+    await userEvent.clear(first)
+    await userEvent.type(first, 'Charlie')
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ items: [{ name: 'Charlie' }, { name: 'Bob' }] }),
+      expect.anything(),
+    )
+  })
+
+  it('appends a new item when the Add button is clicked', async () => {
+    render(
+      <Form values={{ items: [] }} onChange={vi.fn()}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }))
+    expect(screen.getAllByLabelText('Name')).toHaveLength(1)
+    expect(screen.getByLabelText('Name')).toHaveValue('')
+  })
+
+  it('removes the correct item when its Remove button is clicked', async () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    )
+    const firstRemove: HTMLElement | undefined = screen.getAllByRole('button', { name: 'Remove' })[0]
+    if (firstRemove === undefined) throw new Error('Expected at least one Remove button')
+    await userEvent.click(firstRemove)
+    const inputs = screen.getAllByLabelText('Name')
+    expect(inputs).toHaveLength(1)
+    expect(inputs[0]).toHaveValue('Bob')
+  })
+
+  it('works nested inside a Scope', () => {
+    render(
+      <Form values={{ team: { members: [{ name: 'Alice' }] } }} onChange={vi.fn()}>
+        <Scope path="team">
+          <List bind="members" defaultItem={{ name: '' }}>
+            <TextInput bind="name" label="Name" />
+          </List>
+        </Scope>
+      </Form>,
+    )
+    expect(screen.getByLabelText('Name')).toHaveValue('Alice')
+  })
+})
