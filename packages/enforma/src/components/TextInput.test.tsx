@@ -66,6 +66,40 @@ describe('TextInput', () => {
     expect(screen.getByLabelText('Email')).not.toBeDisabled()
   })
 
+  it('renders a reactive label based on form values', async () => {
+    render(
+      <Form values={{ type: 'personal', email: '' }} onChange={vi.fn()}>
+        <TextInput bind="type" label="Type" />
+        <TextInput
+          bind="email"
+          label={(_, all) => all.type === 'work' ? 'Work Email' : 'Personal Email'}
+        />
+      </Form>,
+    )
+    expect(screen.getByLabelText('Personal Email')).toBeInTheDocument()
+    await userEvent.clear(screen.getByLabelText('Type'))
+    await userEvent.type(screen.getByLabelText('Type'), 'work')
+    expect(screen.getByLabelText('Work Email')).toBeInTheDocument()
+  })
+
+  it('renders a reactive placeholder based on form values', async () => {
+    render(
+      <Form values={{ name: '', email: '' }} onChange={vi.fn()}>
+        <TextInput bind="name" label="Name" />
+        <TextInput
+          bind="email"
+          label="Email"
+          placeholder={(_, all) =>
+            all.name === '' ? 'Enter your email' : `Enter email for ${String(all.name)}`
+          }
+        />
+      </Form>,
+    )
+    expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument()
+    await userEvent.type(screen.getByLabelText('Name'), 'Alice')
+    expect(screen.getByPlaceholderText('Enter email for Alice')).toBeInTheDocument()
+  })
+
   it('only re-renders when its own bound field changes', async () => {
     let nameRenderCount = 0
     let emailRenderCount = 0
