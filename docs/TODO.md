@@ -1,38 +1,10 @@
 # Enforma — TODO
 
-## Task 2: Reactive attributes
+## Task 5: Types in demo app
 
-Props as functions evaluated against the current form state.
+- A lot of type errors because all being untyped
 
-```tsx
-<Enforma.TextInput
-  bind="email"
-  disabled={(values) => !values.name}
-/>
-```
-
-## Task 3: Validation and errors
-
-Field-level and form-level validation with error display.
-
-```tsx
-<Enforma.TextInput
-  bind="email"
-  rules={{ required: true, pattern: /\S+@\S+/ }}
-/>
-```
-
-## Task 4: Array / list support
-
-Repeated sections driven by array data.
-
-```tsx
-<Enforma.List bind="items">
-  {(item) => <Enforma.TextInput bind="name" />}
-</Enforma.List>
-```
-
-## Task 5: More components
+## Task 6: More components
 
 - `Enforma.Select`
 - `Enforma.Checkbox`
