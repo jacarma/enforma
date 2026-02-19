@@ -33,7 +33,10 @@ describe('TextInput', () => {
     const onChange = vi.fn()
     renderWithForm({ name: '' }, onChange)
     await userEvent.type(screen.getByLabelText('Name'), 'Bob')
-    expect(onChange).toHaveBeenLastCalledWith({ name: 'Bob' })
+    expect(onChange).toHaveBeenLastCalledWith(
+      { name: 'Bob' },
+      { isValid: true, errors: {} },
+    )
   })
 
   it('renders a placeholder when provided', () => {
@@ -98,6 +101,102 @@ describe('TextInput', () => {
     expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument()
     await userEvent.type(screen.getByLabelText('Name'), 'Alice')
     expect(screen.getByPlaceholderText('Enter email for Alice')).toBeInTheDocument()
+  })
+
+  describe('validation', () => {
+    it('does not show an error initially even when validate returns one', () => {
+      render(
+        <Form values={{ name: '' }} onChange={vi.fn()}>
+          <TextInput
+            bind="name"
+            label="Name"
+            validate={(v) => (v === '' ? 'required' : null)}
+          />
+        </Form>,
+      )
+      expect(screen.queryByText('required')).not.toBeInTheDocument()
+    })
+
+    it('shows the error after the field is blurred', async () => {
+      render(
+        <Form values={{ name: '' }} onChange={vi.fn()}>
+          <TextInput
+            bind="name"
+            label="Name"
+            validate={(v) => (v === '' ? 'required' : null)}
+          />
+        </Form>,
+      )
+      await userEvent.click(screen.getByLabelText('Name'))
+      await userEvent.tab()
+      expect(screen.getByText('required')).toBeInTheDocument()
+    })
+
+    it('hides the error once the user fixes the value after blur', async () => {
+      render(
+        <Form values={{ name: '' }} onChange={vi.fn()}>
+          <TextInput
+            bind="name"
+            label="Name"
+            validate={(v) => (v === '' ? 'required' : null)}
+          />
+        </Form>,
+      )
+      await userEvent.click(screen.getByLabelText('Name'))
+      await userEvent.tab()
+      expect(screen.getByText('required')).toBeInTheDocument()
+      await userEvent.type(screen.getByLabelText('Name'), 'Alice')
+      expect(screen.queryByText('required')).not.toBeInTheDocument()
+    })
+
+    it('shows the error immediately when Form has showErrors', () => {
+      render(
+        <Form values={{ name: '' }} onChange={vi.fn()} showErrors>
+          <TextInput
+            bind="name"
+            label="Name"
+            validate={(v) => (v === '' ? 'required' : null)}
+          />
+        </Form>,
+      )
+      expect(screen.getByText('required')).toBeInTheDocument()
+    })
+
+    it('does not show an error when validate returns null', () => {
+      render(
+        <Form values={{ name: 'Alice' }} onChange={vi.fn()} showErrors>
+          <TextInput
+            bind="name"
+            label="Name"
+            validate={(v) => (v === '' ? 'required' : null)}
+          />
+        </Form>,
+      )
+      expect(screen.queryByText('required')).not.toBeInTheDocument()
+    })
+
+    it('updates error reactively when another field changes', async () => {
+      render(
+        <Form values={{ password: '', confirm: '' }} onChange={vi.fn()}>
+          <TextInput bind="password" label="Password" />
+          <TextInput
+            bind="confirm"
+            label="Confirm"
+            validate={(v, _, all) =>
+              v !== all.password ? 'Passwords do not match' : null
+            }
+          />
+        </Form>,
+      )
+      // Touch the confirm field so errors are visible
+      await userEvent.click(screen.getByLabelText('Confirm'))
+      await userEvent.tab()
+      // Both are empty so they match — no error yet
+      expect(screen.queryByText('Passwords do not match')).not.toBeInTheDocument()
+      // Type in password — confirm should re-validate reactively
+      await userEvent.type(screen.getByLabelText('Password'), 'secret')
+      expect(screen.getByText('Passwords do not match')).toBeInTheDocument()
+    })
   })
 
   it('only re-renders when its own bound field changes', async () => {

@@ -17,7 +17,10 @@ describe('Scope', () => {
       </Form>,
     )
     await userEvent.type(screen.getByLabelText('City'), 'London')
-    expect(onChange).toHaveBeenLastCalledWith({ address: { city: 'London' } })
+    expect(onChange).toHaveBeenLastCalledWith(
+      { address: { city: 'London' } },
+      { isValid: true, errors: {} },
+    )
   })
 
   it('displays the initial value from the scoped path', () => {
@@ -43,9 +46,10 @@ describe('Scope', () => {
       </Form>,
     )
     await userEvent.type(screen.getByLabelText('Line 1'), 'Baker St')
-    expect(onChange).toHaveBeenLastCalledWith({
-      address: { street: { line1: 'Baker St' } },
-    })
+    expect(onChange).toHaveBeenLastCalledWith(
+      { address: { street: { line1: 'Baker St' } } },
+      { isValid: true, errors: {} },
+    )
   })
 
   it('passes scoped values as first arg and all values as second arg to reactive props', () => {
@@ -111,6 +115,9 @@ describe('Scope', () => {
       </Form>,
     )
     await userEvent.type(screen.getByLabelText('Name'), 'Alice')
-    expect(onChange).toHaveBeenLastCalledWith({ name: 'Alice', address: { city: '' } })
+    expect(onChange).toHaveBeenLastCalledWith(
+      { name: 'Alice', address: { city: '' } },
+      { isValid: true, errors: {} },
+    )
   })
 })
