@@ -1,4 +1,3 @@
-// packages/enforma/src/store/FormStore.ts
 type Subscriber = () => void
 export type FormValues = Record<string, unknown>
 
@@ -29,9 +28,19 @@ function setByPath(obj: FormValues, path: string, value: unknown): FormValues {
 export class FormStore {
   private _values: FormValues
   private readonly _subscribers = new Set<Subscriber>()
+  private readonly _touched = new Set<string>()
+  private _submitted = false
+  private readonly _errors = new Map<string, string | null>()
+  private readonly _validators = new Map<string, () => string | null>()
 
   constructor(initialValues: FormValues) {
     this._values = { ...initialValues }
+  }
+
+  private notifySubscribers(): void {
+    for (const cb of this._subscribers) {
+      cb()
+    }
   }
 
   getSnapshot(): FormValues {
@@ -51,8 +60,57 @@ export class FormStore {
 
   setField(path: string, value: unknown): void {
     this._values = setByPath(this._values, path, value)
-    for (const cb of this._subscribers) {
-      cb()
+    this.runAllValidators()
+    this.notifySubscribers()
+  }
+
+  registerValidator(path: string, fn: () => string | null): () => void {
+    this._validators.set(path, fn)
+    this._errors.set(path, fn())
+    this.notifySubscribers()
+    return () => {
+      this._validators.delete(path)
+      this._errors.delete(path)
     }
+  }
+
+  runAllValidators(): void {
+    for (const [path, fn] of this._validators) {
+      this._errors.set(path, fn())
+    }
+  }
+
+  touchField(path: string): void {
+    this._touched.add(path)
+    this.notifySubscribers()
+  }
+
+  setSubmitted(): void {
+    this._submitted = true
+    this.runAllValidators()
+    this.notifySubscribers()
+  }
+
+  getError(path: string): string | null {
+    return this._errors.get(path) ?? null
+  }
+
+  getErrors(): Record<string, string | null> {
+    return Object.fromEntries(this._errors)
+  }
+
+  isTouched(path: string): boolean {
+    return this._touched.has(path)
+  }
+
+  isSubmitted(): boolean {
+    return this._submitted
+  }
+
+  isValid(): boolean {
+    for (const error of this._errors.values()) {
+      if (error !== null) return false
+    }
+    return true
   }
 }

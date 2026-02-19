@@ -81,4 +81,116 @@ describe('FormStore', () => {
       expect(before).not.toBe(after)
     })
   })
+
+  describe('registerValidator', () => {
+    it('initializes the error immediately on registration', () => {
+      const store = new FormStore({ name: '' })
+      store.registerValidator('name', () => 'required')
+      expect(store.getError('name')).toBe('required')
+    })
+
+    it('initializes null when the validator passes', () => {
+      const store = new FormStore({ name: 'Alice' })
+      store.registerValidator('name', () => null)
+      expect(store.getError('name')).toBeNull()
+    })
+
+    it('returns an unregister function that removes the validator and error', () => {
+      const store = new FormStore({ name: '' })
+      const unregister = store.registerValidator('name', () => 'required')
+      unregister()
+      expect(store.getError('name')).toBeNull()
+    })
+
+    it('notifies subscribers after registration', () => {
+      const store = new FormStore({ name: '' })
+      const cb = vi.fn()
+      store.subscribe(cb)
+      store.registerValidator('name', () => 'required')
+      expect(cb).toHaveBeenCalledOnce()
+    })
+  })
+
+  describe('touchField', () => {
+    it('marks the field as touched', () => {
+      const store = new FormStore({ name: '' })
+      expect(store.isTouched('name')).toBe(false)
+      store.touchField('name')
+      expect(store.isTouched('name')).toBe(true)
+    })
+
+    it('notifies subscribers', () => {
+      const store = new FormStore({ name: '' })
+      const cb = vi.fn()
+      store.subscribe(cb)
+      store.touchField('name')
+      expect(cb).toHaveBeenCalledOnce()
+    })
+  })
+
+  describe('setSubmitted', () => {
+    it('marks the form as submitted', () => {
+      const store = new FormStore({})
+      expect(store.isSubmitted()).toBe(false)
+      store.setSubmitted()
+      expect(store.isSubmitted()).toBe(true)
+    })
+
+    it('re-runs all validators and updates errors', () => {
+      const store = new FormStore({ name: '' })
+      store.registerValidator('name', () =>
+        store.getField('name') === '' ? 'required' : null,
+      )
+      store.setSubmitted()
+      expect(store.getError('name')).toBe('required')
+    })
+
+    it('notifies subscribers', () => {
+      const store = new FormStore({})
+      const cb = vi.fn()
+      store.subscribe(cb)
+      store.setSubmitted()
+      expect(cb).toHaveBeenCalledOnce()
+    })
+  })
+
+  describe('isValid', () => {
+    it('returns true when no validators are registered', () => {
+      const store = new FormStore({})
+      expect(store.isValid()).toBe(true)
+    })
+
+    it('returns true when all validators pass', () => {
+      const store = new FormStore({ name: 'Alice' })
+      store.registerValidator('name', () => null)
+      expect(store.isValid()).toBe(true)
+    })
+
+    it('returns false when any validator has an error', () => {
+      const store = new FormStore({ name: '' })
+      store.registerValidator('name', () => 'required')
+      expect(store.isValid()).toBe(false)
+    })
+  })
+
+  describe('getErrors', () => {
+    it('returns all current errors as a plain object', () => {
+      const store = new FormStore({ name: '', email: 'a@b.com' })
+      store.registerValidator('name', () => 'required')
+      store.registerValidator('email', () => null)
+      expect(store.getErrors()).toEqual({ name: 'required', email: null })
+    })
+  })
+
+  describe('setField re-runs validators', () => {
+    it('re-runs all validators after a field change', () => {
+      const store = new FormStore({ name: '' })
+      store.registerValidator('name', () =>
+        store.getField('name') === '' ? 'required' : null,
+      )
+      expect(store.getError('name')).toBe('required')
+      store.setField('name', 'Alice')
+      expect(store.getError('name')).toBeNull()
+    })
+  })
 })
