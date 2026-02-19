@@ -64,6 +64,22 @@ export class FormStore {
     this.notifySubscribers()
   }
 
+  appendItem(path: string, value: unknown): void {
+    const current = getByPath(this._values, path)
+    const arr: unknown[] = Array.isArray(current) ? (current as unknown[]) : []
+    this._values = setByPath(this._values, path, [...arr, value])
+    this.runAllValidators()
+    this.notifySubscribers()
+  }
+
+  removeItem(path: string, index: number): void {
+    const current = getByPath(this._values, path)
+    if (!Array.isArray(current)) return
+    this._values = setByPath(this._values, path, current.filter((_, i) => i !== index))
+    this.runAllValidators()
+    this.notifySubscribers()
+  }
+
   registerValidator(path: string, fn: () => string | null): () => void {
     this._validators.set(path, fn)
     this._errors.set(path, fn())
