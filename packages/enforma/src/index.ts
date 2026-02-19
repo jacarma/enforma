@@ -7,3 +7,4 @@ const Enforma = { Form, TextInput, Scope } as const
 
 export default Enforma
 export type { FormValues } from './store/FormStore'
+export type { Reactive } from './context/ScopeContext'

@@ -1,27 +1,33 @@
 // packages/enforma/src/components/TextInput.tsx
 import { useId } from 'react'
-import { useFormValue } from '../context/ScopeContext'
+import { useFormValue, useReactiveProp } from '../context/ScopeContext'
+import type { Reactive } from '../context/ScopeContext'
 
 interface TextInputProps {
   bind: string
-  label?: string
-  placeholder?: string
+  label?: Reactive<string>
+  placeholder?: Reactive<string>
+  disabled?: Reactive<boolean>
   id?: string
 }
 
-export function TextInput({ bind, label, placeholder, id }: TextInputProps) {
+export function TextInput({ bind, label, disabled, placeholder, id }: TextInputProps) {
   const [value, setValue] = useFormValue(bind)
   const generatedId = useId()
   const inputId = id ?? generatedId
+  const resolvedLabel = useReactiveProp(label)
+  const resolvedDisabled = useReactiveProp(disabled)
+  const resolvedPlaceholder = useReactiveProp(placeholder)
 
   return (
     <div>
-      {label !== undefined && <label htmlFor={inputId}>{label}</label>}
+      {resolvedLabel !== undefined && <label htmlFor={inputId}>{resolvedLabel}</label>}
       <input
         id={inputId}
         type="text"
         value={value}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
+        disabled={resolvedDisabled}
         onChange={(e) => {
           setValue(e.target.value)
         }}

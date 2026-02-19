@@ -45,6 +45,27 @@ describe('TextInput', () => {
     expect(screen.getByPlaceholderText('Enter name')).toBeInTheDocument()
   })
 
+  it('disables the input when disabled prop is a function returning true', () => {
+    render(
+      <Form values={{ name: '', email: '' }} onChange={vi.fn()}>
+        <TextInput bind="email" label="Email" disabled={(_, all) => all.name === ''} />
+      </Form>,
+    )
+    expect(screen.getByLabelText('Email')).toBeDisabled()
+  })
+
+  it('re-enables the input when the reactive disabled function returns false', async () => {
+    render(
+      <Form values={{ name: '', email: '' }} onChange={vi.fn()}>
+        <TextInput bind="name" label="Name" />
+        <TextInput bind="email" label="Email" disabled={(_, all) => all.name === ''} />
+      </Form>,
+    )
+    expect(screen.getByLabelText('Email')).toBeDisabled()
+    await userEvent.type(screen.getByLabelText('Name'), 'Alice')
+    expect(screen.getByLabelText('Email')).not.toBeDisabled()
+  })
+
   it('only re-renders when its own bound field changes', async () => {
     let nameRenderCount = 0
     let emailRenderCount = 0
