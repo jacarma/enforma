@@ -1,6 +1,7 @@
 // packages/enforma/src/context/ScopeContext.ts
-import { createContext, useContext, useSyncExternalStore } from 'react'
+import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react'
 import type { FormStore, FormValues } from '../store/FormStore'
+import { useFormSettings } from './FormSettingsContext'
 
 interface ScopeValue {
   store: FormStore
@@ -73,4 +74,86 @@ export function makeScopeValue(store: FormStore, prefix: string): ScopeValue {
 
 export function extendPrefix(parent: ScopeValue, path: string): ScopeValue {
   return { store: parent.store, prefix: joinPath(parent.prefix, path) }
+}
+
+export function useFieldValidation(
+  bind: string,
+  validate: ((value: unknown, scopeValues: FormValues, allValues: FormValues) => string | null) | undefined,
+  localMessages: Partial<Record<string, string>> | undefined,
+  implicitValidator?: () => string | null,
+): { error: string | null; showError: boolean; onBlur: () => void } {
+  const { store, prefix } = useScopeValue()
+  const { showErrors: formShowErrors, messages: formMessages } = useFormSettings()
+  const fullPath = joinPath(prefix, bind)
+
+  // Use refs so the registered validator always sees latest props without re-registering.
+  const validateRef = useRef(validate)
+  validateRef.current = validate
+
+  const localMessagesRef = useRef(localMessages)
+  localMessagesRef.current = localMessages
+
+  const formMessagesRef = useRef(formMessages)
+  formMessagesRef.current = formMessages
+
+  const implicitValidatorRef = useRef(implicitValidator)
+  implicitValidatorRef.current = implicitValidator
+
+  useEffect(() => {
+    // Skip registration when there is nothing to validate.
+    if (validateRef.current === undefined && implicitValidatorRef.current === undefined) return
+
+    const combinedValidator = (): string | null => {
+      // 1. Implicit check — returns a message key (e.g. "invalidDate") or null.
+      const implicitFn = implicitValidatorRef.current
+      if (implicitFn !== undefined) {
+        const key = implicitFn()
+        if (key !== null) {
+          return (
+            localMessagesRef.current?.[key] ??
+            formMessagesRef.current[key] ??
+            key
+          )
+        }
+      }
+
+      // 2. User's validate fn — only runs if implicit check passes.
+      const validateFn = validateRef.current
+      if (validateFn !== undefined) {
+        const fieldValue = store.getField(fullPath)
+        const allValues = store.getSnapshot()
+        const raw = prefix === '' ? allValues : store.getField(prefix)
+        const scopeValues: FormValues =
+          raw === null || typeof raw !== 'object' ? allValues : (raw as FormValues)
+        return validateFn(fieldValue, scopeValues, allValues)
+      }
+
+      return null
+    }
+
+    return store.registerValidator(fullPath, combinedValidator)
+  }, [store, fullPath, prefix])
+
+  const error = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.getError(fullPath),
+  )
+
+  const isTouched = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.isTouched(fullPath),
+  )
+
+  const isSubmitted = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.isSubmitted(),
+  )
+
+  const showError = (isTouched || isSubmitted || formShowErrors) && error !== null
+
+  const onBlur = () => {
+    store.touchField(fullPath)
+  }
+
+  return { error, showError, onBlur }
 }
