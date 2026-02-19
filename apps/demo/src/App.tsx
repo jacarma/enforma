@@ -19,9 +19,18 @@ const REACTIVE_INITIAL: FormValues = {
   contact: '',
 }
 
+const SIGNUP_INITIAL: FormValues = {
+  name: '',
+  email: '',
+  password: '',
+  confirm: '',
+}
+
 export function App() {
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES)
   const [reactiveValues, setReactiveValues] = useState<FormValues>(REACTIVE_INITIAL)
+  const [signupValues, setSignupValues] = useState<FormValues>(SIGNUP_INITIAL)
+  const [submitted, setSubmitted] = useState<FormValues | null>(null)
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -83,6 +92,61 @@ export function App() {
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(reactiveValues, null, 2)}
       </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Validation</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Errors appear after blur. Submitting while invalid reveals all errors and blocks{' '}
+        <code>onSubmit</code>.
+      </p>
+
+      {submitted !== null ? (
+        <div>
+          <p style={{ color: 'green', fontWeight: 'bold' }}>Submitted!</p>
+          <pre style={{ background: '#f4f4f4', padding: '1rem' }}>
+            {JSON.stringify(submitted, null, 2)}
+          </pre>
+          <button onClick={() => { setSubmitted(null); setSignupValues(SIGNUP_INITIAL) }}>
+            Reset
+          </button>
+        </div>
+      ) : (
+        <Enforma.Form
+          values={signupValues}
+          onChange={setSignupValues}
+          onSubmit={setSubmitted}
+          aria-label="signup form"
+        >
+          <Enforma.TextInput
+            bind="name"
+            label="Name"
+            placeholder="Your name"
+            validate={(v) => (v === '' ? 'Name is required' : null)}
+          />
+          <Enforma.TextInput
+            bind="email"
+            label="Email"
+            placeholder="you@example.com"
+            validate={(v) => (v === '' ? 'Email is required' : null)}
+          />
+          <Enforma.TextInput
+            bind="password"
+            label="Password"
+            placeholder="Choose a password"
+            validate={(v) => (v === '' ? 'Password is required' : null)}
+          />
+          <Enforma.TextInput
+            bind="confirm"
+            label="Confirm password"
+            placeholder="Repeat your password"
+            validate={(v, _, all) =>
+              v !== all.password ? 'Passwords do not match' : null
+            }
+          />
+          <button type="submit" style={{ marginTop: '0.5rem' }}>Sign up</button>
+        </Enforma.Form>
+      )}
     </div>
   )
 }
