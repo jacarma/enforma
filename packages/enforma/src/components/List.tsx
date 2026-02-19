@@ -1,6 +1,7 @@
 // packages/enforma/src/components/List.tsx
+// packages/enforma/src/components/List.tsx
 import { type ReactNode } from 'react'
-import { useArrayField } from '../context/ScopeContext'
+import { useFormValue } from '../context/ScopeContext'
 import { Scope } from './Scope'
 
 interface ListProps {
@@ -10,7 +11,8 @@ interface ListProps {
 }
 
 export function List({ bind, defaultItem, children }: ListProps) {
-  const [arr, setArr] = useArrayField(bind)
+  const [rawArr, setArr] = useFormValue<unknown[]>(bind)
+  const arr = rawArr ?? []
 
   return (
     <Scope path={bind}>
