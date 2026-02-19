@@ -48,6 +48,56 @@ describe('Scope', () => {
     })
   })
 
+  it('passes scoped values as first arg and all values as second arg to reactive props', () => {
+    const receivedArgs: [unknown, unknown][] = []
+
+    render(
+      <Form
+        values={{ name: 'Alice', address: { city: 'London' } }}
+        onChange={vi.fn()}
+      >
+        <Scope path="address">
+          <TextInput
+            bind="city"
+            label="City"
+            placeholder={(scopeValues, allValues) => {
+              receivedArgs.push([scopeValues, allValues])
+              return 'placeholder'
+            }}
+          />
+        </Scope>
+      </Form>,
+    )
+
+    expect(receivedArgs.length).toBeGreaterThan(0)
+    const [scopeValues, allValues] = receivedArgs[0]
+    // scopeValues is the object at the 'address' prefix
+    expect(scopeValues).toEqual({ city: 'London' })
+    // allValues is the full form root
+    expect(allValues).toEqual({ name: 'Alice', address: { city: 'London' } })
+  })
+
+  it('receives allValues equal to scopeValues at form root (no Scope)', () => {
+    const receivedArgs: [unknown, unknown][] = []
+
+    render(
+      <Form values={{ name: 'Alice' }} onChange={vi.fn()}>
+        <TextInput
+          bind="name"
+          label="Name"
+          placeholder={(scopeValues, allValues) => {
+            receivedArgs.push([scopeValues, allValues])
+            return 'placeholder'
+          }}
+        />
+      </Form>,
+    )
+
+    expect(receivedArgs.length).toBeGreaterThan(0)
+    const [scopeValues, allValues] = receivedArgs[0]
+    expect(scopeValues).toEqual(allValues)
+  })
+
   it('does not affect sibling inputs outside the Scope', async () => {
     const onChange = vi.fn()
     render(
