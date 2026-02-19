@@ -193,4 +193,5 @@ describe('FormStore', () => {
       expect(store.getError('name')).toBeNull()
     })
   })
+
 })

@@ -18,6 +18,22 @@ function setByPath(obj: FormValues, path: string, value: unknown): FormValues {
   const key = path.slice(0, dotIndex)
   const rest = path.slice(dotIndex + 1)
   const existing = obj[key]
+  if (Array.isArray(existing)) {
+    const restDotIndex = rest.indexOf('.')
+    const indexStr = restDotIndex === -1 ? rest : rest.slice(0, restDotIndex)
+    const afterIndex = restDotIndex === -1 ? '' : rest.slice(restDotIndex + 1)
+    const index = parseInt(indexStr, 10)
+    const newArr = [...(existing as unknown[])]
+    if (afterIndex === '') {
+      newArr[index] = value
+    } else {
+      const item = existing[index] as unknown
+      const itemObj: FormValues =
+        item !== null && typeof item === 'object' ? { ...(item as FormValues) } : {}
+      newArr[index] = setByPath(itemObj, afterIndex, value)
+    }
+    return { ...obj, [key]: newArr }
+  }
   const nested: FormValues =
     existing !== null && typeof existing === 'object'
       ? { ...(existing as FormValues) }

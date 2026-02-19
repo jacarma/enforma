@@ -22,21 +22,18 @@ function joinPath(prefix: string, bind: string): string {
   return prefix === '' ? bind : `${prefix}.${bind}`
 }
 
-export function useFormValue(
+export function useFormValue<T>(
   bind: string,
-): [string, (value: string) => void] {
+): [T | undefined, (value: T) => void] {
   const { store, prefix } = useScopeValue()
   const fullPath = joinPath(prefix, bind)
 
   const value = useSyncExternalStore(
     (cb) => store.subscribe(cb),
-    () => {
-      const fieldValue = store.getField(fullPath)
-      return typeof fieldValue === 'string' ? fieldValue : ''
-    },
+    () => store.getField(fullPath) as T | undefined,
   )
 
-  const setValue = (newValue: string) => {
+  const setValue = (newValue: T) => {
     store.setField(fullPath, newValue)
   }
 

@@ -26,11 +26,16 @@ const SIGNUP_INITIAL: FormValues = {
   confirm: '',
 }
 
+const LIST_INITIAL: FormValues = {
+  members: [{ name: 'Alice' }, { name: 'Bob' }],
+}
+
 export function App() {
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES)
   const [reactiveValues, setReactiveValues] = useState<FormValues>(REACTIVE_INITIAL)
   const [signupValues, setSignupValues] = useState<FormValues>(SIGNUP_INITIAL)
   const [submitted, setSubmitted] = useState<FormValues | null>(null)
+  const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL)
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -147,6 +152,23 @@ export function App() {
           <button type="submit" style={{ marginTop: '0.5rem' }}>Sign up</button>
         </Enforma.Form>
       )}
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>List</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Repeated sections driven by an array. Each item is scoped automatically.
+      </p>
+
+      <Enforma.Form values={listValues} onChange={setListValues} aria-label="list demo form">
+        <Enforma.List bind="members" defaultItem={{ name: '' }}>
+          <Enforma.TextInput bind="name" label="Name" />
+        </Enforma.List>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(listValues, null, 2)}
+      </pre>
     </div>
   )
 }

@@ -22,7 +22,8 @@ export function TextInput({
   validate,
   messages,
 }: TextInputProps) {
-  const [value, setValue] = useFormValue(bind)
+  const [rawValue, setValue] = useFormValue<string>(bind)
+  const value = rawValue ?? ''
   const generatedId = useId()
   const inputId = id ?? generatedId
   const errorId = `${inputId}-error`
