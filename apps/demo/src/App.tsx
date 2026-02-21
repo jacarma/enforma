@@ -119,25 +119,27 @@ export function App() {
             bind="name"
             label="Name"
             placeholder="Your name"
-            validate={(v) => (v === '' ? 'Name is required' : null)}
+            validate={(v) => (!v ? 'Name is required' : null)}
           />
           <Enforma.TextInput
             bind="email"
             label="Email"
             placeholder="you@example.com"
-            validate={(v) => (v === '' ? 'Email is required' : null)}
+            validate={(v) => (!v ? 'Email is required' : null)}
           />
           <Enforma.TextInput
             bind="password"
             label="Password"
             placeholder="Choose a password"
-            validate={(v) => (v === '' ? 'Password is required' : null)}
+            validate={(v) => (!v ? 'Password is required' : null)}
           />
           <Enforma.TextInput
             bind="confirm"
             label="Confirm password"
             placeholder="Repeat your password"
-            validate={(v, _, all) => (v !== all.password ? 'Passwords do not match' : null)}
+            validate={(v, { password }) =>
+              v || password ? (v !== password ? 'Passwords do not match' : null) : null
+            }
           />
           <button type="submit" style={{ marginTop: '0.5rem' }}>
             Sign up
