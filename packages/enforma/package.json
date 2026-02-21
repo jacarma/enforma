@@ -6,8 +6,10 @@
   "main": "./dist/enforma.cjs",
   "module": "./dist/enforma.js",
   "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/enforma.js",
       "require": "./dist/enforma.cjs"
