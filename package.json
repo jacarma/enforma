@@ -5,7 +5,9 @@
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "build": "pnpm -r --filter './packages/*' build",
-    "dev": "pnpm --filter demo dev"
+    "dev": "pnpm --filter demo dev",
+    "typecheck": "pnpm -r typecheck",
+    "typecheck:watch": "pnpm -r --parallel typecheck:watch"
   },
   "engines": {
     "node": ">=20",

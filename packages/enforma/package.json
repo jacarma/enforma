@@ -21,7 +21,9 @@
     "dev": "vite build --watch",
     "lint": "eslint src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch"
   },
   "engines": {
     "node": ">=20",
