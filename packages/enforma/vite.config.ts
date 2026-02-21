@@ -1,13 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import dts from 'vite-plugin-dts'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import dts from 'vite-plugin-dts';
+import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    dts({ include: ['src'], exclude: ['src/**/*.test.*', 'src/test'] }),
-  ],
+  plugins: [react(), dts({ include: ['src'], exclude: ['src/**/*.test.*', 'src/test'] })],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
@@ -28,7 +25,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/test/setup.tsx'],
     passWithNoTests: true,
     coverage: {
       provider: 'v8',
@@ -37,4 +34,4 @@ export default defineConfig({
       exclude: ['src/**/*.test.*', 'src/test/**'],
     },
   },
-})
+});
