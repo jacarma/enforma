@@ -1,27 +1,27 @@
 // packages/enforma/src/components/Scope.test.tsx
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { Form } from './Form'
-import { TextInput } from './TextInput'
-import { Scope } from './Scope'
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Form } from './Form';
+import { TextInput } from './component-wrap';
+import { Scope } from './Scope';
 
 describe('Scope', () => {
   it('prefixes bind paths for child inputs', async () => {
-    const onChange = vi.fn()
+    const onChange = vi.fn();
     render(
       <Form values={{ address: { city: '' } }} onChange={onChange}>
         <Scope path="address">
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,
-    )
-    await userEvent.type(screen.getByLabelText('City'), 'London')
+    );
+    await userEvent.type(screen.getByLabelText('City'), 'London');
     expect(onChange).toHaveBeenLastCalledWith(
       { address: { city: 'London' } },
       { isValid: true, errors: {} },
-    )
-  })
+    );
+  });
 
   it('displays the initial value from the scoped path', () => {
     render(
@@ -30,12 +30,12 @@ describe('Scope', () => {
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,
-    )
-    expect(screen.getByLabelText('City')).toHaveValue('Paris')
-  })
+    );
+    expect(screen.getByLabelText('City')).toHaveValue('Paris');
+  });
 
   it('supports nested Scopes', async () => {
-    const onChange = vi.fn()
+    const onChange = vi.fn();
     render(
       <Form values={{ address: { street: { line1: '' } } }} onChange={onChange}>
         <Scope path="address">
@@ -44,47 +44,44 @@ describe('Scope', () => {
           </Scope>
         </Scope>
       </Form>,
-    )
-    await userEvent.type(screen.getByLabelText('Line 1'), 'Baker St')
+    );
+    await userEvent.type(screen.getByLabelText('Line 1'), 'Baker St');
     expect(onChange).toHaveBeenLastCalledWith(
       { address: { street: { line1: 'Baker St' } } },
       { isValid: true, errors: {} },
-    )
-  })
+    );
+  });
 
   it('passes scoped values as first arg and all values as second arg to reactive props', () => {
-    let capturedScope: unknown
-    let capturedAll: unknown
+    let capturedScope: unknown;
+    let capturedAll: unknown;
 
     render(
-      <Form
-        values={{ name: 'Alice', address: { city: 'London' } }}
-        onChange={vi.fn()}
-      >
+      <Form values={{ name: 'Alice', address: { city: 'London' } }} onChange={vi.fn()}>
         <Scope path="address">
           <TextInput
             bind="city"
             label="City"
             placeholder={(scopeValues, allValues) => {
-              capturedScope = scopeValues
-              capturedAll = allValues
-              return 'placeholder'
+              capturedScope = scopeValues;
+              capturedAll = allValues;
+              return 'placeholder';
             }}
           />
         </Scope>
       </Form>,
-    )
+    );
 
-    expect(capturedScope).toBeDefined()
+    expect(capturedScope).toBeDefined();
     // scopeValues is the object at the 'address' prefix
-    expect(capturedScope).toEqual({ city: 'London' })
+    expect(capturedScope).toEqual({ city: 'London' });
     // allValues is the full form root
-    expect(capturedAll).toEqual({ name: 'Alice', address: { city: 'London' } })
-  })
+    expect(capturedAll).toEqual({ name: 'Alice', address: { city: 'London' } });
+  });
 
   it('receives allValues equal to scopeValues at form root (no Scope)', () => {
-    let capturedScope: unknown
-    let capturedAll: unknown
+    let capturedScope: unknown;
+    let capturedAll: unknown;
 
     render(
       <Form values={{ name: 'Alice' }} onChange={vi.fn()}>
@@ -92,20 +89,20 @@ describe('Scope', () => {
           bind="name"
           label="Name"
           placeholder={(scopeValues, allValues) => {
-            capturedScope = scopeValues
-            capturedAll = allValues
-            return 'placeholder'
+            capturedScope = scopeValues;
+            capturedAll = allValues;
+            return 'placeholder';
           }}
         />
       </Form>,
-    )
+    );
 
-    expect(capturedScope).toBeDefined()
-    expect(capturedScope).toEqual(capturedAll)
-  })
+    expect(capturedScope).toBeDefined();
+    expect(capturedScope).toEqual(capturedAll);
+  });
 
   it('does not affect sibling inputs outside the Scope', async () => {
-    const onChange = vi.fn()
+    const onChange = vi.fn();
     render(
       <Form values={{ name: '', address: { city: '' } }} onChange={onChange}>
         <TextInput bind="name" label="Name" />
@@ -113,11 +110,11 @@ describe('Scope', () => {
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,
-    )
-    await userEvent.type(screen.getByLabelText('Name'), 'Alice')
+    );
+    await userEvent.type(screen.getByLabelText('Name'), 'Alice');
     expect(onChange).toHaveBeenLastCalledWith(
       { name: 'Alice', address: { city: '' } },
       { isValid: true, errors: {} },
-    )
-  })
-})
+    );
+  });
+});

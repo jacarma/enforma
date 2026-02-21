@@ -1,23 +1,23 @@
-import { useRef, type ReactNode, type FormEvent } from 'react'
-import { FormStore, type FormValues } from '../store/FormStore'
-import { FormContext } from '../context/FormContext'
-import { FormSettingsContext } from '../context/FormSettingsContext'
-import { ScopeContext, makeScopeValue } from '../context/ScopeContext'
+import { useRef, type ReactNode, type FormEvent } from 'react';
+import { FormStore, type FormValues } from '../store/FormStore';
+import { FormContext } from '../context/FormContext';
+import { FormSettingsContext } from '../context/FormSettingsContext';
+import { ScopeContext, makeScopeValue } from '../context/ScopeContext';
 
-interface ValidationState {
-  isValid: boolean
-  errors: Record<string, string | null>
-}
+type ValidationState = {
+  isValid: boolean;
+  errors: Record<string, string | null>;
+};
 
-interface FormProps {
-  values: FormValues
-  onChange: (values: FormValues, state: ValidationState) => void
-  onSubmit?: (values: FormValues) => void
-  showErrors?: boolean
-  messages?: Partial<Record<string, string>>
-  children: ReactNode
-  'aria-label'?: string
-}
+type FormProps = {
+  values: FormValues;
+  onChange: (values: FormValues, state: ValidationState) => void;
+  onSubmit?: (values: FormValues) => void;
+  showErrors?: boolean;
+  messages?: Partial<Record<string, string>>;
+  children: ReactNode;
+  'aria-label'?: string;
+};
 
 export function Form({
   values,
@@ -28,35 +28,35 @@ export function Form({
   children,
   'aria-label': ariaLabel = 'form',
 }: FormProps) {
-  const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  const onSubmitRef = useRef(onSubmit)
-  onSubmitRef.current = onSubmit
+  const onSubmitRef = useRef(onSubmit);
+  onSubmitRef.current = onSubmit;
 
-  const storeRef = useRef<FormStore | null>(null)
+  const storeRef = useRef<FormStore | null>(null);
   if (storeRef.current === null) {
-    const store = new FormStore(values)
+    const store = new FormStore(values);
     store.subscribe(() => {
       onChangeRef.current(store.getSnapshot(), {
         isValid: store.isValid(),
         errors: store.getErrors(),
-      })
-    })
-    storeRef.current = store
+      });
+    });
+    storeRef.current = store;
   }
 
-  const store = storeRef.current
-  const scopeValue = makeScopeValue(store, '')
-  const formSettings = { showErrors, messages }
+  const store = storeRef.current;
+  const scopeValue = makeScopeValue(store, '');
+  const formSettings = { showErrors, messages };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    store.setSubmitted()
+    e.preventDefault();
+    store.setSubmitted();
     if (store.isValid()) {
-      onSubmitRef.current?.(store.getSnapshot())
+      onSubmitRef.current?.(store.getSnapshot());
     }
-  }
+  };
 
   return (
     <FormContext.Provider value={store}>
@@ -68,5 +68,5 @@ export function Form({
         </ScopeContext.Provider>
       </FormSettingsContext.Provider>
     </FormContext.Provider>
-  )
+  );
 }
