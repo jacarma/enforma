@@ -1,15 +1,17 @@
-// core/components/TextInput.tsx
 import { getComponent } from './registry';
 import {
   CheckboxProps,
-  ComponentProps,
   ComponentPropsMap,
+  FieldsetProps,
   SelectProps,
   TextareaProps,
   TextInputProps,
 } from './types';
 
-function InputWrapper(componentType: keyof ComponentPropsMap, props: ComponentProps) {
+function InputWrapper<K extends keyof ComponentPropsMap>(
+  componentType: K,
+  props: ComponentPropsMap[K],
+) {
   const Impl = getComponent(componentType);
   if (!Impl) {
     throw new Error(`Enforma: component "${componentType}" is not registered.`);
@@ -21,3 +23,4 @@ export const TextInput = (props: TextInputProps) => InputWrapper('TextInput', pr
 export const Textarea = (props: TextareaProps) => InputWrapper('Textarea', props);
 export const Select = (props: SelectProps) => InputWrapper('Select', props);
 export const Checkbox = (props: CheckboxProps) => InputWrapper('Checkbox', props);
+export const Fieldset = (props: FieldsetProps) => InputWrapper('Fieldset', props);

@@ -17,8 +17,16 @@ export type {
   CheckboxProps,
   ComponentPropsMap,
   ComponentProps,
+  FieldsetProps,
 } from './components/types';
 export type { EnformaComponentRegistry } from './components/registry';
-export { useFormValue, useReactiveProp, useComponentProps } from './context/ScopeContext';
+export {
+  useFormValue,
+  useReactiveProp,
+  useComponentProps,
+  ScopeContext,
+  extendPrefix,
+  type ScopeValue,
+} from './context/ScopeContext';
 export { useFieldValidation } from './context/ScopeContext';
 export { registerComponents } from './components/registry';

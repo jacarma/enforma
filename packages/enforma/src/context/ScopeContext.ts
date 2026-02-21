@@ -9,6 +9,8 @@ type ScopeValue = {
   prefix: string;
 };
 
+export type { ScopeValue };
+
 export const ScopeContext = createContext<ScopeValue | null>(null);
 
 function useScopeValue(): ScopeValue {

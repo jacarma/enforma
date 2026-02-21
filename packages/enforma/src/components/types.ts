@@ -1,4 +1,5 @@
 import type { FormValues } from '../store/FormStore';
+import type { ReactNode } from 'react';
 
 export type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) => T);
 
@@ -18,11 +19,18 @@ export type TextareaProps = CommonProps;
 export type SelectProps = CommonProps;
 export type CheckboxProps = CommonProps;
 
+export type FieldsetProps = {
+  path?: string;
+  children: ReactNode;
+  title?: string;
+};
+
 export type ComponentPropsMap = {
   TextInput: TextInputProps;
   Textarea: TextareaProps;
   Select: SelectProps;
   Checkbox: CheckboxProps;
+  Fieldset: FieldsetProps;
 };
 
-export type ComponentProps = ComponentPropsMap[keyof ComponentPropsMap];
+export type ComponentProps = CommonProps;

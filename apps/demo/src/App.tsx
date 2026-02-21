@@ -23,15 +23,12 @@ export function App() {
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
 
-        <fieldset>
-          <legend>Address</legend>
-          <Enforma.Scope path="address">
-            <Enforma.TextInput bind="city" label="City" placeholder="City" />
-            <Enforma.Scope path="street">
-              <Enforma.TextInput bind="line1" label="Street line 1" placeholder="123 Main St" />
-            </Enforma.Scope>
-          </Enforma.Scope>
-        </fieldset>
+        <Enforma.Fieldset path="address" title="Address">
+          <Enforma.TextInput bind="city" label="City" placeholder="City" />
+          <Enforma.Fieldset path="street">
+            <Enforma.TextInput bind="line1" label="Street line 1" placeholder="123 Main St" />
+          </Enforma.Fieldset>
+        </Enforma.Fieldset>
       </Enforma.Form>
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
