@@ -1,41 +1,19 @@
 // apps/demo/src/App.tsx
-import { useState } from 'react'
-import Enforma, { type FormValues } from 'enforma'
-
-const INITIAL_VALUES: FormValues = {
-  name: '',
-  email: '',
-  address: {
-    city: '',
-    street: {
-      line1: '',
-    },
-  },
-}
-
-const REACTIVE_INITIAL: FormValues = {
-  name: '',
-  contactType: 'personal',
-  contact: '',
-}
-
-const SIGNUP_INITIAL: FormValues = {
-  name: '',
-  email: '',
-  password: '',
-  confirm: '',
-}
+import { useState } from 'react';
+import Enforma, { type FormValues, registerComponents } from 'enforma';
+import enformaJoy from 'enforma-joy';
+registerComponents(enformaJoy);
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
-}
+};
 
 export function App() {
-  const [values, setValues] = useState<FormValues>(INITIAL_VALUES)
-  const [reactiveValues, setReactiveValues] = useState<FormValues>(REACTIVE_INITIAL)
-  const [signupValues, setSignupValues] = useState<FormValues>(SIGNUP_INITIAL)
-  const [submitted, setSubmitted] = useState<FormValues | null>(null)
-  const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL)
+  const [values, setValues] = useState<FormValues>({});
+  const [reactiveValues, setReactiveValues] = useState<FormValues>({});
+  const [signupValues, setSignupValues] = useState<FormValues>({});
+  const [submitted, setSubmitted] = useState<FormValues | null>(null);
+  const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -68,28 +46,37 @@ export function App() {
         as form state changes.
       </p>
 
-      <Enforma.Form values={reactiveValues} onChange={setReactiveValues} aria-label="reactive demo form">
+      <Enforma.Form
+        values={reactiveValues}
+        onChange={setReactiveValues}
+        aria-label="reactive demo form"
+      >
         {/* Reactive disabled: email is locked until name is entered */}
-        <Enforma.TextInput bind="name" label="Name" placeholder="Enter your name to unlock the next field" />
+        <Enforma.TextInput
+          bind="name"
+          label="Name"
+          placeholder="Enter your name to unlock the next field"
+        />
         <Enforma.TextInput
           bind="email"
-          label={(_, all) => `Email${String(all.name) === '' ? ' (locked until name is entered)' : ''}`}
-          placeholder={(_, all) =>
-            String(all.name) === '' ? 'Fill in your name first' : `Email for ${String(all.name)}`
+          label={({ name }) =>
+            `Email${String(name) === '' ? ' (locked until name is entered)' : ''}`
           }
-          disabled={(_, all) => String(all.name) === ''}
+          placeholder={({ name }) =>
+            String(name) === '' ? 'Fill in your name first' : `Email for ${String(name)}`
+          }
+          disabled={({ name }) => String(name) === ''}
         />
 
         {/* Reactive label driven by another field */}
-        <Enforma.TextInput
-          bind="contactType"
-          label="Contact type (try: personal / work)"
-        />
+        <Enforma.TextInput bind="contactType" label="Contact type (try: personal / work)" />
         <Enforma.TextInput
           bind="contact"
-          label={(_, all) => all.contactType === 'work' ? 'Work contact' : 'Personal contact'}
-          placeholder={(_, all) =>
-            all.contactType === 'work' ? 'work@company.com' : 'personal@example.com'
+          label={({ contactType }) =>
+            contactType === 'work' ? 'Work contact' : 'Personal contact'
+          }
+          placeholder={({ contactType }) =>
+            contactType === 'work' ? 'work@company.com' : 'personal@example.com'
           }
         />
       </Enforma.Form>
@@ -112,7 +99,12 @@ export function App() {
           <pre style={{ background: '#f4f4f4', padding: '1rem' }}>
             {JSON.stringify(submitted, null, 2)}
           </pre>
-          <button onClick={() => { setSubmitted(null); setSignupValues(SIGNUP_INITIAL) }}>
+          <button
+            onClick={() => {
+              setSubmitted(null);
+              setSignupValues({});
+            }}
+          >
             Reset
           </button>
         </div>
@@ -145,11 +137,11 @@ export function App() {
             bind="confirm"
             label="Confirm password"
             placeholder="Repeat your password"
-            validate={(v, _, all) =>
-              v !== all.password ? 'Passwords do not match' : null
-            }
+            validate={(v, _, all) => (v !== all.password ? 'Passwords do not match' : null)}
           />
-          <button type="submit" style={{ marginTop: '0.5rem' }}>Sign up</button>
+          <button type="submit" style={{ marginTop: '0.5rem' }}>
+            Sign up
+          </button>
         </Enforma.Form>
       )}
 
@@ -170,5 +162,5 @@ export function App() {
         {JSON.stringify(listValues, null, 2)}
       </pre>
     </div>
-  )
+  );
 }

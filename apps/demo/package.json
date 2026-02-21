@@ -14,7 +14,8 @@
     "pnpm": ">=9"
   },
   "dependencies": {
-    "enforma": "workspace:*"
+    "enforma": "workspace:*",
+    "enforma-joy": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
