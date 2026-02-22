@@ -1,5 +1,4 @@
 // packages/enforma/src/components/List.tsx
-// packages/enforma/src/components/List.tsx
 import { type ReactNode } from 'react';
 import { useFormValue } from '../context/ScopeContext';
 import { Scope } from './Scope';
