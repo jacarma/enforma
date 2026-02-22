@@ -56,7 +56,8 @@ export function List({ bind, defaultItem, children }: ListProps) {
                     // Mouse click: restore pre-click focus
                     mouseTarget.focus();
                   } else if (containerRef.current !== null && newArr.length > 0) {
-                    // Keyboard activation: focus the input at the nearest remaining index
+                    // Keyboard activation: focus the input at the nearest remaining index.
+                    // NOTE: assumes one focusable <input> per list item.
                     const inputs = containerRef.current.querySelectorAll('input');
                     const targetInput = inputs[Math.min(index, newArr.length - 1)];
                     if (targetInput instanceof HTMLElement) {

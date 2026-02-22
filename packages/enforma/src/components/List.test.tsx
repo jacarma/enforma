@@ -112,7 +112,7 @@ describe('List', () => {
     if (inputs[1] === undefined) throw new Error('Expected second input');
     inputs[1].focus();
 
-    // Tab to the first Remove button and press Enter
+    // Tab to Bob's Remove button (the second Remove) and press Enter
     await userEvent.tab();
     await userEvent.keyboard('{Enter}');
 
