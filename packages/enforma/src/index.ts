@@ -7,6 +7,7 @@ import { List } from './components/List';
 const Enforma = { Form, ...components, Scope, List } as const;
 
 export default Enforma;
+export { Form };
 export type { FormValues } from './store/FormStore';
 export type {
   Reactive,

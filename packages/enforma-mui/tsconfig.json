@@ -16,7 +16,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "enforma": ["../enforma/src/index.ts"]
+    }
   },
   "include": ["src"]
 }
