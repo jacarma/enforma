@@ -97,4 +97,30 @@ describe('List', () => {
     );
     expect(screen.getByLabelText('Name')).toHaveValue('Alice');
   });
+
+  it('preserves focus when removing an item above the focused one', async () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
+        <List bind="items" defaultItem={{ name: '' }}>
+          <TextInput bind="name" label="Name" />
+        </List>
+      </Form>,
+    );
+
+    const inputs = screen.getAllByLabelText('Name');
+    // Focus the second input (Bob)
+    if (inputs[1] === undefined) throw new Error('Expected second input');
+    inputs[1].focus();
+    expect(document.activeElement).toBe(inputs[1]);
+
+    // Remove the first item (Alice)
+    const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
+    if (removeButtons[0] === undefined) throw new Error('Expected a Remove button');
+    await userEvent.click(removeButtons[0]);
+
+    // Only one input remains; it should still be focused
+    const remaining = screen.getAllByLabelText('Name');
+    expect(remaining).toHaveLength(1);
+    expect(document.activeElement).toBe(remaining[0]);
+  });
 });
