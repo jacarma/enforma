@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "enforma": "workspace:*",
-    "enforma-joy": "workspace:*"
+    "enforma-mui": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
