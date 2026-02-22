@@ -113,8 +113,8 @@ describe('MUI TextInput variants', () => {
     expect(screen.getByLabelText('Full name')).toBeInTheDocument();
   });
 
-  it('outlined (default): renders an input accessible by label text without FormWrap', () => {
-    // No FormWrap registered — context defaults to 'outlined'
+  it('classic (default): renders an input accessible by label text without FormWrap', () => {
+    // No FormWrap registered — context defaults to 'classic'
     render(
       <Form values={{}} onChange={() => undefined}>
         <TextInput bind="name" label="Full name" />

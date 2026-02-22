@@ -1,8 +1,8 @@
 // apps/demo/src/App.tsx
 import { useState } from 'react';
 import Enforma, { type FormValues, registerComponents } from 'enforma';
-import enformaMui from 'enforma-mui';
-registerComponents(enformaMui);
+import { classic } from 'enforma-mui';
+registerComponents(classic);
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
