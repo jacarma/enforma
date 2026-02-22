@@ -9,6 +9,8 @@ export type ListFormSlotProps = {
   children: ReactNode;
 };
 
-export function ListFormSlot(_props: ListFormSlotProps): null {
+// Props are read externally by the parent via React.Children — not used in the body
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ListFormSlot(_: ListFormSlotProps): null {
   return null;
 }

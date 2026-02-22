@@ -8,6 +8,8 @@ export type ListItemSlotProps = {
   showDeleteButton?: boolean;
 };
 
-export function ListItemSlot(_props: ListItemSlotProps): null {
+// Props are read externally by the parent via React.Children — not used in the body
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ListItemSlot(_: ListItemSlotProps): null {
   return null;
 }
