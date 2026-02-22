@@ -32,3 +32,4 @@ export {
 } from './context/ScopeContext';
 export { useFieldValidation } from './context/ScopeContext';
 export { registerComponents, getComponent, clearRegistry } from './components/registry';
+export { useListState } from './hooks/useListState';
