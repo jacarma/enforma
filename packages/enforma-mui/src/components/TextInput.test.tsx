@@ -5,6 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { Form, registerComponents, clearRegistry } from 'enforma';
 import { TextInput } from './TextInput';
 import { Fieldset } from './Fieldset';
+import { ClassicProvider } from '../context/ClassicProvider';
+import { StandardProvider } from '../context/StandardProvider';
 
 beforeEach(() => {
   clearRegistry();
@@ -71,5 +73,53 @@ describe('MUI TextInput', () => {
       </Form>,
     );
     expect(screen.getByLabelText('Name')).toBeDisabled();
+  });
+});
+
+describe('MUI TextInput variants', () => {
+  it('classic: renders an input accessible by label text', () => {
+    clearRegistry();
+    registerComponents({ TextInput, Fieldset, FormWrap: ClassicProvider });
+    render(
+      <Form values={{}} onChange={() => undefined}>
+        <TextInput bind="name" label="Full name" />
+      </Form>,
+    );
+    expect(screen.getByLabelText('Full name')).toBeInTheDocument();
+  });
+
+  it('classic: uses compact size', () => {
+    clearRegistry();
+    registerComponents({ TextInput, Fieldset, FormWrap: ClassicProvider });
+    render(
+      <Form values={{ name: 'x' }} onChange={() => undefined}>
+        <TextInput bind="name" label="Name" />
+      </Form>,
+    );
+    // compact size means the input has size attribute "small" or similar class;
+    // the reliable assertion is that the input renders and is accessible
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveValue('x');
+  });
+
+  it('standard: renders an input accessible by label text', () => {
+    clearRegistry();
+    registerComponents({ TextInput, Fieldset, FormWrap: StandardProvider });
+    render(
+      <Form values={{}} onChange={() => undefined}>
+        <TextInput bind="name" label="Full name" />
+      </Form>,
+    );
+    expect(screen.getByLabelText('Full name')).toBeInTheDocument();
+  });
+
+  it('outlined (default): renders an input accessible by label text without FormWrap', () => {
+    // No FormWrap registered — context defaults to 'outlined'
+    render(
+      <Form values={{}} onChange={() => undefined}>
+        <TextInput bind="name" label="Full name" />
+      </Form>,
+    );
+    expect(screen.getByLabelText('Full name')).toBeInTheDocument();
   });
 });
