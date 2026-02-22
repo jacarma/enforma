@@ -1,7 +1,11 @@
 // apps/demo/src/App.tsx
 import { useState } from 'react';
 import Enforma, { type FormValues, registerComponents } from 'enforma';
-import { classic } from 'enforma-mui';
+import { classic, outlined, standard } from 'enforma-mui';
+
+const bundleMap = { classic, outlined, standard };
+type VariantKey = keyof typeof bundleMap;
+
 registerComponents(classic);
 
 const LIST_INITIAL: FormValues = {
@@ -9,15 +13,33 @@ const LIST_INITIAL: FormValues = {
 };
 
 export function App() {
+  const [variant, setVariant] = useState<VariantKey>('classic');
   const [values, setValues] = useState<FormValues>({});
   const [reactiveValues, setReactiveValues] = useState<FormValues>({});
   const [signupValues, setSignupValues] = useState<FormValues>({});
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
 
+  const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const v = e.target.value as VariantKey;
+    registerComponents(bundleMap[v]);
+    setVariant(v);
+  };
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Enforma Demo</h1>
+
+      <div style={{ marginBottom: '1.5rem' }}>
+        <label htmlFor="variant-select" style={{ marginRight: '0.5rem' }}>
+          Variant:
+        </label>
+        <select id="variant-select" value={variant} onChange={handleVariantChange}>
+          <option value="classic">Classic</option>
+          <option value="outlined">MUI Outline</option>
+          <option value="standard">MUI Default</option>
+        </select>
+      </div>
 
       <Enforma.Form values={values} onChange={setValues} aria-label="demo form">
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
