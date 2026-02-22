@@ -1,7 +1,7 @@
 // apps/demo/src/App.tsx
 import { useState } from 'react';
 import Enforma, { type FormValues, registerComponents } from 'enforma';
-import { classic, outlined, standard } from 'enforma-mui';
+import { classic, outlined, standard, List } from 'enforma-mui';
 
 const bundleMap = { classic, outlined, standard };
 type VariantKey = keyof typeof bundleMap;
@@ -170,13 +170,16 @@ export function App() {
 
       <h2>List</h2>
       <p style={{ color: '#555', marginBottom: '1rem' }}>
-        Repeated sections driven by an array. Each item is scoped automatically.
+        Repeated sections driven by an array. Click a row to edit in a modal.
       </p>
 
       <Enforma.Form values={listValues} onChange={setListValues} aria-label="list demo form">
-        <Enforma.List bind="members" defaultItem={{ name: '' }}>
-          <Enforma.TextInput bind="name" label="Name" />
-        </Enforma.List>
+        <List bind="members" defaultItem={{ name: '' }}>
+          <List.Item title="name" showDeleteButton />
+          <List.Form showDeleteButton>
+            <Enforma.TextInput bind="name" label="Name" />
+          </List.Form>
+        </List>
       </Enforma.Form>
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
