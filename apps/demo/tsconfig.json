@@ -8,7 +8,10 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "enforma-mui": ["../../packages/enforma-mui/src/index.ts"]
+    }
   },
   "include": ["src"]
 }
