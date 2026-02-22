@@ -29,4 +29,4 @@ export {
   type ScopeValue,
 } from './context/ScopeContext';
 export { useFieldValidation } from './context/ScopeContext';
-export { registerComponents } from './components/registry';
+export { registerComponents, getComponent, clearRegistry } from './components/registry';

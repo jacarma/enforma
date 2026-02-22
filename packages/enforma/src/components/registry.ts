@@ -18,3 +18,7 @@ export function getComponent<K extends keyof ComponentPropsMap>(
 ): React.ComponentType<ComponentPropsMap[K]> | undefined {
   return registry[type];
 }
+
+export function clearRegistry() {
+  registry = {};
+}

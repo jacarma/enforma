@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom/vitest';
-import { afterEach } from 'vitest';
+import { afterEach, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { useId } from 'react';
-import { registerComponents } from '../components/registry';
+import { registerComponents, clearRegistry } from '../components/registry';
 import { useComponentProps } from '../context/ScopeContext';
 import type { TextInputProps } from '../components/types';
 
@@ -38,6 +38,9 @@ function DefaultTextInput(props: TextInputProps) {
   );
 }
 
-registerComponents({ TextInput: DefaultTextInput });
+beforeEach(() => {
+  clearRegistry();
+  registerComponents({ TextInput: DefaultTextInput });
+});
 
 afterEach(cleanup);
