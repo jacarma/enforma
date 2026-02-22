@@ -25,12 +25,17 @@ export type FieldsetProps = {
   title?: string;
 };
 
+export type FormWrapProps = {
+  children: ReactNode;
+};
+
 export type ComponentPropsMap = {
   TextInput: TextInputProps;
   Textarea: TextareaProps;
   Select: SelectProps;
   Checkbox: CheckboxProps;
   Fieldset: FieldsetProps;
+  FormWrap: FormWrapProps;
 };
 
 export type ComponentProps = CommonProps;

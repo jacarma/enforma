@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
 import { TextInput } from './component-wrap';
+import { registerComponents } from './registry';
+import type { ReactNode } from 'react';
 
 describe('Form', () => {
   it('renders a <form> element', () => {
@@ -92,5 +94,28 @@ describe('Form', () => {
       );
       expect(screen.getByText('Name is required')).toBeInTheDocument();
     });
+  });
+
+  it('renders children directly when no FormWrap is registered', () => {
+    render(
+      <Form values={{}} onChange={vi.fn()}>
+        <span>unwrapped</span>
+      </Form>,
+    );
+    expect(screen.getByText('unwrapped')).toBeInTheDocument();
+  });
+
+  it('renders children inside FormWrap when one is registered', () => {
+    const FormWrap = ({ children }: { children: ReactNode }) => (
+      <div data-testid="adapter-wrap">{children}</div>
+    );
+    registerComponents({ FormWrap });
+    render(
+      <Form values={{}} onChange={vi.fn()}>
+        <span>wrapped</span>
+      </Form>,
+    );
+    expect(screen.getByTestId('adapter-wrap')).toBeInTheDocument();
+    expect(screen.getByText('wrapped')).toBeInTheDocument();
   });
 });

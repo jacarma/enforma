@@ -19,6 +19,7 @@ export type {
   ComponentPropsMap,
   ComponentProps,
   FieldsetProps,
+  FormWrapProps,
 } from './components/types';
 export type { EnformaComponentRegistry } from './components/registry';
 export {

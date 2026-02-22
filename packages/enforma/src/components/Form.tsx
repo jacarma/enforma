@@ -3,6 +3,7 @@ import { FormStore, type FormValues } from '../store/FormStore';
 import { FormContext } from '../context/FormContext';
 import { FormSettingsContext } from '../context/FormSettingsContext';
 import { ScopeContext, makeScopeValue } from '../context/ScopeContext';
+import { getComponent } from './registry';
 
 type ValidationState = {
   isValid: boolean;
@@ -58,12 +59,15 @@ export function Form({
     }
   };
 
+  const FormWrap = getComponent('FormWrap');
+  const wrappedChildren = FormWrap ? <FormWrap>{children}</FormWrap> : children;
+
   return (
     <FormContext.Provider value={store}>
       <FormSettingsContext.Provider value={formSettings}>
         <ScopeContext.Provider value={scopeValue}>
           <form aria-label={ariaLabel} onSubmit={handleSubmit}>
-            {children}
+            {wrappedChildren}
           </form>
         </ScopeContext.Provider>
       </FormSettingsContext.Provider>
