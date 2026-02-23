@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 describe('MUI Fieldset', () => {
-  it('renders children without a path', () => {
+  it('renders children without a bind', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
         <Fieldset>
@@ -21,10 +21,10 @@ describe('MUI Fieldset', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('Alice');
   });
 
-  it('scopes children to the given path', () => {
+  it('scopes children to the given bind', () => {
     render(
       <Form values={{ address: { city: 'Paris' } }} onChange={() => undefined}>
-        <Fieldset path="address" title="Address">
+        <Fieldset bind="address" title="Address">
           <TextInput bind="city" label="City" />
         </Fieldset>
       </Form>,

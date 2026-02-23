@@ -16,10 +16,10 @@ export function List({ bind, defaultItem, children }: ListProps) {
   );
 
   return (
-    <Scope path={bind}>
+    <Scope bind={bind}>
       <div ref={containerRef}>
         {arr.map((_, index) => (
-          <Scope key={keys[index] ?? String(index)} path={String(index)}>
+          <Scope key={keys[index] ?? String(index)} bind={String(index)}>
             {children}
             <button
               type="button"

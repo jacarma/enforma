@@ -45,9 +45,9 @@ export function App() {
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
 
-        <Enforma.Fieldset path="address" title="Address">
+        <Enforma.Fieldset bind="address" title="Address">
           <Enforma.TextInput bind="city" label="City" placeholder="City" />
-          <Enforma.Fieldset path="street">
+          <Enforma.Fieldset bind="street">
             <Enforma.TextInput bind="line1" label="Street line 1" placeholder="123 Main St" />
           </Enforma.Fieldset>
         </Enforma.Fieldset>

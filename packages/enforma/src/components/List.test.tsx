@@ -89,7 +89,7 @@ describe('List', () => {
   it('works nested inside a Scope', () => {
     render(
       <Form values={{ team: { members: [{ name: 'Alice' }] } }} onChange={vi.fn()}>
-        <Scope path="team">
+        <Scope bind="team">
           <List bind="members" defaultItem={{ name: '' }}>
             <TextInput bind="name" label="Name" />
           </List>

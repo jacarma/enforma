@@ -20,7 +20,7 @@ export type SelectProps = CommonProps;
 export type CheckboxProps = CommonProps;
 
 export type FieldsetProps = {
-  path?: string;
+  bind?: string;
   children: ReactNode;
   title?: string;
 };

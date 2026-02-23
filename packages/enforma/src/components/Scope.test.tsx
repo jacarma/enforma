@@ -11,7 +11,7 @@ describe('Scope', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ address: { city: '' } }} onChange={onChange}>
-        <Scope path="address">
+        <Scope bind="address">
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,
@@ -26,7 +26,7 @@ describe('Scope', () => {
   it('displays the initial value from the scoped path', () => {
     render(
       <Form values={{ address: { city: 'Paris' } }} onChange={vi.fn()}>
-        <Scope path="address">
+        <Scope bind="address">
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,
@@ -38,8 +38,8 @@ describe('Scope', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ address: { street: { line1: '' } } }} onChange={onChange}>
-        <Scope path="address">
-          <Scope path="street">
+        <Scope bind="address">
+          <Scope bind="street">
             <TextInput bind="line1" label="Line 1" />
           </Scope>
         </Scope>
@@ -58,7 +58,7 @@ describe('Scope', () => {
 
     render(
       <Form values={{ name: 'Alice', address: { city: 'London' } }} onChange={vi.fn()}>
-        <Scope path="address">
+        <Scope bind="address">
           <TextInput
             bind="city"
             label="City"
@@ -106,7 +106,7 @@ describe('Scope', () => {
     render(
       <Form values={{ name: '', address: { city: '' } }} onChange={onChange}>
         <TextInput bind="name" label="Name" />
-        <Scope path="address">
+        <Scope bind="address">
           <TextInput bind="city" label="City" />
         </Scope>
       </Form>,

@@ -2,8 +2,8 @@ import { FormGroup, FormLabel } from '@mui/material';
 import Enforma, { type FieldsetProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 
-export function Fieldset({ path, children, title }: FieldsetProps) {
-  const content = path ? <Enforma.Scope path={path}>{children}</Enforma.Scope> : children;
+export function Fieldset({ bind, children, title }: FieldsetProps) {
+  const content = bind ? <Enforma.Scope bind={bind}>{children}</Enforma.Scope> : children;
 
   return (
     <ComponentWrap component="fieldset" margin={title ? 'dense' : 'none'}>
