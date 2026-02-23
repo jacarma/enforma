@@ -3,12 +3,12 @@ import { afterEach, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { useId } from 'react';
 import { registerComponents, clearRegistry } from '../components/registry';
-import { useComponentProps } from '../context/ScopeContext';
+import { useFieldProps } from '../context/ScopeContext';
 import type { TextInputProps } from '../components/types';
 
 function DefaultTextInput(props: TextInputProps) {
   const { value, setValue, label, disabled, placeholder, error, showError, onBlur } =
-    useComponentProps<string>(props);
+    useFieldProps<string>(props);
   const generatedId = useId();
   const inputId = props.id ?? generatedId;
   const errorId = `${inputId}-error`;

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
 import { List } from './List';
 import { Scope } from './Scope';
-import { TextInput } from './component-wrap';
+import { TextInput } from './fields';
 import { useFormStore } from '../context/FormContext';
 
 describe('List', () => {

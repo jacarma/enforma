@@ -41,7 +41,7 @@ export function useFormValue<T>(bind: string): [T | undefined, (value: T) => voi
   return [value, setValue];
 }
 
-export function useComponentProps<T>({
+export function useFieldProps<T>({
   bind,
   label,
   disabled,

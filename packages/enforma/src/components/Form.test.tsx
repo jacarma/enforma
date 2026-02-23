@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
-import { TextInput } from './component-wrap';
+import { TextInput } from './fields';
 import { registerComponents } from './registry';
 import type { ReactNode } from 'react';
 

@@ -26,7 +26,7 @@ export type { FormSettings } from './context/FormSettingsContext';
 export {
   useFormValue,
   useReactiveProp,
-  useComponentProps,
+  useFieldProps,
   useFieldValidation,
   ScopeContext,
   childScope,

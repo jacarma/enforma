@@ -1,12 +1,12 @@
 import { useId, useContext } from 'react';
 import { FormLabel, TextField } from '@mui/material';
-import { type TextInputProps, useComponentProps } from 'enforma';
+import { type TextInputProps, useFieldProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
 export function TextInput(props: TextInputProps) {
   const { value, setValue, label, disabled, placeholder, description, error, showError, onBlur } =
-    useComponentProps<string>(props);
+    useFieldProps<string>(props);
   const variant = useContext(MuiVariantContext);
   const id = useId();
 
