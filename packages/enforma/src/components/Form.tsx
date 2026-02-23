@@ -2,7 +2,7 @@ import { useRef, type ReactNode, type FormEvent } from 'react';
 import { FormStore, type FormValues } from '../store/FormStore';
 import { FormContext } from '../context/FormContext';
 import { FormSettingsContext } from '../context/FormSettingsContext';
-import { ScopeContext, makeScopeValue } from '../context/ScopeContext';
+import { ScopeContext } from '../context/ScopeContext';
 import { getComponent } from './registry';
 import type { ValidationState } from './types';
 
@@ -44,7 +44,7 @@ export function Form({
   }
 
   const store = storeRef.current;
-  const scopeValue = makeScopeValue(store, '');
+  const scopeValue = { store, prefix: '' };
   const formSettings = { showErrors, messages };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
