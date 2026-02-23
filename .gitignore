@@ -3,3 +3,4 @@ dist
 .turbo
 *.local
 coverage
+CLAUDE.local.md

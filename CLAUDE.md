@@ -3,6 +3,7 @@
 ## Mandatory rules at every step
 
 - Run `pnpm lint` before any commit. It must pass with no errors or warnings.
+- Run `pnpm typecheck` before any commit. It must pass with no errors or warnings.
 - Run `pnpm test` before any commit. All tests must pass.
 - A step is not considered complete until both commands pass with no errors.
 
