@@ -1,10 +1,10 @@
 // packages/enforma/src/index.ts
 import { Form } from './components/Form';
-import * as components from './components/component-wrap';
+import * as fields from './components/fields';
 import { Scope } from './components/Scope';
 import { List } from './components/List';
 
-const Enforma = { Form, ...components, Scope, List } as const;
+const Enforma = { Form, ...fields, Scope, List } as const;
 
 export default Enforma;
 export { Form, Scope, List };
