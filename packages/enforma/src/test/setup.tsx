@@ -3,7 +3,7 @@ import { afterEach, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { useId } from 'react';
 import { registerComponents, clearRegistry } from '../components/registry';
-import { useFieldProps } from '../context/ScopeContext';
+import { useFieldProps } from '../hooks/useField';
 import type { TextInputProps } from '../components/types';
 
 function DefaultTextInput(props: TextInputProps) {

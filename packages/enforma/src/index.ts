@@ -23,14 +23,7 @@ export type {
 } from './components/types';
 export type { EnformaComponentRegistry } from './components/registry';
 export type { FormSettings } from './context/FormSettingsContext';
-export {
-  useFormValue,
-  useReactiveProp,
-  useFieldProps,
-  useFieldValidation,
-  ScopeContext,
-  childScope,
-  type ScopeValue,
-} from './context/ScopeContext';
+export { ScopeContext, childScope, useScope, type ScopeValue } from './context/ScopeContext';
+export { useFormValue, useReactiveProp, useFieldProps, useFieldValidation } from './hooks/useField';
 export { registerComponents, clearRegistry } from './components/registry';
 export { useListState } from './hooks/useListState';

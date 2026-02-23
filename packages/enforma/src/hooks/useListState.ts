@@ -1,7 +1,7 @@
 // packages/enforma/src/hooks/useListState.ts
 import { useRef } from 'react';
 import { flushSync } from 'react-dom';
-import { useFormValue } from '../context/ScopeContext';
+import { useFormValue } from './useField';
 
 export function useListState(bind: string, defaultItem: Record<string, unknown>) {
   const [rawArr, setArr] = useFormValue<unknown[]>(bind);
