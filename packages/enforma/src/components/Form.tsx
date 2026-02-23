@@ -4,11 +4,7 @@ import { FormContext } from '../context/FormContext';
 import { FormSettingsContext } from '../context/FormSettingsContext';
 import { ScopeContext, makeScopeValue } from '../context/ScopeContext';
 import { getComponent } from './registry';
-
-type ValidationState = {
-  isValid: boolean;
-  errors: Record<string, string | null>;
-};
+import type { ValidationState } from './types';
 
 type FormProps = {
   values: FormValues;

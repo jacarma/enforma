@@ -39,3 +39,8 @@ export type ComponentPropsMap = {
 };
 
 export type ComponentProps = CommonProps;
+
+export type ValidationState = {
+  isValid: boolean;
+  errors: Record<string, string | null>;
+};
