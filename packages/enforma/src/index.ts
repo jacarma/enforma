@@ -7,7 +7,7 @@ import { List } from './components/List';
 const Enforma = { Form, ...components, Scope, List } as const;
 
 export default Enforma;
-export { Form };
+export { Form, Scope, List };
 export type { FormValues } from './store/FormStore';
 export type {
   Reactive,
@@ -31,5 +31,5 @@ export {
   extendPrefix,
   type ScopeValue,
 } from './context/ScopeContext';
-export { registerComponents, getComponent, clearRegistry } from './components/registry';
+export { registerComponents, clearRegistry } from './components/registry';
 export { useListState } from './hooks/useListState';
