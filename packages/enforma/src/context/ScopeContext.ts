@@ -88,7 +88,7 @@ export function makeScopeValue(store: FormStore, prefix: string): ScopeValue {
   return { store, prefix };
 }
 
-export function extendPrefix(parent: ScopeValue, path: string): ScopeValue {
+export function childScope(parent: ScopeValue, path: string): ScopeValue {
   return { store: parent.store, prefix: joinPath(parent.prefix, path) };
 }
 

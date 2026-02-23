@@ -29,7 +29,7 @@ export {
   useComponentProps,
   useFieldValidation,
   ScopeContext,
-  extendPrefix,
+  childScope,
   type ScopeValue,
 } from './context/ScopeContext';
 export { registerComponents, clearRegistry } from './components/registry';
