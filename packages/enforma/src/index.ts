@@ -17,7 +17,6 @@ export type {
   SelectProps,
   CheckboxProps,
   ComponentPropsMap,
-  ComponentProps,
   FieldsetProps,
   FormWrapProps,
   ValidationState,

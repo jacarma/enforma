@@ -38,8 +38,6 @@ export type ComponentPropsMap = {
   FormWrap: FormWrapProps;
 };
 
-export type ComponentProps = CommonProps;
-
 export type ValidationState = {
   isValid: boolean;
   errors: Record<string, string | null>;

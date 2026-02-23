@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 import type { FormStore, FormValues } from '../store/FormStore';
 import { useFormSettings } from './FormSettingsContext';
-import { ComponentProps, Reactive } from '../components/types';
+import { CommonProps, Reactive } from '../components/types';
 
 type ScopeValue = {
   store: FormStore;
@@ -49,7 +49,7 @@ export function useComponentProps<T>({
   description,
   validate,
   messages,
-}: ComponentProps) {
+}: CommonProps) {
   const [value, setValue] = useFormValue<T>(bind);
 
   return {
