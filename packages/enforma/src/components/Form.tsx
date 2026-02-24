@@ -1,10 +1,12 @@
-import { useRef, type ReactNode, type FormEvent } from 'react';
+import { useRef, useMemo, type ReactNode, type FormEvent } from 'react';
 import { FormStore, type FormValues } from '../store/FormStore';
 import { FormContext } from '../context/FormContext';
 import { FormSettingsContext } from '../context/FormSettingsContext';
 import { ScopeContext } from '../context/ScopeContext';
 import { getComponent } from './registry';
 import type { ValidationState } from './types';
+
+const emptyMessages: Partial<Record<string, string>> = {};
 
 type FormProps = {
   values: FormValues;
@@ -21,7 +23,7 @@ export function Form({
   onChange,
   onSubmit,
   showErrors = false,
-  messages = {},
+  messages = emptyMessages,
   children,
   'aria-label': ariaLabel = 'form',
 }: FormProps) {
@@ -44,8 +46,8 @@ export function Form({
   }
 
   const store = storeRef.current;
-  const scopeValue = { store, prefix: '' };
-  const formSettings = { showErrors, messages };
+  const scopeValue = useMemo(() => ({ store, prefix: '' }), [store]);
+  const formSettings = useMemo(() => ({ showErrors, messages }), [showErrors, messages]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

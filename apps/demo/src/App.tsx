@@ -11,12 +11,13 @@ registerComponents(classic);
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
 };
+const EMPTY_VALUES = {};
 
 export function App() {
   const [variant, setVariant] = useState<VariantKey>('classic');
-  const [values, setValues] = useState<FormValues>({});
-  const [reactiveValues, setReactiveValues] = useState<FormValues>({});
-  const [signupValues, setSignupValues] = useState<FormValues>({});
+  const [values, setValues] = useState<FormValues>(EMPTY_VALUES);
+  const [reactiveValues, setReactiveValues] = useState<FormValues>(EMPTY_VALUES);
+  const [signupValues, setSignupValues] = useState<FormValues>(EMPTY_VALUES);
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
 

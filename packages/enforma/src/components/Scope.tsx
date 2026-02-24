@@ -1,5 +1,5 @@
 // packages/enforma/src/components/Scope.tsx
-import { useContext, type ReactNode } from 'react';
+import { useContext, useMemo, type ReactNode } from 'react';
 import { ScopeContext, childScope } from '../context/ScopeContext';
 
 type ScopeProps = {
@@ -12,6 +12,6 @@ export function Scope({ bind, children }: ScopeProps) {
   if (parent === null) {
     throw new Error('<Enforma.Scope> must be used within <Enforma.Form>');
   }
-  const scopeValue = childScope(parent, bind);
+  const scopeValue = useMemo(() => childScope(parent, bind), [parent, bind]);
   return <ScopeContext.Provider value={scopeValue}>{children}</ScopeContext.Provider>;
 }

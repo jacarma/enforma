@@ -1,9 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { memo, useState } from 'react';
 import { Form } from './Form';
 import { TextInput } from './fields';
 import { registerComponents } from './registry';
+import { useFieldProps } from '../hooks/useField';
+import type { TextInputProps } from './types';
 import type { ReactNode } from 'react';
 
 describe('Form', () => {
@@ -117,5 +120,91 @@ describe('Form', () => {
     );
     expect(screen.getByTestId('adapter-wrap')).toBeInTheDocument();
     expect(screen.getByText('wrapped')).toBeInTheDocument();
+  });
+});
+
+describe('render isolation', () => {
+  it('typing in one field does not re-render sibling fields', async () => {
+    const emailRenderSpy = vi.fn();
+
+    // memo + no props = always bails out on parent re-renders.
+    // Context changes (if any) would still bypass memo and cause re-renders,
+    // which is exactly what this test guards against.
+    const EmailField = memo(function EmailField() {
+      emailRenderSpy();
+      const { value, setValue } = useFieldProps<string>({ bind: 'email' });
+      return (
+        <input
+          aria-label="email"
+          value={value ?? ''}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
+      );
+    });
+
+    // Stateful parent that re-renders on every change, just like the demo app.
+    function App() {
+      const [values, setValues] = useState({});
+      return (
+        <Form values={values} onChange={setValues}>
+          <TextInput bind="name" label="Name" />
+          <EmailField />
+        </Form>
+      );
+    }
+
+    render(<App />);
+    emailRenderSpy.mockClear();
+
+    await userEvent.type(screen.getByLabelText('Name'), 'hello');
+
+    expect(emailRenderSpy).not.toHaveBeenCalled();
+  });
+
+  it('typing in form 1 does not re-render fields in form 2 that have function props', async () => {
+    // Track how many times each registered adapter renders, keyed by bind.
+    const adapterRenders = { name: 0, email: 0 };
+
+    registerComponents({
+      TextInput: function TrackedTextInput(props: TextInputProps) {
+        const { value, setValue } = useFieldProps<string>(props);
+        adapterRenders[props.bind as keyof typeof adapterRenders]++;
+        return (
+          <input
+            aria-label={typeof props.label === 'string' ? props.label : props.bind}
+            value={value ?? ''}
+            onChange={(e) => {
+              setValue(e.target.value);
+            }}
+          />
+        );
+      },
+    });
+
+    function App() {
+      const [values1, setValues1] = useState({});
+      return (
+        <>
+          <Form values={values1} onChange={setValues1}>
+            <TextInput bind="name" label="Name" />
+          </Form>
+          <Form values={{}} onChange={vi.fn()}>
+            {/* validate is an inline arrow fn — new reference on every App render */}
+            <TextInput bind="email" label="Email" validate={(v) => (!v ? 'required' : null)} />
+          </Form>
+        </>
+      );
+    }
+
+    render(<App />);
+    adapterRenders.name = 0;
+    adapterRenders.email = 0;
+
+    await userEvent.type(screen.getByLabelText('Name'), 'hello');
+
+    expect(adapterRenders.name).toBeGreaterThan(0); // sanity: name field updated
+    expect(adapterRenders.email).toBe(0); // email in form 2 must not re-render
   });
 });

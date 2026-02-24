@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { getComponent } from './registry';
 import {
   CheckboxProps,
@@ -7,6 +8,26 @@ import {
   TextareaProps,
   TextInputProps,
 } from './types';
+
+function isEmptyRef(v: unknown): boolean {
+  if (Array.isArray(v)) return v.length === 0;
+  if (v !== null && typeof v === 'object') return Object.keys(v).length === 0;
+  return false;
+}
+
+function stablePropsEqual<P extends object>(prev: P, next: P): boolean {
+  const prevKeys = Object.keys(prev);
+  const nextKeys = Object.keys(next);
+  if (prevKeys.length !== nextKeys.length) return false;
+  for (const key of nextKeys) {
+    const p = prev[key as keyof P];
+    const n = next[key as keyof P];
+    if (typeof p === 'function' && typeof n === 'function') continue;
+    if (isEmptyRef(p) && isEmptyRef(n) && Array.isArray(p) === Array.isArray(n)) continue;
+    if (!Object.is(p, n)) return false;
+  }
+  return true;
+}
 
 function dispatchComponent<K extends keyof ComponentPropsMap>(
   componentType: K,
@@ -19,8 +40,23 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
   return <Impl {...props} />;
 }
 
-export const TextInput = (props: TextInputProps) => dispatchComponent('TextInput', props);
-export const Textarea = (props: TextareaProps) => dispatchComponent('Textarea', props);
-export const Select = (props: SelectProps) => dispatchComponent('Select', props);
-export const Checkbox = (props: CheckboxProps) => dispatchComponent('Checkbox', props);
-export const Fieldset = (props: FieldsetProps) => dispatchComponent('Fieldset', props);
+export const TextInput = memo(
+  (props: TextInputProps) => dispatchComponent('TextInput', props),
+  stablePropsEqual,
+);
+export const Textarea = memo(
+  (props: TextareaProps) => dispatchComponent('Textarea', props),
+  stablePropsEqual,
+);
+export const Select = memo(
+  (props: SelectProps) => dispatchComponent('Select', props),
+  stablePropsEqual,
+);
+export const Checkbox = memo(
+  (props: CheckboxProps) => dispatchComponent('Checkbox', props),
+  stablePropsEqual,
+);
+export const Fieldset = memo(
+  (props: FieldsetProps) => dispatchComponent('Fieldset', props),
+  stablePropsEqual,
+);
