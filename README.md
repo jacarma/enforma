@@ -276,9 +276,62 @@ Components subscribe to specific fields via `useSyncExternalStore`, so only affe
 - **ScopeContext** — Manages hierarchical path prefixing
 - **FormSettingsContext** — Distributes validation settings (show errors, messages) without prop-drilling
 
+## Authoring Adapters
+
+Enforma ships without UI — you bring your own component library by calling `registerComponents`. Each registered component receives typed props and is expected to use `useFieldProps` to read them.
+
+```tsx
+import { registerComponents, useFieldProps } from 'enforma';
+import type { TextInputProps } from 'enforma';
+
+registerComponents({
+  TextInput: function MyTextInput(props: TextInputProps) {
+    const { value, setValue, label, error, disabled, placeholder } =
+      useFieldProps<string>(props);
+
+    return (
+      <div>
+        <label>{label}</label>
+        <input
+          value={value ?? ''}
+          onChange={(e) => setValue(e.target.value)}
+          disabled={disabled ?? false}
+          placeholder={placeholder}
+        />
+        {error && <span className="error">{error}</span>}
+      </div>
+    );
+  },
+});
+```
+
+### Always use `useFieldProps` for reactive props
+
+Props like `validate`, `label`, `disabled`, and `placeholder` can be either static values or functions `(scopeValues, allValues) => T`. The field wrappers intentionally suppress re-renders when a function prop changes reference — because the function is evaluated lazily inside the adapter via `useSyncExternalStore`.
+
+**Never read function-capable props directly:**
+
+```tsx
+// ❌ Wrong — will silently receive stale closures
+function MyTextInput(props: TextInputProps) {
+  const label = typeof props.label === 'function'
+    ? props.label(scopeValues, allValues)
+    : props.label;
+  ...
+}
+
+// ✅ Correct — useFieldProps handles reactivity via useSyncExternalStore
+function MyTextInput(props: TextInputProps) {
+  const { label } = useFieldProps<string>(props);
+  ...
+}
+```
+
+`useFieldProps` subscribes to the form store and re-evaluates reactive props automatically whenever the relevant form state changes.
+
 ## Component Library
 
-A set of pre-built, accessible form components is coming soon. In the meantime, you can build custom components using the `useFieldValidation` and reactive prop hooks provided by Enforma.
+A set of pre-built, accessible form components is coming soon.
 
 ## Development
 
