@@ -1,5 +1,6 @@
 import type { FormValues } from '../store/FormStore';
 import type { ReactNode } from 'react';
+import type { DataSourceProp } from '../datasource/types';
 
 export type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) => T);
 
@@ -16,7 +17,10 @@ export type CommonProps = {
 
 export type TextInputProps = CommonProps;
 export type TextareaProps = CommonProps;
-export type SelectProps = CommonProps;
+export type SelectProps = CommonProps & {
+  dataSource?: DataSourceProp<unknown>;
+  children?: ReactNode;
+};
 export type CheckboxProps = CommonProps;
 
 export type FieldsetProps = {

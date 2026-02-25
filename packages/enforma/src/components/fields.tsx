@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { getComponent } from './registry';
+import { SelectOption } from './SelectOption';
 import {
   CheckboxProps,
   ComponentPropsMap,
@@ -48,9 +49,9 @@ export const Textarea = memo(
   (props: TextareaProps) => dispatchComponent('Textarea', props),
   stablePropsEqual,
 );
-export const Select = memo(
-  (props: SelectProps) => dispatchComponent('Select', props),
-  stablePropsEqual,
+export const Select = Object.assign(
+  memo((props: SelectProps) => dispatchComponent('Select', props), stablePropsEqual),
+  { Option: SelectOption },
 );
 export const Checkbox = memo(
   (props: CheckboxProps) => dispatchComponent('Checkbox', props),
@@ -60,3 +61,5 @@ export const Fieldset = memo(
   (props: FieldsetProps) => dispatchComponent('Fieldset', props),
   stablePropsEqual,
 );
+
+export { SelectOption };
