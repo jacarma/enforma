@@ -23,6 +23,24 @@ function makeWrapper(dataSources?: Record<string, DataSourceDefinition<unknown>>
   };
 }
 
+describe('useDataSource — named static DataSource', () => {
+  it('returns items for a named static array from Form dataSources', () => {
+    const { result } = renderHook(() => useDataSource<Country>('countries'), {
+      wrapper: makeWrapper({ countries }),
+    });
+    expect(result.current.items).toEqual(countries);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('returns empty items when the named DataSource is not found', () => {
+    const { result } = renderHook(() => useDataSource<Country>('missing'), {
+      wrapper: makeWrapper(),
+    });
+    expect(result.current.items).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
+  });
+});
+
 describe('useDataSource — static array', () => {
   it('returns items immediately for an inline static array', () => {
     const { result } = renderHook(() => useDataSource<Country>(countries), {
