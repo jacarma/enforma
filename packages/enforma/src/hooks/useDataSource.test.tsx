@@ -17,7 +17,11 @@ const countries: Country[] = [
 function makeWrapper(dataSources?: Record<string, DataSourceDefinition<unknown>>) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <Form values={{}} onChange={() => undefined} {...(dataSources !== undefined ? { dataSources } : {})}>
+      <Form
+        values={{}}
+        onChange={() => undefined}
+        {...(dataSources !== undefined ? { dataSources } : {})}
+      >
         {children}
       </Form>
     );
@@ -140,7 +144,9 @@ describe('useDataSource — query DataSource', () => {
       wrapper: makeWrapper(ds),
     });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     expect(result.current.items).toEqual([{ code: 'us', name: 'United States' }]);
     expect(result.current.total).toBe(42);
@@ -154,7 +160,9 @@ describe('useDataSource — query DataSource', () => {
       wrapper: makeWrapper(ds),
     });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     expect(result.current.error).toBeInstanceOf(Error);
     expect(result.current.error?.message).toBe('Network error');
@@ -164,7 +172,7 @@ describe('useDataSource — query DataSource', () => {
   it('passes component params (search, sort, pagination) to the query function', async () => {
     const queryFn = vi.fn().mockResolvedValue([]);
 
-    const { result: _ } = renderHook(
+    renderHook(
       () =>
         useDataSource<Country>('countries', {
           search: 'uni',
@@ -189,23 +197,26 @@ describe('useDataSource — query DataSource', () => {
     const ds = { countries: { query: queryFn } };
 
     let search = 'a';
-    const { rerender } = renderHook(
-      () => useDataSource<Country>('countries', { search }),
-      { wrapper: makeWrapper(ds) },
-    );
+    const { rerender } = renderHook(() => useDataSource<Country>('countries', { search }), {
+      wrapper: makeWrapper(ds),
+    });
 
-    await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(queryFn).toHaveBeenCalledTimes(1);
+    });
 
     search = 'ab';
     rerender();
 
-    await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
+    await waitFor(() => {
+      expect(queryFn).toHaveBeenCalledTimes(2);
+    });
   });
 
   it('passes form-derived filters to the query function', async () => {
     const queryFn = vi.fn().mockResolvedValue([]);
 
-    const { result: _ } = renderHook(
+    renderHook(
       () =>
         useDataSource<Country>({
           source: 'cities',
@@ -225,9 +236,7 @@ describe('useDataSource — query DataSource', () => {
     );
 
     await waitFor(() => {
-      expect(queryFn).toHaveBeenCalledWith(
-        expect.objectContaining({ filters: { country: 'us' } }),
-      );
+      expect(queryFn).toHaveBeenCalledWith(expect.objectContaining({ filters: { country: 'us' } }));
     });
   });
 });

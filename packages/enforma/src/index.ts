@@ -27,3 +27,12 @@ export { ScopeContext, childScope, useScope, type ScopeValue } from './context/S
 export { useFormValue, useReactiveProp, useFieldProps, useFieldValidation } from './hooks/useField';
 export { registerComponents, clearRegistry } from './components/registry';
 export { useListState } from './hooks/useListState';
+export { useDataSource } from './hooks/useDataSource';
+export { SelectOption } from './components/SelectOption';
+export type {
+  DataSourceDefinition,
+  DataSourceParams,
+  DataSourceProp,
+  DataSourceResult,
+} from './datasource/types';
+export type { SelectOptionProps } from './components/SelectOption';

@@ -19,7 +19,10 @@ type ComponentParams = {
 
 const emptyItems: unknown[] = [];
 
-function normalizeResult<TItem>(result: QueryResult<TItem>): { items: TItem[]; total: number | undefined } {
+function normalizeResult<TItem>(result: QueryResult<TItem>): {
+  items: TItem[];
+  total: number | undefined;
+} {
   if (Array.isArray(result)) return { items: result, total: undefined };
   return { items: result.items, total: result.total };
 }
@@ -31,12 +34,14 @@ function resolveDefinition<TItem>(
   if (typeof dataSource === 'function') return 'reactive';
   if (Array.isArray(dataSource)) return dataSource;
   if (typeof dataSource === 'string') {
-    return (registry[dataSource] as DataSourceDefinition<TItem>) ?? null;
+    const def = registry[dataSource] as DataSourceDefinition<TItem> | undefined;
+    return def ?? null;
   }
   // { source, filters }
   const src = dataSource.source;
   if (typeof src === 'string') {
-    return (registry[src] as DataSourceDefinition<TItem>) ?? null;
+    const def = registry[src] as DataSourceDefinition<TItem> | undefined;
+    return def ?? null;
   }
   return src as DataSourceDefinition<TItem>;
 }
@@ -76,7 +81,6 @@ export function useDataSource<TItem>(
 
   // Compute form-derived filters (if applicable).
   const filters: Record<string, unknown> =
-    dataSource !== null &&
     dataSource !== undefined &&
     typeof dataSource === 'object' &&
     !Array.isArray(dataSource) &&
@@ -88,9 +92,9 @@ export function useDataSource<TItem>(
   const filtersKey = JSON.stringify(filters);
 
   useEffect(() => {
-    if (dataSource === undefined || dataSource === null) return;
+    if (dataSource === undefined) return;
 
-    const definition = resolveDefinition(dataSource as DataSourceProp<TItem>, registry);
+    const definition = resolveDefinition(dataSource, registry);
     if (definition === null || definition === 'reactive' || Array.isArray(definition)) return;
     if (!('query' in definition)) return;
 
@@ -107,7 +111,7 @@ export function useDataSource<TItem>(
     Promise.resolve(definition.query(queryParams))
       .then((result) => {
         if (cancelled) return;
-        const { items, total } = normalizeResult(result as QueryResult<TItem>);
+        const { items, total } = normalizeResult(result);
         setQueryState({ items, total, isLoading: false, error: null });
       })
       .catch((err: unknown) => {
