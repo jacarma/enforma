@@ -356,3 +356,99 @@ describe('useDataSource — auto-clear on items change', () => {
     });
   });
 });
+
+describe('useDataSource — auto-clear on filter change for query datasource', () => {
+  type PokemonItem = { name: string };
+
+  function makeQueryWrapper(
+    initialValues: Record<string, unknown>,
+    queryFn: ReturnType<typeof vi.fn>,
+  ) {
+    let capturedStore: FormStore | null = null;
+
+    function GrabStore() {
+      capturedStore = useScope().store;
+      return null;
+    }
+
+    function Wrapper({ children }: { children: ReactNode }) {
+      return (
+        <Form
+          values={initialValues}
+          onChange={() => undefined}
+          dataSources={{ pokemon: { query: queryFn } }}
+        >
+          <GrabStore />
+          {children}
+        </Form>
+      );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return { Wrapper, getStore: () => capturedStore! };
+  }
+
+  it('clears the bound field when filters change after mount for a query datasource', async () => {
+    const queryFn = vi.fn().mockResolvedValue([]);
+    const { Wrapper, getStore } = makeQueryWrapper({ type: 'fire', pokemon: 'charizard' }, queryFn);
+
+    renderHook(
+      () =>
+        useDataSource<PokemonItem>(
+          { source: 'pokemon', filters: (scope) => ({ type: scope.type }) },
+          { bind: 'pokemon' },
+        ),
+      { wrapper: Wrapper },
+    );
+
+    // Initial mount must preserve the existing value.
+    expect(getStore().getField('pokemon')).toBe('charizard');
+
+    // Changing the filter key triggers a clear.
+    act(() => {
+      getStore().setField('type', 'water');
+    });
+
+    await waitFor(() => {
+      expect(getStore().getField('pokemon')).toBe('');
+    });
+  });
+
+  it('does not clear the bound field on initial mount for a query datasource', () => {
+    const queryFn = vi.fn().mockResolvedValue([]);
+    const { Wrapper, getStore } = makeQueryWrapper({ type: 'fire', pokemon: 'charizard' }, queryFn);
+
+    renderHook(
+      () =>
+        useDataSource<PokemonItem>(
+          { source: 'pokemon', filters: (scope) => ({ type: scope.type }) },
+          { bind: 'pokemon' },
+        ),
+      { wrapper: Wrapper },
+    );
+
+    expect(getStore().getField('pokemon')).toBe('charizard');
+  });
+
+  it('does nothing when bind is not provided for a query datasource', async () => {
+    const queryFn = vi.fn().mockResolvedValue([]);
+    const { Wrapper, getStore } = makeQueryWrapper({ type: 'fire', pokemon: 'charizard' }, queryFn);
+
+    renderHook(
+      () =>
+        useDataSource<PokemonItem>({
+          source: 'pokemon',
+          filters: (scope) => ({ type: scope.type }),
+        }),
+      { wrapper: Wrapper },
+    );
+
+    act(() => {
+      getStore().setField('type', 'water');
+    });
+
+    await waitFor(() => {
+      expect(getStore().getField('pokemon')).toBe('charizard');
+    });
+  });
+});

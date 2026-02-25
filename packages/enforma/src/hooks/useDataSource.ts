@@ -126,6 +126,21 @@ export function useDataSource<TItem>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [staticItems]);
 
+  // Auto-clear the bound field when form-derived filters change for query-based datasources.
+  // This mirrors the static-items auto-clear above, but fires on filtersKey instead of staticItems.
+  const didMountQueryClear = useRef(false);
+  useEffect(() => {
+    if (!didMountQueryClear.current) {
+      didMountQueryClear.current = true;
+      return;
+    }
+    if (!bind || dataSource === undefined) return;
+    const def = resolveDefinition(dataSource, registry);
+    if (def === null || Array.isArray(def) || def === 'reactive') return;
+    store.setField(joinPath(prefix, bind), '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtersKey]);
+
   useEffect(() => {
     if (dataSource === undefined) return;
 
