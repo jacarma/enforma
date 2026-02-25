@@ -1,5 +1,5 @@
 // apps/demo/src/App.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
   registerComponents,
@@ -22,6 +22,15 @@ const allCities: OptionItem[] = [
   { code: 'par', name: 'Paris', country: 'fr' },
 ];
 
+const DATASOURCE_DEMO_SOURCES = {
+  countries: [
+    { code: 'us', name: 'United States' },
+    { code: 'gb', name: 'United Kingdom' },
+    { code: 'fr', name: 'France' },
+  ],
+  cities: allCities,
+};
+
 function DemoSelect(props: SelectProps) {
   const { value, setValue, label, error, showError } = useFieldProps<string>(props);
 
@@ -36,15 +45,7 @@ function DemoSelect(props: SelectProps) {
   });
 
   const dataSource = props.dataSource as DataSourceProp<OptionItem> | undefined;
-  const { items, isLoading } = useDataSource<OptionItem>(dataSource);
-
-  // Clear the value when it's no longer in the available items (e.g. country changed).
-  useEffect(() => {
-    if (isLoading || !value) return;
-    if (!items.some((item) => item[valueKey] === value)) {
-      setValue('');
-    }
-  }, [items, isLoading, value, valueKey, setValue]);
+  const { items, isLoading } = useDataSource<OptionItem>(dataSource, { bind: props.bind });
 
   return (
     <div style={{ marginBottom: '1rem' }}>
@@ -263,14 +264,7 @@ export function App() {
         values={{ country: '', city: '' }}
         onChange={() => {}}
         aria-label="datasource demo form"
-        dataSources={{
-          countries: [
-            { code: 'us', name: 'United States' },
-            { code: 'gb', name: 'United Kingdom' },
-            { code: 'fr', name: 'France' },
-          ],
-          cities: allCities,
-        }}
+        dataSources={DATASOURCE_DEMO_SOURCES}
       >
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
