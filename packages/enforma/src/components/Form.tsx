@@ -3,10 +3,13 @@ import { FormStore, type FormValues } from '../store/FormStore';
 import { FormContext } from '../context/FormContext';
 import { FormSettingsContext } from '../context/FormSettingsContext';
 import { ScopeContext } from '../context/ScopeContext';
+import { DataSourceContext } from '../context/DataSourceContext';
+import type { DataSourceDefinition } from '../datasource/types';
 import { getComponent } from './registry';
 import type { ValidationState } from './types';
 
 const emptyMessages: Partial<Record<string, string>> = {};
+const emptyDataSources: Record<string, DataSourceDefinition<unknown>> = {};
 
 type FormProps = {
   values: FormValues;
@@ -16,6 +19,7 @@ type FormProps = {
   messages?: Partial<Record<string, string>>;
   children: ReactNode;
   'aria-label'?: string;
+  dataSources?: Record<string, DataSourceDefinition<unknown>>;
 };
 
 export function Form({
@@ -26,6 +30,7 @@ export function Form({
   messages = emptyMessages,
   children,
   'aria-label': ariaLabel = 'form',
+  dataSources = emptyDataSources,
 }: FormProps) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -61,14 +66,16 @@ export function Form({
   const wrappedChildren = FormWrap ? <FormWrap>{children}</FormWrap> : children;
 
   return (
-    <FormContext.Provider value={store}>
-      <FormSettingsContext.Provider value={formSettings}>
-        <ScopeContext.Provider value={scopeValue}>
-          <form aria-label={ariaLabel} onSubmit={handleSubmit}>
-            {wrappedChildren}
-          </form>
-        </ScopeContext.Provider>
-      </FormSettingsContext.Provider>
-    </FormContext.Provider>
+    <DataSourceContext.Provider value={dataSources}>
+      <FormContext.Provider value={store}>
+        <FormSettingsContext.Provider value={formSettings}>
+          <ScopeContext.Provider value={scopeValue}>
+            <form aria-label={ariaLabel} onSubmit={handleSubmit}>
+              {wrappedChildren}
+            </form>
+          </ScopeContext.Provider>
+        </FormSettingsContext.Provider>
+      </FormContext.Provider>
+    </DataSourceContext.Provider>
   );
 }

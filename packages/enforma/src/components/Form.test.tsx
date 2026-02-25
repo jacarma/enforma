@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { memo, useState } from 'react';
 import { Form } from './Form';
@@ -8,6 +8,7 @@ import { registerComponents } from './registry';
 import { useFieldProps } from '../hooks/useField';
 import type { TextInputProps } from './types';
 import type { ReactNode } from 'react';
+import { useDataSources } from '../context/DataSourceContext';
 
 describe('Form', () => {
   it('renders a <form> element', () => {
@@ -206,5 +207,33 @@ describe('render isolation', () => {
 
     expect(adapterRenders.name).toBeGreaterThan(0); // sanity: name field updated
     expect(adapterRenders.email).toBe(0); // email in form 2 must not re-render
+  });
+});
+
+describe('Form dataSources', () => {
+  it('makes named DataSources available to descendants via useDataSources', () => {
+    const countries = [{ code: 'us', name: 'United States' }];
+
+    const { result } = renderHook(() => useDataSources(), {
+      wrapper: ({ children }) => (
+        <Form values={{}} onChange={vi.fn()} dataSources={{ countries }}>
+          {children}
+        </Form>
+      ),
+    });
+
+    expect(result.current).toEqual({ countries });
+  });
+
+  it('provides an empty map when dataSources prop is omitted', () => {
+    const { result } = renderHook(() => useDataSources(), {
+      wrapper: ({ children }) => (
+        <Form values={{}} onChange={vi.fn()}>
+          {children}
+        </Form>
+      ),
+    });
+
+    expect(result.current).toEqual({});
   });
 });
