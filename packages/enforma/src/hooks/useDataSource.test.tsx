@@ -1,10 +1,12 @@
 // packages/enforma/src/hooks/useDataSource.test.tsx
 import { describe, it, expect, vi } from 'vitest';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { Form } from '../components/Form';
 import { useDataSource } from './useDataSource';
+import { useScope } from '../context/ScopeContext';
+import type { FormStore } from '../store/FormStore';
 import type { DataSourceDefinition } from '../datasource/types';
 
 type Country = { code: string; name: string };
@@ -258,6 +260,102 @@ describe('useDataSource — query DataSource', () => {
 
     await waitFor(() => {
       expect(queryFn).toHaveBeenCalledWith(expect.objectContaining({ filters: { country: 'us' } }));
+    });
+  });
+});
+
+describe('useDataSource — auto-clear on items change', () => {
+  type City = { code: string; name: string; country: string };
+
+  const allCities: City[] = [
+    { code: 'nyc', name: 'New York', country: 'us' },
+    { code: 'lon', name: 'London', country: 'gb' },
+  ];
+
+  function makeAutoWrapper(initialValues: Record<string, unknown>) {
+    let capturedStore: FormStore | null = null;
+
+    function GrabStore() {
+      capturedStore = useScope().store;
+      return null;
+    }
+
+    function Wrapper({ children }: { children: ReactNode }) {
+      return (
+        <Form
+          values={initialValues}
+          onChange={() => {}}
+          dataSources={{ cities: allCities }}
+        >
+          <GrabStore />
+          {children}
+        </Form>
+      );
+    }
+
+    return { Wrapper, getStore: () => capturedStore! };
+  }
+
+  it('clears the bound field when filtered items change after mount', async () => {
+    const { Wrapper, getStore } = makeAutoWrapper({ country: 'us', city: 'nyc' });
+
+    renderHook(
+      () =>
+        useDataSource<City>(
+          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          { bind: 'city' },
+        ),
+      { wrapper: Wrapper },
+    );
+
+    // After initial mount the city value must be preserved.
+    expect(getStore().getField('city')).toBe('nyc');
+
+    // Changing country changes the filtered set → should clear city.
+    act(() => {
+      getStore().setField('country', 'gb');
+    });
+
+    await waitFor(() => {
+      expect(getStore().getField('city')).toBe('');
+    });
+  });
+
+  it('does not clear the bound field on initial mount', () => {
+    const { Wrapper, getStore } = makeAutoWrapper({ country: 'us', city: 'nyc' });
+
+    renderHook(
+      () =>
+        useDataSource<City>(
+          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          { bind: 'city' },
+        ),
+      { wrapper: Wrapper },
+    );
+
+    // Initial mount must not wipe a pre-populated value.
+    expect(getStore().getField('city')).toBe('nyc');
+  });
+
+  it('does nothing when bind is not provided', async () => {
+    const { Wrapper, getStore } = makeAutoWrapper({ country: 'us', city: 'nyc' });
+
+    renderHook(
+      () =>
+        useDataSource<City>(
+          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          // no bind
+        ),
+      { wrapper: Wrapper },
+    );
+
+    act(() => {
+      getStore().setField('country', 'gb');
+    });
+
+    await waitFor(() => {
+      // City should NOT be cleared since bind was not provided.
+      expect(getStore().getField('city')).toBe('nyc');
     });
   });
 });
