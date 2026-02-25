@@ -1,5 +1,5 @@
 // packages/enforma/src/hooks/useDataSource.ts
-import { useState, useEffect, useSyncExternalStore } from 'react';
+import { useState, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { useScope } from '../context/ScopeContext';
 import { useDataSources } from '../context/DataSourceContext';
 import type { FormValues } from '../store/FormStore';
@@ -12,6 +12,7 @@ import type {
 } from '../datasource/types';
 
 type ComponentParams = {
+  bind?: string;
   search?: string;
   sort?: { field: string; direction: 'asc' | 'desc' } | null;
   pagination?: { page: number; pageSize: number };
@@ -91,6 +92,25 @@ export function useDataSource<TItem>(
 
   const filtersKey = JSON.stringify(filters);
 
+  // Resolve definition and memoize filtered static items.
+  // useMemo gives a stable reference so the auto-clear effect only fires when the
+  // filtered set actually changes, not on every render.
+  const definition = dataSource !== undefined ? resolveDefinition(dataSource, registry) : null;
+
+  const staticItems = useMemo((): TItem[] => {
+    if (!Array.isArray(definition)) return emptyItems as TItem[];
+    const hasFilters =
+      typeof dataSource === 'object' && !Array.isArray(dataSource) && 'filters' in dataSource;
+    if (!hasFilters) return definition;
+    return definition.filter((item) =>
+      Object.entries(filters).every(([k, v]) => (item as Record<string, unknown>)[k] === v),
+    );
+    // definition and filtersKey capture the two things that can change the result.
+    // dataSource and filters are intentionally omitted — they change every render
+    // but their semantics are captured by definition (resolved array ref) and filtersKey.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [definition, filtersKey]);
+
   useEffect(() => {
     if (dataSource === undefined) return;
 
@@ -133,11 +153,9 @@ export function useDataSource<TItem>(
     return { items: emptyItems as TItem[], total: undefined, isLoading: false, error: null };
   }
 
-  const definition = resolveDefinition(dataSource, registry);
-
-  // Static array (inline or named)
+  // Static array (inline or named) — items may be filtered by equality predicates.
   if (Array.isArray(definition)) {
-    return { items: definition, total: undefined, isLoading: false, error: null };
+    return { items: staticItems, total: undefined, isLoading: false, error: null };
   }
 
   // Form-reactive function

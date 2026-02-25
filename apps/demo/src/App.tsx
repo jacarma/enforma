@@ -1,5 +1,5 @@
 // apps/demo/src/App.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Enforma, {
   type FormValues,
   registerComponents,
@@ -14,6 +14,13 @@ import { classic, outlined, standard, List } from 'enforma-mui';
 
 // Minimal Select adapter for demo purposes
 type OptionItem = Record<string, string>;
+
+const allCities: OptionItem[] = [
+  { code: 'nyc', name: 'New York', country: 'us' },
+  { code: 'la', name: 'Los Angeles', country: 'us' },
+  { code: 'lon', name: 'London', country: 'gb' },
+  { code: 'par', name: 'Paris', country: 'fr' },
+];
 
 function DemoSelect(props: SelectProps) {
   const { value, setValue, label, error, showError } = useFieldProps<string>(props);
@@ -30,6 +37,14 @@ function DemoSelect(props: SelectProps) {
 
   const dataSource = props.dataSource as DataSourceProp<OptionItem> | undefined;
   const { items, isLoading } = useDataSource<OptionItem>(dataSource);
+
+  // Clear the value when it's no longer in the available items (e.g. country changed).
+  useEffect(() => {
+    if (isLoading || !value) return;
+    if (!items.some((item) => item[valueKey] === value)) {
+      setValue('');
+    }
+  }, [items, isLoading, value, valueKey, setValue]);
 
   return (
     <div style={{ marginBottom: '1rem' }}>
@@ -254,12 +269,7 @@ export function App() {
             { code: 'gb', name: 'United Kingdom' },
             { code: 'fr', name: 'France' },
           ],
-          cities: [
-            { code: 'nyc', name: 'New York', country: 'us' },
-            { code: 'la', name: 'Los Angeles', country: 'us' },
-            { code: 'lon', name: 'London', country: 'gb' },
-            { code: 'par', name: 'Paris', country: 'fr' },
-          ],
+          cities: allCities,
         }}
       >
         <Enforma.Select bind="country" label="Country" dataSource="countries">
