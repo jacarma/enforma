@@ -9,6 +9,8 @@ import Enforma, {
   type SelectProps,
   type SelectOptionProps,
   type DataSourceProp,
+  type DataSourceDefinition,
+  type DataSourceParams,
 } from 'enforma';
 import { classic, outlined, standard, List } from 'enforma-mui';
 
@@ -29,6 +31,38 @@ const DATASOURCE_DEMO_SOURCES = {
     { code: 'fr', name: 'France' },
   ],
   cities: allCities,
+};
+
+type PokemonItem = { name: string; label: string };
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
+  types: {
+    query: async (): Promise<PokemonItem[]> => {
+      const res = await fetch('https://pokeapi.co/api/v2/type?limit=20');
+      const data = (await res.json()) as { results: { name: string }[] };
+      return data.results
+        .filter((t) => t.name !== 'unknown' && t.name !== 'shadow')
+        .map((t) => ({ name: t.name, label: capitalize(t.name) }));
+    },
+  },
+  pokemon: {
+    query: async ({ filters }: DataSourceParams): Promise<PokemonItem[]> => {
+      const type = filters.type as string;
+      if (!type) return [];
+      const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+      const data = (await res.json()) as {
+        pokemon: { pokemon: { name: string } }[];
+      };
+      return data.pokemon.map(({ pokemon }) => ({
+        name: pokemon.name,
+        label: capitalize(pokemon.name),
+      }));
+    },
+  },
 };
 
 function DemoSelect(props: SelectProps) {
@@ -279,6 +313,37 @@ export function App() {
           }}
         >
           <Enforma.Select.Option label="name" value="code" />
+        </Enforma.Select>
+      </Enforma.Form>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>API DataSources</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Select options loaded from the{' '}
+        <a href="https://pokeapi.co" target="_blank" rel="noreferrer">
+          PokeAPI
+        </a>
+        . Both selects use async query datasources. Picking a type reloads and clears the Pokémon
+        select.
+      </p>
+
+      <Enforma.Form
+        values={{ type: '', pokemon: '' }}
+        onChange={() => {}}
+        aria-label="api datasource demo form"
+        dataSources={POKEMON_DATASOURCES}
+      >
+        <Enforma.Select bind="type" label="Type" dataSource="types">
+          <Enforma.Select.Option label="label" value="name" />
+        </Enforma.Select>
+
+        <Enforma.Select
+          bind="pokemon"
+          label="Pokémon"
+          dataSource={{ source: 'pokemon', filters: (scope) => ({ type: scope.type }) }}
+        >
+          <Enforma.Select.Option label="label" value="name" />
         </Enforma.Select>
       </Enforma.Form>
     </div>
