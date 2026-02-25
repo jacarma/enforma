@@ -20,6 +20,36 @@ type ComponentParams = {
 
 const emptyItems: unknown[] = [];
 
+// Module-level in-flight request deduplication.
+// Prevents double network requests caused by React StrictMode (mount → cleanup → remount).
+type NormalizedResult = { items: unknown[]; total: number | undefined };
+const queryInFlight = new WeakMap<object, Map<string, Promise<NormalizedResult>>>();
+
+function deduplicatedQuery<TItem>(
+  definition: {
+    query: (params: DataSourceParams) => QueryResult<TItem> | Promise<QueryResult<TItem>>;
+  },
+  queryParams: DataSourceParams,
+  paramsKey: string,
+): Promise<{ items: TItem[]; total: number | undefined }> {
+  let defMap = queryInFlight.get(definition);
+  if (defMap === undefined) {
+    defMap = new Map();
+    queryInFlight.set(definition, defMap);
+  }
+  const cached = defMap.get(paramsKey);
+  if (cached !== undefined) {
+    return cached as Promise<{ items: TItem[]; total: number | undefined }>;
+  }
+  const promise: Promise<NormalizedResult> = Promise.resolve(definition.query(queryParams))
+    .then((result) => normalizeResult(result) as NormalizedResult)
+    .finally(() => {
+      defMap.delete(paramsKey);
+    });
+  defMap.set(paramsKey, promise);
+  return promise as Promise<{ items: TItem[]; total: number | undefined }>;
+}
+
 function normalizeResult<TItem>(result: QueryResult<TItem>): {
   items: TItem[];
   total: number | undefined;
@@ -157,11 +187,11 @@ export function useDataSource<TItem>(
       sort,
       pagination,
     };
+    const paramsKey = JSON.stringify(queryParams);
 
-    Promise.resolve(definition.query(queryParams))
-      .then((result) => {
+    deduplicatedQuery(definition, queryParams, paramsKey)
+      .then(({ items, total }) => {
         if (cancelled) return;
-        const { items, total } = normalizeResult(result);
         setQueryState({ items, total, isLoading: false, error: null });
       })
       .catch((err: unknown) => {
