@@ -1,12 +1,62 @@
 // apps/demo/src/App.tsx
-import { useState } from 'react';
-import Enforma, { type FormValues, registerComponents } from 'enforma';
+import React, { useState } from 'react';
+import Enforma, {
+  type FormValues,
+  registerComponents,
+  useFieldProps,
+  useDataSource,
+  SelectOption,
+  type SelectProps,
+  type SelectOptionProps,
+  type DataSourceProp,
+} from 'enforma';
 import { classic, outlined, standard, List } from 'enforma-mui';
+
+// Minimal Select adapter for demo purposes
+type OptionItem = Record<string, string>;
+
+function DemoSelect(props: SelectProps) {
+  const { value, setValue, label, error, showError } = useFieldProps<string>(props);
+
+  let labelKey = 'label';
+  let valueKey = 'value';
+
+  React.Children.forEach(props.children, (child) => {
+    if (!React.isValidElement(child) || child.type !== SelectOption) return;
+    const p = child.props as SelectOptionProps<OptionItem>;
+    if (typeof p.label === 'string') labelKey = p.label;
+    if (typeof p.value === 'string') valueKey = p.value;
+  });
+
+  const dataSource = props.dataSource as DataSourceProp<OptionItem> | undefined;
+  const { items, isLoading } = useDataSource<OptionItem>(dataSource);
+
+  return (
+    <div style={{ marginBottom: '1rem' }}>
+      {label && <label>{label}</label>}
+      <select
+        value={value ?? ''}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        disabled={isLoading}
+      >
+        <option value="">— select —</option>
+        {items.map((item, i) => (
+          <option key={i} value={item[valueKey] ?? ''}>
+            {item[labelKey] ?? ''}
+          </option>
+        ))}
+      </select>
+      {showError && error && <span style={{ color: 'red' }}>{error}</span>}
+    </div>
+  );
+}
 
 const bundleMap = { classic, outlined, standard };
 type VariantKey = keyof typeof bundleMap;
 
-registerComponents(classic);
+registerComponents({ ...classic, Select: DemoSelect });
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
@@ -186,6 +236,47 @@ export function App() {
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(listValues, null, 2)}
       </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>DataSources</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Select options driven by a static DataSource defined on the Form.
+      </p>
+
+      <Enforma.Form
+        values={{ country: '', city: '' }}
+        onChange={() => {}}
+        aria-label="datasource demo form"
+        dataSources={{
+          countries: [
+            { code: 'us', name: 'United States' },
+            { code: 'gb', name: 'United Kingdom' },
+            { code: 'fr', name: 'France' },
+          ],
+          cities: [
+            { code: 'nyc', name: 'New York', country: 'us' },
+            { code: 'la', name: 'Los Angeles', country: 'us' },
+            { code: 'lon', name: 'London', country: 'gb' },
+            { code: 'par', name: 'Paris', country: 'fr' },
+          ],
+        }}
+      >
+        <Enforma.Select bind="country" label="Country" dataSource="countries">
+          <Enforma.Select.Option label="name" value="code" />
+        </Enforma.Select>
+
+        <Enforma.Select
+          bind="city"
+          label="City"
+          dataSource={{
+            source: 'cities',
+            filters: (scope) => ({ country: scope.country }),
+          }}
+        >
+          <Enforma.Select.Option label="name" value="code" />
+        </Enforma.Select>
+      </Enforma.Form>
     </div>
   );
 }
