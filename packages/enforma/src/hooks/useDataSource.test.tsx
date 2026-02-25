@@ -60,3 +60,30 @@ describe('useDataSource — static array', () => {
     expect(result.current.isLoading).toBe(false);
   });
 });
+
+describe('useDataSource — form-reactive function', () => {
+  it('returns items derived from current form values', () => {
+    type City = { name: string; country: string };
+    const allCities: City[] = [
+      { name: 'New York', country: 'us' },
+      { name: 'London', country: 'gb' },
+    ];
+
+    const { result } = renderHook(
+      () =>
+        useDataSource<City>((scope) =>
+          allCities.filter((c) => c.country === (scope.country as string)),
+        ),
+      {
+        wrapper: ({ children }) => (
+          <Form values={{ country: 'us' }} onChange={() => undefined}>
+            {children}
+          </Form>
+        ),
+      },
+    );
+
+    expect(result.current.items).toEqual([{ name: 'New York', country: 'us' }]);
+    expect(result.current.isLoading).toBe(false);
+  });
+});
