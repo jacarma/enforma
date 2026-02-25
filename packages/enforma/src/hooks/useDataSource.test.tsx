@@ -87,3 +87,24 @@ describe('useDataSource — form-reactive function', () => {
     expect(result.current.isLoading).toBe(false);
   });
 });
+
+describe('useDataSource — named source with filters', () => {
+  it('passes form-derived filters to a named static source (acts as client-side filter reference)', () => {
+    // { source, filters } with a static array resolves the static array.
+    // The filters are relevant for query DataSources (Task 8).
+    // This test verifies the object form resolves the named static source.
+    const { result } = renderHook(
+      () =>
+        useDataSource<Country>({
+          source: 'countries',
+          filters: (scope) => ({ continent: scope.continent }),
+        }),
+      {
+        wrapper: makeWrapper({ countries }),
+      },
+    );
+
+    expect(result.current.items).toEqual(countries);
+    expect(result.current.isLoading).toBe(false);
+  });
+});
