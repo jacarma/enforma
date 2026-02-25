@@ -14,9 +14,7 @@ describe('useDataSources', () => {
   it('returns the dataSources map provided by the context', () => {
     const countries = [{ code: 'us', name: 'United States' }];
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <DataSourceContext.Provider value={{ countries }}>
-        {children}
-      </DataSourceContext.Provider>
+      <DataSourceContext.Provider value={{ countries }}>{children}</DataSourceContext.Provider>
     );
     const { result } = renderHook(() => useDataSources(), { wrapper });
     expect(result.current).toEqual({ countries });
