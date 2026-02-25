@@ -282,17 +282,14 @@ describe('useDataSource — auto-clear on items change', () => {
 
     function Wrapper({ children }: { children: ReactNode }) {
       return (
-        <Form
-          values={initialValues}
-          onChange={() => {}}
-          dataSources={{ cities: allCities }}
-        >
+        <Form values={initialValues} onChange={() => undefined} dataSources={{ cities: allCities }}>
           <GrabStore />
           {children}
         </Form>
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { Wrapper, getStore: () => capturedStore! };
   }
 

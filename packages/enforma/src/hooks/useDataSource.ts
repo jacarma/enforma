@@ -1,6 +1,6 @@
 // packages/enforma/src/hooks/useDataSource.ts
-import { useState, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { useScope } from '../context/ScopeContext';
+import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import { useScope, joinPath } from '../context/ScopeContext';
 import { useDataSources } from '../context/DataSourceContext';
 import type { FormValues } from '../store/FormStore';
 import type {
@@ -76,6 +76,7 @@ export function useDataSource<TItem>(
     error: Error | null;
   }>({ items: emptyItems as TItem[], total: undefined, isLoading: false, error: null });
 
+  const bind = params.bind;
   const search = params.search ?? '';
   const sort = params.sort ?? null;
   const pagination = params.pagination ?? { page: 0, pageSize: 20 };
@@ -110,6 +111,20 @@ export function useDataSource<TItem>(
     // but their semantics are captured by definition (resolved array ref) and filtersKey.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [definition, filtersKey]);
+
+  // Auto-clear the bound field when the filtered items change after initial mount.
+  // This handles the case where a dependent field's value is no longer valid
+  // (e.g., city select should reset when country changes and filters city list).
+  const didMount = useRef(false);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    if (!bind) return;
+    store.setField(joinPath(prefix, bind), '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staticItems]);
 
   useEffect(() => {
     if (dataSource === undefined) return;
