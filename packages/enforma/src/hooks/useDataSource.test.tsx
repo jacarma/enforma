@@ -94,22 +94,43 @@ describe('useDataSource — form-reactive function', () => {
 });
 
 describe('useDataSource — named source with filters', () => {
-  it('passes form-derived filters to a named static source (acts as client-side filter reference)', () => {
-    // { source, filters } with a static array resolves the static array.
-    // The filters are relevant for query DataSources (Task 8).
-    // This test verifies the object form resolves the named static source.
+  it('filters a named static array by equality when { source, filters } form is used', () => {
+    type City = { code: string; name: string; country: string };
+    const cities: City[] = [
+      { code: 'nyc', name: 'New York', country: 'us' },
+      { code: 'lon', name: 'London', country: 'gb' },
+    ];
+
     const { result } = renderHook(
       () =>
-        useDataSource<Country>({
-          source: 'countries',
-          filters: (scope) => ({ continent: scope.continent }),
+        useDataSource<City>({
+          source: 'cities',
+          filters: () => ({ country: 'us' }),
         }),
-      {
-        wrapper: makeWrapper({ countries }),
-      },
+      { wrapper: makeWrapper({ cities }) },
     );
 
-    expect(result.current.items).toEqual(countries);
+    expect(result.current.items).toEqual([{ code: 'nyc', name: 'New York', country: 'us' }]);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('returns all items when no filter values match any items', () => {
+    type City = { code: string; name: string; country: string };
+    const cities: City[] = [
+      { code: 'nyc', name: 'New York', country: 'us' },
+      { code: 'lon', name: 'London', country: 'gb' },
+    ];
+
+    const { result } = renderHook(
+      () =>
+        useDataSource<City>({
+          source: 'cities',
+          filters: () => ({ country: 'de' }),
+        }),
+      { wrapper: makeWrapper({ cities }) },
+    );
+
+    expect(result.current.items).toEqual([]);
     expect(result.current.isLoading).toBe(false);
   });
 });
