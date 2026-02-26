@@ -1,4 +1,4 @@
-// packages/enforma-mui/src/components/ListFormSlot.tsx
+// packages/enforma/src/components/ListFormSlot.tsx
 import { type ReactNode } from 'react';
 
 export type ListFormSlotMode = 'CREATE' | 'UPDATE' | 'DISPLAY';

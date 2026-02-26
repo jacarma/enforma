@@ -15,8 +15,13 @@ import {
   DialogActions,
 } from '@mui/material';
 import { Form, type FormValues, useListState } from 'enforma';
-import { ListItemSlot, type ListItemSlotProps } from './ListItemSlot';
-import { ListFormSlot, type ListFormSlotProps, type ListFormSlotMode } from './ListFormSlot';
+import {
+  ListItemSlot,
+  type ListItemSlotProps,
+  ListFormSlot,
+  type ListFormSlotProps,
+  type ListFormSlotMode,
+} from 'enforma';
 
 type ListProps = {
   bind: string;

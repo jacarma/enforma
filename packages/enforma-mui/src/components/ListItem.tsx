@@ -1,10 +1,4 @@
-import {
-  ListItemButton,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  IconButton,
-} from '@mui/material';
+import { ListItemButton, ListItemText, ListItemAvatar, Avatar, IconButton } from '@mui/material';
 import { type ResolvedListItemProps } from 'enforma';
 
 export function ListItem({

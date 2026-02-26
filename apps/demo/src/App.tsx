@@ -3,12 +3,7 @@ import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
   registerComponents,
-  useFieldProps,
-  useDataSource,
-  SelectOption,
-  type SelectProps,
-  type SelectOptionProps,
-  type DataSourceProp,
+  type ResolvedSelectProps,
   type DataSourceDefinition,
   type DataSourceParams,
 } from 'enforma';
@@ -65,36 +60,29 @@ const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
   },
 };
 
-function DemoSelect(props: SelectProps) {
-  const { value, setValue, label, error, showError } = useFieldProps<string>(props);
-
-  let labelKey = 'label';
-  let valueKey = 'value';
-
-  React.Children.forEach(props.children, (child) => {
-    if (!React.isValidElement(child) || child.type !== SelectOption) return;
-    const p = child.props as SelectOptionProps<OptionItem>;
-    if (typeof p.label === 'string') labelKey = p.label;
-    if (typeof p.value === 'string') valueKey = p.value;
-  });
-
-  const dataSource = props.dataSource as DataSourceProp<OptionItem> | undefined;
-  const { items, isLoading } = useDataSource<OptionItem>(dataSource, { bind: props.bind });
-
+function DemoSelect({
+  value,
+  setValue,
+  label,
+  error,
+  showError,
+  options,
+  isLoading,
+}: ResolvedSelectProps) {
   return (
     <div style={{ marginBottom: '1rem' }}>
       {label && <label>{label}</label>}
       <select
-        value={value ?? ''}
+        value={typeof value === 'string' ? value : ''}
         onChange={(e) => {
           setValue(e.target.value);
         }}
         disabled={isLoading}
       >
         <option value="">— select —</option>
-        {items.map((item, i) => (
-          <option key={i} value={item[valueKey] ?? ''}>
-            {item[labelKey] ?? ''}
+        {options.map((opt, i) => (
+          <option key={i} value={typeof opt.value === 'string' ? opt.value : ''}>
+            {opt.label}
           </option>
         ))}
       </select>

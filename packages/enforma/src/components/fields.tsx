@@ -63,22 +63,54 @@ function CheckboxDispatch(props: CheckboxProps) {
 
 function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
   const content = bind !== undefined ? <Scope bind={bind}>{children}</Scope> : children;
-  return dispatchComponent('Fieldset', { children: content, ...(title !== undefined && { title }) });
+  return dispatchComponent('Fieldset', {
+    children: content,
+    ...(title !== undefined && { title }),
+  });
 }
 
 function buildSelectOptions(
   items: unknown[],
   children: React.ReactNode,
 ): { value: unknown; label: string }[] {
-  const fromChildren: { value: unknown; label: string }[] = [];
+  const childOptions: { value: unknown; label: unknown }[] = [];
   React.Children.forEach(children, (child) => {
     if (!React.isValidElement(child)) return;
     const props = child.props as SelectOptionProps;
-    fromChildren.push({ value: props.value, label: props.label as string });
+    childOptions.push({ value: props.value, label: props.label });
   });
 
-  if (fromChildren.length > 0) return fromChildren;
+  // Single SelectOption with string fields + datasource items → field-name mapping template
+  if (items.length > 0 && childOptions.length === 1) {
+    const template = childOptions[0];
+    if (
+      template !== undefined &&
+      typeof template.label === 'string' &&
+      typeof template.value === 'string'
+    ) {
+      const labelKey = template.label;
+      const valueKey = template.value;
+      return items.map((item) => {
+        if (typeof item === 'object' && item !== null) {
+          const obj = item as Record<string, unknown>;
+          const lv = obj[labelKey];
+          const label =
+            typeof lv === 'string' || typeof lv === 'number' || typeof lv === 'boolean'
+              ? String(lv)
+              : '';
+          return { value: obj[valueKey], label };
+        }
+        return { value: item, label: String(item) };
+      });
+    }
+  }
 
+  // Inline literal children
+  if (childOptions.length > 0) {
+    return childOptions.map((opt) => ({ value: opt.value, label: String(opt.label) }));
+  }
+
+  // No children: map items directly, expecting { value, label } shape
   return items.map((item) => {
     if (typeof item === 'object' && item !== null && 'value' in item && 'label' in item) {
       return {
@@ -92,7 +124,11 @@ function buildSelectOptions(
 
 function SelectDispatch(props: SelectProps) {
   const resolved = useFieldProps<unknown>(props);
-  const { items, isLoading, error: dataSourceError } = useDataSource(props.dataSource, {
+  const {
+    items,
+    isLoading,
+    error: dataSourceError,
+  } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
   const options = buildSelectOptions(items, props.children);

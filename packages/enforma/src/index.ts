@@ -29,6 +29,10 @@ export { registerComponents, clearRegistry } from './components/registry';
 export { useListState } from './hooks/useListState';
 export { useDataSource } from './hooks/useDataSource';
 export { SelectOption } from './components/SelectOption';
+export { ListItemSlot } from './components/ListItemSlot';
+export type { ListItemSlotProps } from './components/ListItemSlot';
+export { ListFormSlot } from './components/ListFormSlot';
+export type { ListFormSlotProps, ListFormSlotMode } from './components/ListFormSlot';
 export type {
   DataSourceDefinition,
   DataSourceParams,

@@ -1,5 +1,5 @@
-// packages/enforma-mui/src/components/ListItemSlot.tsx
-import { type FormValues } from 'enforma';
+// packages/enforma/src/components/ListItemSlot.tsx
+import type { FormValues } from '../store/FormStore';
 
 export type ListItemSlotProps = {
   title: string | ((item: FormValues) => string);
