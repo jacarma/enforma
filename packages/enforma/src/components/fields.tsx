@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import React from 'react';
 import { getComponent } from './registry';
 import { SelectOption } from './SelectOption';
+import type { SelectOptionProps } from './SelectOption';
 import {
   CheckboxProps,
   ComponentPropsMap,
@@ -10,6 +12,7 @@ import {
   TextInputProps,
 } from './types';
 import { useFieldProps } from '../hooks/useField';
+import { useDataSource } from '../hooks/useDataSource';
 import { Scope } from './Scope';
 
 function isEmptyRef(v: unknown): boolean {
@@ -63,15 +66,51 @@ function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
   return dispatchComponent('Fieldset', { children: content, ...(title !== undefined && { title }) });
 }
 
+function buildSelectOptions(
+  items: unknown[],
+  children: React.ReactNode,
+): { value: unknown; label: string }[] {
+  const fromChildren: { value: unknown; label: string }[] = [];
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+    const props = child.props as SelectOptionProps;
+    fromChildren.push({ value: props.value, label: props.label as string });
+  });
+
+  if (fromChildren.length > 0) return fromChildren;
+
+  return items.map((item) => {
+    if (typeof item === 'object' && item !== null && 'value' in item && 'label' in item) {
+      return {
+        value: (item as { value: unknown }).value,
+        label: String((item as { label: unknown }).label),
+      };
+    }
+    return { value: item, label: String(item) };
+  });
+}
+
+function SelectDispatch(props: SelectProps) {
+  const resolved = useFieldProps<unknown>(props);
+  const { items, isLoading, error: dataSourceError } = useDataSource(props.dataSource, {
+    bind: props.bind,
+  });
+  const options = buildSelectOptions(items, props.children);
+  return dispatchComponent('Select', {
+    ...resolved,
+    options,
+    isLoading,
+    dataSourceError: dataSourceError ?? null,
+    children: props.children,
+  });
+}
+
 export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);
 export const Fieldset = memo(FieldsetDispatch, stablePropsEqual);
-
-// Select is a temporary stub — will be properly updated in Task 5
-export const Select = Object.assign(
-  memo((props: SelectProps) => dispatchComponent('Select', props as never), stablePropsEqual),
-  { Option: SelectOption },
-);
+export const Select = Object.assign(memo(SelectDispatch, stablePropsEqual), {
+  Option: SelectOption,
+});
 
 export { SelectOption };
