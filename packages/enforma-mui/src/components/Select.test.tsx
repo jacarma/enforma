@@ -50,7 +50,7 @@ describe('MUI Select', () => {
 
   it('shows loading state when datasource is loading', () => {
     // Query datasources are registered on Form and referenced by name
-    const neverResolvingDs = { query: () => new Promise(() => undefined) };
+    const neverResolvingDs = { query: (): Promise<never[]> => new Promise(() => undefined) };
     render(
       <Form
         values={{ country: '' }}
