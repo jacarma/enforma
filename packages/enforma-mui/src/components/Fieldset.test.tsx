@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Form, registerComponents, clearRegistry } from 'enforma';
+import Enforma, { Form, registerComponents, clearRegistry } from 'enforma';
 import { TextInput } from './TextInput';
 import { Fieldset } from './Fieldset';
 
@@ -13,9 +13,9 @@ describe('MUI Fieldset', () => {
   it('renders children without a bind', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
-        <Fieldset>
-          <TextInput bind="name" label="Name" />
-        </Fieldset>
+        <Enforma.Fieldset>
+          <Enforma.TextInput bind="name" label="Name" />
+        </Enforma.Fieldset>
       </Form>,
     );
     expect(screen.getByLabelText('Name')).toHaveValue('Alice');
@@ -24,9 +24,9 @@ describe('MUI Fieldset', () => {
   it('scopes children to the given bind', () => {
     render(
       <Form values={{ address: { city: 'Paris' } }} onChange={() => undefined}>
-        <Fieldset bind="address" title="Address">
-          <TextInput bind="city" label="City" />
-        </Fieldset>
+        <Enforma.Fieldset bind="address" title="Address">
+          <Enforma.TextInput bind="city" label="City" />
+        </Enforma.Fieldset>
       </Form>,
     );
     expect(screen.getByLabelText('City')).toHaveValue('Paris');
@@ -35,9 +35,9 @@ describe('MUI Fieldset', () => {
   it('renders the title', () => {
     render(
       <Form values={{}} onChange={() => undefined}>
-        <Fieldset title="Personal Info">
-          <TextInput bind="name" label="Name" />
-        </Fieldset>
+        <Enforma.Fieldset title="Personal Info">
+          <Enforma.TextInput bind="name" label="Name" />
+        </Enforma.Fieldset>
       </Form>,
     );
     expect(screen.getByText('Personal Info')).toBeInTheDocument();

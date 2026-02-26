@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Form, clearRegistry, registerComponents } from 'enforma';
+import Enforma, { Form, clearRegistry, registerComponents } from 'enforma';
 import { TextInput } from './TextInput';
 import { List } from './List';
 
@@ -26,7 +26,7 @@ function renderList(
       <List {...defaultProps} {...listProps}>
         <List.Item title="name" />
         <List.Form>
-          <TextInput bind="name" label="Name" />
+          <Enforma.TextInput bind="name" label="Name" />
         </List.Form>
         {extraChildren}
       </List>
@@ -49,7 +49,7 @@ describe('MUI List — rows', () => {
         <List {...defaultProps}>
           <List.Item title="name" subtitle="email" />
           <List.Form>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,
@@ -81,7 +81,7 @@ describe('MUI List — row delete button', () => {
         <List {...defaultProps}>
           <List.Item title="name" showDeleteButton />
           <List.Form>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,
@@ -96,7 +96,7 @@ describe('MUI List — row delete button', () => {
         <List {...defaultProps}>
           <List.Item title="name" showDeleteButton />
           <List.Form>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,
@@ -237,7 +237,7 @@ describe('MUI List — modal delete', () => {
         <List {...defaultProps}>
           <List.Item title="name" />
           <List.Form showDeleteButton>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,
@@ -254,7 +254,7 @@ describe('MUI List — modal delete', () => {
         <List {...defaultProps}>
           <List.Item title="name" />
           <List.Form showDeleteButton>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,
@@ -279,10 +279,10 @@ describe('MUI List — disabled', () => {
         <List {...defaultProps} disabled>
           <List.Item title="name" />
           <List.Form mode="UPDATE">
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
           <List.Form mode="DISPLAY">
-            <TextInput bind="name" label="Name" disabled />
+            <Enforma.TextInput bind="name" label="Name" disabled />
           </List.Form>
         </List>
       </Form>,
@@ -300,7 +300,7 @@ describe('MUI List — disabled', () => {
         <List {...defaultProps} disabled>
           <List.Item title="name" showDeleteButton />
           <List.Form>
-            <TextInput bind="name" label="Name" />
+            <Enforma.TextInput bind="name" label="Name" />
           </List.Form>
         </List>
       </Form>,

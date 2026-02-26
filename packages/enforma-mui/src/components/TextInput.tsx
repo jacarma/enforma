@@ -1,18 +1,26 @@
 import { useId, useContext } from 'react';
 import { FormLabel, TextField } from '@mui/material';
-import { type TextInputProps, useFieldProps } from 'enforma';
+import { type ResolvedTextInputProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
-export function TextInput(props: TextInputProps) {
-  const { value, setValue, label, disabled, placeholder, description, error, showError, onBlur } =
-    useFieldProps<string>(props);
+export function TextInput({
+  value,
+  setValue,
+  label,
+  disabled = false,
+  placeholder,
+  description,
+  error,
+  showError,
+  onBlur,
+}: ResolvedTextInputProps) {
   const variant = useContext(MuiVariantContext);
   const id = useId();
 
   const commonProps = {
     value: value ?? '',
-    disabled: disabled ?? false,
+    disabled,
     onBlur,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
       setValue(e.target.value);
@@ -27,7 +35,7 @@ export function TextInput(props: TextInputProps) {
 
   if (variant === 'classic') {
     return (
-      <ComponentWrap error={showError} disabled={disabled ?? false}>
+      <ComponentWrap error={showError} disabled={disabled}>
         {label !== undefined && <FormLabel htmlFor={id}>{label}</FormLabel>}
         <TextField
           {...commonProps}
@@ -40,7 +48,7 @@ export function TextInput(props: TextInputProps) {
   }
 
   return (
-    <ComponentWrap error={showError} disabled={disabled ?? false}>
+    <ComponentWrap error={showError} disabled={disabled}>
       <TextField {...commonProps} label={label} variant={variant} />
     </ComponentWrap>
   );
