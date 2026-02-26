@@ -6,7 +6,7 @@ import { Form } from './Form';
 import { TextInput } from './fields';
 import { registerComponents } from './registry';
 import { useFieldProps } from '../hooks/useField';
-import type { TextInputProps } from './types';
+import type { ResolvedTextInputProps } from './types';
 import type { ReactNode } from 'react';
 import { useDataSources } from '../context/DataSourceContext';
 
@@ -169,12 +169,12 @@ describe('render isolation', () => {
     const adapterRenders = { name: 0, email: 0 };
 
     registerComponents({
-      TextInput: function TrackedTextInput(props: TextInputProps) {
-        const { value, setValue } = useFieldProps<string>(props);
-        adapterRenders[props.bind as keyof typeof adapterRenders]++;
+      TextInput: function TrackedTextInput({ value, setValue, label }: ResolvedTextInputProps) {
+        const key = (label?.toLowerCase() ?? '') as keyof typeof adapterRenders;
+        if (key in adapterRenders) adapterRenders[key]++;
         return (
           <input
-            aria-label={typeof props.label === 'string' ? props.label : props.bind}
+            aria-label={label}
             value={value ?? ''}
             onChange={(e) => {
               setValue(e.target.value);

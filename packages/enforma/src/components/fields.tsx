@@ -9,6 +9,8 @@ import {
   TextareaProps,
   TextInputProps,
 } from './types';
+import { useFieldProps } from '../hooks/useField';
+import { Scope } from './Scope';
 
 function isEmptyRef(v: unknown): boolean {
   if (Array.isArray(v)) return v.length === 0;
@@ -41,25 +43,35 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
   return <Impl {...props} />;
 }
 
-export const TextInput = memo(
-  (props: TextInputProps) => dispatchComponent('TextInput', props),
-  stablePropsEqual,
-);
-export const Textarea = memo(
-  (props: TextareaProps) => dispatchComponent('Textarea', props),
-  stablePropsEqual,
-);
+function TextInputDispatch(props: TextInputProps) {
+  const resolved = useFieldProps<string>(props);
+  return dispatchComponent('TextInput', resolved);
+}
+
+function TextareaDispatch(props: TextareaProps) {
+  const resolved = useFieldProps<string>(props);
+  return dispatchComponent('Textarea', resolved);
+}
+
+function CheckboxDispatch(props: CheckboxProps) {
+  const resolved = useFieldProps<boolean>(props);
+  return dispatchComponent('Checkbox', resolved);
+}
+
+function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
+  const content = bind !== undefined ? <Scope bind={bind}>{children}</Scope> : children;
+  return dispatchComponent('Fieldset', { children: content, ...(title !== undefined && { title }) });
+}
+
+export const TextInput = memo(TextInputDispatch, stablePropsEqual);
+export const Textarea = memo(TextareaDispatch, stablePropsEqual);
+export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);
+export const Fieldset = memo(FieldsetDispatch, stablePropsEqual);
+
+// Select is a temporary stub — will be properly updated in Task 5
 export const Select = Object.assign(
-  memo((props: SelectProps) => dispatchComponent('Select', props), stablePropsEqual),
+  memo((props: SelectProps) => dispatchComponent('Select', props as never), stablePropsEqual),
   { Option: SelectOption },
-);
-export const Checkbox = memo(
-  (props: CheckboxProps) => dispatchComponent('Checkbox', props),
-  stablePropsEqual,
-);
-export const Fieldset = memo(
-  (props: FieldsetProps) => dispatchComponent('Fieldset', props),
-  stablePropsEqual,
 );
 
 export { SelectOption };

@@ -57,23 +57,23 @@ export type ValidationState = {
 export type ResolvedCommonProps = {
   value: unknown;
   setValue: (value: unknown) => void;
-  label?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  description?: string;
+  label: string | undefined;
+  disabled: boolean | undefined;
+  placeholder: string | undefined;
+  description: string | undefined;
   error: string | null;
   showError: boolean;
   onBlur: () => void;
 };
 
-export type ResolvedTextInputProps = ResolvedCommonProps & {
+export type ResolvedTextInputProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
   value: string | undefined;
   setValue: (value: string) => void;
 };
 
 export type ResolvedTextareaProps = ResolvedTextInputProps;
 
-export type ResolvedCheckboxProps = ResolvedCommonProps & {
+export type ResolvedCheckboxProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
   value: boolean | undefined;
   setValue: (value: boolean) => void;
 };

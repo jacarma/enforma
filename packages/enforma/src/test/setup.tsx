@@ -3,14 +3,19 @@ import { afterEach, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { useId } from 'react';
 import { registerComponents, clearRegistry } from '../components/registry';
-import { useFieldProps } from '../hooks/useField';
-import type { TextInputProps } from '../components/types';
+import type { ResolvedTextInputProps } from '../components/types';
 
-function DefaultTextInput(props: TextInputProps) {
-  const { value, setValue, label, disabled, placeholder, error, showError, onBlur } =
-    useFieldProps<string>(props);
-  const generatedId = useId();
-  const inputId = props.id ?? generatedId;
+function DefaultTextInput({
+  value,
+  setValue,
+  label,
+  disabled,
+  placeholder,
+  error,
+  showError,
+  onBlur,
+}: ResolvedTextInputProps) {
+  const inputId = useId();
   const errorId = `${inputId}-error`;
 
   return (

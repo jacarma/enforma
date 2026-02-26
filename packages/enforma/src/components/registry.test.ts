@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { registerComponents, getComponent, clearRegistry } from './registry';
-import type { TextInputProps } from './types';
+import type { ResolvedTextInputProps } from './types';
 import React from 'react';
 
-const FakeA: React.ComponentType<TextInputProps> = () => React.createElement('div', null, 'A');
-const FakeB: React.ComponentType<TextInputProps> = () => React.createElement('div', null, 'B');
+const FakeA: React.ComponentType<ResolvedTextInputProps> = () => React.createElement('div', null, 'A');
+const FakeB: React.ComponentType<ResolvedTextInputProps> = () => React.createElement('div', null, 'B');
 
 describe('registry', () => {
   beforeEach(() => {
