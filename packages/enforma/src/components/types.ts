@@ -46,3 +46,79 @@ export type ValidationState = {
   isValid: boolean;
   errors: Record<string, string | null>;
 };
+
+// Resolved types — what registered adapter components receive.
+// Core dispatch calls hooks and passes these; adapters have no enforma imports.
+
+export type ResolvedCommonProps = {
+  value: unknown;
+  setValue: (value: unknown) => void;
+  label?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  description?: string;
+  error: string | null;
+  showError: boolean;
+  onBlur: () => void;
+};
+
+export type ResolvedTextInputProps = ResolvedCommonProps & {
+  value: string | undefined;
+  setValue: (value: string) => void;
+};
+
+export type ResolvedTextareaProps = ResolvedTextInputProps;
+
+export type ResolvedCheckboxProps = ResolvedCommonProps & {
+  value: boolean | undefined;
+  setValue: (value: boolean) => void;
+};
+
+export type ResolvedSelectProps = ResolvedCommonProps & {
+  value: unknown;
+  setValue: (value: unknown) => void;
+  options: { value: unknown; label: string }[];
+  isLoading: boolean;
+  dataSourceError: Error | null;
+  children?: ReactNode;
+};
+
+export type ResolvedFieldsetProps = {
+  children: ReactNode;
+  title?: string;
+};
+
+export type ResolvedListProps = {
+  items: ReactNode[];
+  addButton: ReactNode;
+  modal: ReactNode;
+  isEmpty: boolean;
+  disabled: boolean;
+};
+
+export type ResolvedListItemProps = {
+  item: FormValues;
+  index: number;
+  onEdit: () => void;
+  onDelete: () => void;
+  disabled: boolean;
+  title: string;
+  subtitle?: string;
+  avatar?: string;
+  showDeleteButton: boolean;
+};
+
+export type ResolvedFormModalProps = {
+  open: boolean;
+  mode: 'CREATE' | 'UPDATE' | 'DISPLAY';
+  title: string;
+  children: ReactNode;
+  onConfirm: () => void;
+  onCancel: () => void;
+  onDelete?: () => void;
+};
+
+export type ResolvedAddButtonProps = {
+  onClick: () => void;
+  disabled: boolean;
+};
