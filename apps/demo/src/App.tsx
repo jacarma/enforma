@@ -7,7 +7,7 @@ import Enforma, {
   type DataSourceDefinition,
   type DataSourceParams,
 } from 'enforma';
-import { classic, outlined, standard, List } from 'enforma-mui';
+import { classic, outlined, standard } from 'enforma-mui';
 
 // Minimal Select adapter for demo purposes
 type OptionItem = Record<string, string>;
@@ -263,12 +263,12 @@ export function App() {
       </p>
 
       <Enforma.Form values={listValues} onChange={setListValues} aria-label="list demo form">
-        <List bind="members" defaultItem={{ name: '' }}>
-          <List.Item title="name" showDeleteButton />
-          <List.Form showDeleteButton>
+        <Enforma.List bind="members" defaultItem={{ name: '' }}>
+          <Enforma.List.Item title="name" showDeleteButton />
+          <Enforma.List.Form showDeleteButton>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Enforma.Form>
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
