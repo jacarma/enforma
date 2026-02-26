@@ -34,12 +34,16 @@ export type FormWrapProps = {
 };
 
 export type ComponentPropsMap = {
-  TextInput: TextInputProps;
-  Textarea: TextareaProps;
-  Select: SelectProps;
-  Checkbox: CheckboxProps;
-  Fieldset: FieldsetProps;
+  TextInput: ResolvedTextInputProps;
+  Textarea: ResolvedTextareaProps;
+  Select: ResolvedSelectProps;
+  Checkbox: ResolvedCheckboxProps;
+  Fieldset: ResolvedFieldsetProps;
   FormWrap: FormWrapProps;
+  ListWrap: ResolvedListProps;
+  ListItem: ResolvedListItemProps;
+  FormModal: ResolvedFormModalProps;
+  AddButton: ResolvedAddButtonProps;
 };
 
 export type ValidationState = {

@@ -36,3 +36,15 @@ export type {
   DataSourceResult,
 } from './datasource/types';
 export type { SelectOptionProps } from './components/SelectOption';
+export type {
+  ResolvedCommonProps,
+  ResolvedTextInputProps,
+  ResolvedTextareaProps,
+  ResolvedCheckboxProps,
+  ResolvedSelectProps,
+  ResolvedFieldsetProps,
+  ResolvedListProps,
+  ResolvedListItemProps,
+  ResolvedFormModalProps,
+  ResolvedAddButtonProps,
+} from './components/types';
