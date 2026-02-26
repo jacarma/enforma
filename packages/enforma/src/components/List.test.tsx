@@ -1,129 +1,350 @@
 // packages/enforma/src/components/List.test.tsx
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { createPortal } from 'react-dom';
 import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
 import { List } from './List';
-import { Scope } from './Scope';
 import { TextInput } from './fields';
+import { registerComponents } from './registry';
+import type {
+  ResolvedListProps,
+  ResolvedListItemProps,
+  ResolvedFormModalProps,
+  ResolvedAddButtonProps,
+} from './types';
 import { useFormStore } from '../context/FormContext';
 
-describe('List', () => {
-  it('renders one scoped item per array element', () => {
-    render(
-      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
+// Minimal stub slot components used to exercise List orchestration logic.
+
+function StubListWrap({ items, addButton, modal }: ResolvedListProps) {
+  return (
+    <div>
+      <div data-testid="list-rows">{items}</div>
+      {addButton}
+      {modal}
+    </div>
+  );
+}
+
+function StubListItem({
+  title,
+  subtitle,
+  onEdit,
+  onDelete,
+  showDeleteButton,
+  disabled,
+}: ResolvedListItemProps) {
+  return (
+    <div>
+      <button type="button" onClick={onEdit}>
+        {title}
+      </button>
+      {subtitle !== undefined && <span>{subtitle}</span>}
+      {showDeleteButton && !disabled && (
+        <button type="button" aria-label="delete" onClick={onDelete}>
+          Delete
+        </button>
+      )}
+    </div>
+  );
+}
+
+function StubAddButton({ onClick, disabled }: ResolvedAddButtonProps) {
+  if (disabled) return null;
+  return (
+    <button type="button" onClick={onClick}>
+      Add
+    </button>
+  );
+}
+
+function StubFormModal({
+  open,
+  mode,
+  title,
+  children,
+  onConfirm,
+  onCancel,
+  onDelete,
+}: ResolvedFormModalProps) {
+  if (!open) return null;
+  return createPortal(
+    <div role="dialog" aria-label={title}>
+      {children}
+      {mode !== 'DISPLAY' && (
+        <>
+          <button type="button" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="button" onClick={onConfirm}>
+            Confirm
+          </button>
+        </>
+      )}
+      {mode === 'DISPLAY' && (
+        <button type="button" onClick={onCancel}>
+          Close
+        </button>
+      )}
+      {onDelete !== undefined && (
+        <button type="button" onClick={onDelete}>
+          Delete
+        </button>
+      )}
+    </div>,
+    document.body,
+  );
+}
+
+beforeEach(() => {
+  // setup.tsx beforeEach already clears registry and registers TextInput.
+  // We add the List slot components on top.
+  registerComponents({
+    ListWrap: StubListWrap,
+    ListItem: StubListItem,
+    AddButton: StubAddButton,
+    FormModal: StubFormModal,
+  });
+});
+
+const defaultProps = { bind: 'items', defaultItem: { name: '' } };
+
+function renderList(listProps: Partial<typeof defaultProps & { disabled?: boolean }> = {}) {
+  const onChange = vi.fn();
+  render(
+    <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
+      <List {...defaultProps} {...listProps}>
+        <List.Item title="name" />
+        <List.Form>
           <TextInput bind="name" label="Name" />
-        </List>
-      </Form>,
-    );
-    const inputs = screen.getAllByLabelText('Name');
-    expect(inputs).toHaveLength(2);
-    expect(inputs[0]).toHaveValue('Alice');
-    expect(inputs[1]).toHaveValue('Bob');
+        </List.Form>
+      </List>
+    </Form>,
+  );
+  return { onChange };
+}
+
+describe('List — items rendering', () => {
+  it('renders one row per array element showing the title field value', () => {
+    renderList();
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getByText('Bob')).toBeInTheDocument();
   });
 
-  it('renders nothing when the array is empty', () => {
+  it('renders nothing but Add button when array is empty', () => {
     render(
       <Form values={{ items: [] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
+        <List {...defaultProps}>
+          <List.Item title="name" />
+          <List.Form>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
         </List>
       </Form>,
     );
-    expect(screen.queryAllByLabelText('Name')).toHaveLength(0);
+    expect(screen.queryByText('Alice')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
   });
 
-  it('scopes each item to its own index so edits do not bleed', async () => {
+  it('renders a subtitle when List.Item has subtitle prop', () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice', role: 'Admin' }] }} onChange={vi.fn()}>
+        <List {...defaultProps}>
+          <List.Item title="name" subtitle="role" />
+          <List.Form>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
+        </List>
+      </Form>,
+    );
+    expect(screen.getByText('Admin')).toBeInTheDocument();
+  });
+
+  it('renders Add button when not disabled', () => {
+    renderList();
+    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
+  });
+
+  it('does not render Add button when disabled', () => {
+    renderList({ disabled: true });
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument();
+  });
+
+  it('shows row delete buttons when List.Item has showDeleteButton', () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()}>
+        <List {...defaultProps}>
+          <List.Item title="name" showDeleteButton />
+          <List.Form>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
+        </List>
+      </Form>,
+    );
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it('does not show row delete buttons on disabled list', () => {
+    render(
+      <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()}>
+        <List {...defaultProps} disabled>
+          <List.Item title="name" showDeleteButton />
+          <List.Form>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
+        </List>
+      </Form>,
+    );
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+  });
+});
+
+describe('List — Edit flow', () => {
+  it('opens modal pre-populated with item data when a row is clicked', async () => {
+    renderList();
+    await userEvent.click(screen.getByText('Alice'));
+    await screen.findByRole('dialog');
+    expect(screen.getByLabelText('Name')).toHaveValue('Alice');
+  });
+
+  it('updates item in parent store on Confirm', async () => {
+    const { onChange } = renderList();
+    await userEvent.click(screen.getByText('Alice'));
+    await screen.findByRole('dialog');
+    await userEvent.clear(screen.getByLabelText('Name'));
+    await userEvent.type(screen.getByLabelText('Name'), 'Alicia');
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await waitFor(() => {
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({ items: [{ name: 'Alicia' }, { name: 'Bob' }] }),
+        expect.anything(),
+      );
+    });
+  });
+
+  it('leaves parent store unchanged on Cancel', async () => {
+    const { onChange } = renderList();
+    onChange.mockClear();
+    await userEvent.click(screen.getByText('Alice'));
+    await screen.findByRole('dialog');
+    await userEvent.clear(screen.getByLabelText('Name'));
+    await userEvent.type(screen.getByLabelText('Name'), 'Alicia');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('List — Add flow', () => {
+  it('opens an empty dialog when Add is clicked', async () => {
+    renderList();
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+    await screen.findByRole('dialog');
+    expect(screen.getByLabelText('Name')).toHaveValue('');
+  });
+
+  it('appends item to parent store on Confirm', async () => {
+    const { onChange } = renderList();
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+    await screen.findByRole('dialog');
+    await userEvent.type(screen.getByLabelText('Name'), 'Charlie');
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await waitFor(() => {
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          items: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
+  it('does NOT write to parent store while typing in the modal', async () => {
+    const { onChange } = renderList();
+    onChange.mockClear();
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+    await screen.findByRole('dialog');
+    await userEvent.type(screen.getByLabelText('Name'), 'Charlie');
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('discards draft on Cancel', async () => {
+    const { onChange } = renderList();
+    onChange.mockClear();
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+    await screen.findByRole('dialog');
+    await userEvent.type(screen.getByLabelText('Name'), 'Charlie');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('List — Delete', () => {
+  it('removes item when row delete button is clicked', async () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
+        <List {...defaultProps}>
+          <List.Item title="name" showDeleteButton />
+          <List.Form showDeleteButton>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
         </List>
       </Form>,
     );
-    const first: HTMLElement | undefined = screen.getAllByLabelText('Name')[0];
-    if (first === undefined) throw new Error('Expected at least one Name input');
-    await userEvent.clear(first);
-    await userEvent.type(first, 'Charlie');
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    const first = deleteButtons[0];
+    if (first === undefined) throw new Error('Expected delete button');
+    await userEvent.click(first);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        items: [{ name: 'Charlie' }, { name: 'Bob' }],
-      }),
+      expect.objectContaining({ items: [{ name: 'Bob' }] }),
       expect.anything(),
     );
   });
 
-  it('appends a new item when the Add button is clicked', async () => {
+  it('shows modal Delete button when List.Form has showDeleteButton', async () => {
     render(
-      <Form values={{ items: [] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
-        </List>
-      </Form>,
-    );
-    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
-    expect(screen.getAllByLabelText('Name')).toHaveLength(1);
-    expect(screen.getByLabelText('Name')).toHaveValue('');
-  });
-
-  it('removes the correct item when its Remove button is clicked', async () => {
-    render(
-      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
-        </List>
-      </Form>,
-    );
-    const firstRemove: HTMLElement | undefined = screen.getAllByRole('button', {
-      name: 'Remove',
-    })[0];
-    if (firstRemove === undefined) throw new Error('Expected at least one Remove button');
-    await userEvent.click(firstRemove);
-    const inputs = screen.getAllByLabelText('Name');
-    expect(inputs).toHaveLength(1);
-    expect(inputs[0]).toHaveValue('Bob');
-  });
-
-  it('works nested inside a Scope', () => {
-    render(
-      <Form values={{ team: { members: [{ name: 'Alice' }] } }} onChange={vi.fn()}>
-        <Scope bind="team">
-          <List bind="members" defaultItem={{ name: '' }}>
+      <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()}>
+        <List {...defaultProps}>
+          <List.Item title="name" />
+          <List.Form showDeleteButton>
             <TextInput bind="name" label="Name" />
-          </List>
-        </Scope>
-      </Form>,
-    );
-    expect(screen.getByLabelText('Name')).toHaveValue('Alice');
-  });
-
-  it('preserves focus when removing via keyboard', async () => {
-    render(
-      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
+          </List.Form>
         </List>
       </Form>,
     );
-
-    const inputs = screen.getAllByLabelText('Name');
-    if (inputs[1] === undefined) throw new Error('Expected second input');
-    inputs[1].focus();
-
-    // Tab to Bob's Remove button (the second Remove) and press Enter
-    await userEvent.tab();
-    await userEvent.keyboard('{Enter}');
-
-    const remaining = screen.getAllByLabelText('Name');
-    expect(remaining).toHaveLength(1);
-    expect(document.activeElement).toBe(remaining[0]);
+    await userEvent.click(screen.getByText('Alice'));
+    await screen.findByRole('dialog');
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
+  it('removes item via modal Delete and closes dialog', async () => {
+    const onChange = vi.fn();
+    render(
+      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
+        <List {...defaultProps}>
+          <List.Item title="name" />
+          <List.Form showDeleteButton>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
+        </List>
+      </Form>,
+    );
+    await userEvent.click(screen.getByText('Alice'));
+    await screen.findByRole('dialog');
+    await userEvent.click(screen.getByRole('button', { name: /delete/i }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ items: [{ name: 'Bob' }] }),
+      expect.anything(),
+    );
+  });
+});
+
+describe('List — key management', () => {
   it('handles external array shrinkage without corrupting keys', async () => {
-    // Resetter bypasses List's onClick to simulate an external store update
-    // (e.g. a sibling component or future form-reset API shrinking the array).
     function Resetter() {
       const store = useFormStore();
       return (
@@ -143,47 +364,26 @@ describe('List', () => {
         onChange={vi.fn()}
       >
         <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
+          <List.Item title="name" />
+          <List.Form>
+            <TextInput bind="name" label="Name" />
+          </List.Form>
         </List>
         <Resetter />
       </Form>,
     );
 
-    // Externally shrink the array to 1 item via the store (bypasses List's onClick)
     await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
-    expect(screen.getAllByLabelText('Name')).toHaveLength(1);
+    expect(screen.queryByText('Bob')).not.toBeInTheDocument();
+    expect(screen.queryByText('Charlie')).not.toBeInTheDocument();
+    expect(screen.getByText('Alice')).toBeInTheDocument();
 
-    // Add a new item — it should get a fresh key, not reuse a stale one
     await userEvent.click(screen.getByRole('button', { name: 'Add' }));
-    const inputs = screen.getAllByLabelText('Name');
-    expect(inputs).toHaveLength(2);
-    expect(inputs[0]).toHaveValue('Alice');
-    expect(inputs[1]).toHaveValue('');
-  });
-
-  it('preserves focus when removing an item above the focused one', async () => {
-    render(
-      <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={vi.fn()}>
-        <List bind="items" defaultItem={{ name: '' }}>
-          <TextInput bind="name" label="Name" />
-        </List>
-      </Form>,
-    );
-
-    const inputs = screen.getAllByLabelText('Name');
-    // Focus the second input (Bob)
-    if (inputs[1] === undefined) throw new Error('Expected second input');
-    inputs[1].focus();
-    expect(document.activeElement).toBe(inputs[1]);
-
-    // Remove the first item (Alice)
-    const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
-    if (removeButtons[0] === undefined) throw new Error('Expected a Remove button');
-    await userEvent.click(removeButtons[0]);
-
-    // Only one input remains; it should still be focused
-    const remaining = screen.getAllByLabelText('Name');
-    expect(remaining).toHaveLength(1);
-    expect(document.activeElement).toBe(remaining[0]);
+    await screen.findByRole('dialog');
+    await userEvent.type(screen.getByLabelText('Name'), 'Dave');
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await waitFor(() => {
+      expect(screen.getByText('Dave')).toBeInTheDocument();
+    });
   });
 });

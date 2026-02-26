@@ -4,11 +4,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Enforma, { Form, clearRegistry, registerComponents } from 'enforma';
 import { TextInput } from './TextInput';
-import { List } from './List';
+import { ListWrap } from './ListWrap';
+import { ListItem } from './ListItem';
+import { AddButton } from './AddButton';
+import { FormModal } from './FormModal';
 
 beforeEach(() => {
   clearRegistry();
-  registerComponents({ TextInput });
+  registerComponents({ TextInput, ListWrap, ListItem, AddButton, FormModal });
 });
 
 const defaultProps = {
@@ -23,13 +26,13 @@ function renderList(
   const onChange = vi.fn();
   render(
     <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
-      <List {...defaultProps} {...listProps}>
-        <List.Item title="name" />
-        <List.Form>
+      <Enforma.List {...defaultProps} {...listProps}>
+        <Enforma.List.Item title="name" />
+        <Enforma.List.Form>
           <Enforma.TextInput bind="name" label="Name" />
-        </List.Form>
+        </Enforma.List.Form>
         {extraChildren}
-      </List>
+      </Enforma.List>
     </Form>,
   );
   return { onChange };
@@ -46,12 +49,12 @@ describe('MUI List — rows', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice', email: 'alice@example.com' }] }} onChange={onChange}>
-        <List {...defaultProps}>
-          <List.Item title="name" subtitle="email" />
-          <List.Form>
+        <Enforma.List {...defaultProps}>
+          <Enforma.List.Item title="name" subtitle="email" />
+          <Enforma.List.Form>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     expect(screen.getByText('alice@example.com')).toBeInTheDocument();
@@ -78,12 +81,12 @@ describe('MUI List — row delete button', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice' }] }} onChange={onChange}>
-        <List {...defaultProps}>
-          <List.Item title="name" showDeleteButton />
-          <List.Form>
+        <Enforma.List {...defaultProps}>
+          <Enforma.List.Item title="name" showDeleteButton />
+          <Enforma.List.Form>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
@@ -93,12 +96,12 @@ describe('MUI List — row delete button', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
-        <List {...defaultProps}>
-          <List.Item title="name" showDeleteButton />
-          <List.Form>
+        <Enforma.List {...defaultProps}>
+          <Enforma.List.Item title="name" showDeleteButton />
+          <Enforma.List.Form>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
@@ -234,12 +237,12 @@ describe('MUI List — modal delete', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice' }] }} onChange={onChange}>
-        <List {...defaultProps}>
-          <List.Item title="name" />
-          <List.Form showDeleteButton>
+        <Enforma.List {...defaultProps}>
+          <Enforma.List.Item title="name" />
+          <Enforma.List.Form showDeleteButton>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     await userEvent.click(screen.getByText('Alice'));
@@ -251,12 +254,12 @@ describe('MUI List — modal delete', () => {
     const onChange = vi.fn();
     render(
       <Form values={{ items: [{ name: 'Alice' }, { name: 'Bob' }] }} onChange={onChange}>
-        <List {...defaultProps}>
-          <List.Item title="name" />
-          <List.Form showDeleteButton>
+        <Enforma.List {...defaultProps}>
+          <Enforma.List.Item title="name" />
+          <Enforma.List.Form showDeleteButton>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     await userEvent.click(screen.getByText('Alice'));
@@ -276,15 +279,15 @@ describe('MUI List — disabled', () => {
   it('opens DISPLAY modal (not edit) when a row is clicked on disabled list', async () => {
     render(
       <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()}>
-        <List {...defaultProps} disabled>
-          <List.Item title="name" />
-          <List.Form mode="UPDATE">
+        <Enforma.List {...defaultProps} disabled>
+          <Enforma.List.Item title="name" />
+          <Enforma.List.Form mode="UPDATE">
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-          <List.Form mode="DISPLAY">
+          </Enforma.List.Form>
+          <Enforma.List.Form mode="DISPLAY">
             <Enforma.TextInput bind="name" label="Name" disabled />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     await userEvent.click(screen.getByText('Alice'));
@@ -297,12 +300,12 @@ describe('MUI List — disabled', () => {
   it('does not show row delete buttons on disabled list even with showDeleteButton', () => {
     render(
       <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()}>
-        <List {...defaultProps} disabled>
-          <List.Item title="name" showDeleteButton />
-          <List.Form>
+        <Enforma.List {...defaultProps} disabled>
+          <Enforma.List.Item title="name" showDeleteButton />
+          <Enforma.List.Form>
             <Enforma.TextInput bind="name" label="Name" />
-          </List.Form>
-        </List>
+          </Enforma.List.Form>
+        </Enforma.List>
       </Form>,
     );
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
