@@ -796,19 +796,134 @@ git commit -m "feat: add MUI ListWrap, ListItem, AddButton, FormModal slot compo
 
 ---
 
-### Task 7: Rewrite core List to own orchestration
+### Task 7: Move ListItemSlot and ListFormSlot to core
 
-Move all modal orchestration from the MUI adapter to the core `List` component. The core List dispatches to registered slot components.
+These slot marker components are currently in `enforma-mui` but core `List` needs them. Move them to `packages/enforma` so core can import them without a circular dependency.
+
+**Files:**
+- Create: `packages/enforma/src/components/ListItemSlot.tsx`
+- Create: `packages/enforma/src/components/ListFormSlot.tsx`
+- Modify: `packages/enforma/src/index.ts`
+- Modify: `packages/enforma-mui/src/components/List.tsx` (update imports)
+- Delete: `packages/enforma-mui/src/components/ListItemSlot.tsx`
+- Delete: `packages/enforma-mui/src/components/ListFormSlot.tsx`
+
+**Step 1: Create ListItemSlot in core**
+
+Create `packages/enforma/src/components/ListItemSlot.tsx`:
+
+```typescript
+// packages/enforma/src/components/ListItemSlot.tsx
+import type { FormValues } from '../store/FormStore';
+
+export type ListItemSlotProps = {
+  title: string | ((item: FormValues) => string);
+  subtitle?: string | ((item: FormValues) => string);
+  avatar?: string | ((item: FormValues) => string);
+  showDeleteButton?: boolean;
+};
+
+// Props are read externally by the parent via React.Children — not used in the body
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ListItemSlot(_: ListItemSlotProps): null {
+  return null;
+}
+```
+
+**Step 2: Create ListFormSlot in core**
+
+Create `packages/enforma/src/components/ListFormSlot.tsx`:
+
+```typescript
+// packages/enforma/src/components/ListFormSlot.tsx
+import { type ReactNode } from 'react';
+
+export type ListFormSlotMode = 'CREATE' | 'UPDATE' | 'DISPLAY';
+
+export type ListFormSlotProps = {
+  mode?: ListFormSlotMode;
+  showDeleteButton?: boolean;
+  children: ReactNode;
+};
+
+// Props are read externally by the parent via React.Children — not used in the body
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ListFormSlot(_: ListFormSlotProps): null {
+  return null;
+}
+```
+
+**Step 3: Export from enforma index**
+
+Add to `packages/enforma/src/index.ts`:
+
+```typescript
+export { ListItemSlot } from './components/ListItemSlot';
+export type { ListItemSlotProps } from './components/ListItemSlot';
+export { ListFormSlot } from './components/ListFormSlot';
+export type { ListFormSlotProps, ListFormSlotMode } from './components/ListFormSlot';
+```
+
+**Step 4: Update enforma-mui List.tsx to import from 'enforma'**
+
+In `packages/enforma-mui/src/components/List.tsx`, replace the local imports:
+
+```typescript
+// remove these:
+import { ListItemSlot, type ListItemSlotProps } from './ListItemSlot';
+import { ListFormSlot, type ListFormSlotProps, type ListFormSlotMode } from './ListFormSlot';
+
+// replace with:
+import {
+  ListItemSlot,
+  type ListItemSlotProps,
+  ListFormSlot,
+  type ListFormSlotProps,
+  type ListFormSlotMode,
+} from 'enforma';
+```
+
+**Step 5: Delete the local enforma-mui slot files**
+
+```bash
+git rm packages/enforma-mui/src/components/ListItemSlot.tsx \
+        packages/enforma-mui/src/components/ListFormSlot.tsx
+```
+
+**Step 6: Run typecheck**
+
+```bash
+nvm use 20 && pnpm typecheck
+```
+Expected: PASS
+
+**Step 7: Run tests**
+
+```bash
+nvm use 20 && pnpm test
+```
+Expected: PASS (no behavior change)
+
+**Step 8: Commit**
+
+```bash
+git add packages/enforma/src/components/ListItemSlot.tsx \
+        packages/enforma/src/components/ListFormSlot.tsx \
+        packages/enforma/src/index.ts \
+        packages/enforma-mui/src/components/List.tsx
+git commit -m "feat: move ListItemSlot and ListFormSlot to enforma core"
+```
+
+---
+
+### Task 8: Rewrite core List to own orchestration
+
+Move all modal orchestration from the MUI adapter to the core `List` component. The core List dispatches to registered slot components. ListItemSlot and ListFormSlot are now in core (Task 7).
 
 **Files:**
 - Modify: `packages/enforma/src/components/List.tsx`
-- Modify: `packages/enforma/src/components/types.ts` (update ListProps)
 
-**Step 1: Add `disabled` to core ListProps and extend `ComponentPropsMap` if needed**
-
-In `packages/enforma/src/components/types.ts`, ensure `ListProps` (used internally in List.tsx) includes `disabled`. This is an internal type change — no public API impact.
-
-**Step 2: Rewrite `packages/enforma/src/components/List.tsx`**
+**Step 1: Rewrite `packages/enforma/src/components/List.tsx`**
 
 ```typescript
 // packages/enforma/src/components/List.tsx
@@ -972,32 +1087,14 @@ export function List({ bind, defaultItem, disabled = false, children }: ListProp
 }
 ```
 
-Note: `ListItemSlot` and `ListFormSlot` are currently in `enforma-mui`. They need to be moved to `packages/enforma/src/components/` since core List now uses them. See sub-steps below.
-
-**Step 2a: Move ListItemSlot and ListFormSlot to core**
-
-Move these files from `packages/enforma-mui/src/components/` to `packages/enforma/src/components/`:
-- `ListItemSlot.tsx` → `packages/enforma/src/components/ListItemSlot.tsx`
-- `ListFormSlot.tsx` → `packages/enforma/src/components/ListFormSlot.tsx`
-
-Update their imports if needed. Export them from `packages/enforma/src/index.ts`:
-
-```typescript
-export { ListItemSlot } from './components/ListItemSlot';
-export { ListFormSlot } from './components/ListFormSlot';
-export type { ListFormSlotMode } from './components/ListFormSlot';
-```
-
-Update `enforma-mui` imports to get them from `'enforma'` instead of local paths.
-
-**Step 3: Run typecheck**
+**Step 2: Run typecheck**
 
 ```bash
 nvm use 20 && pnpm typecheck
 ```
 Expected: PASS
 
-**Step 4: Update List.test.tsx to use registry pattern**
+**Step 3: Update List.test.tsx to use registry pattern**
 
 The existing `List.test.tsx` imports `List` from `'./List'` (MUI). After this refactor, `List` comes from core and dispatches via registry. Update `packages/enforma-mui/src/components/List.test.tsx`:
 
@@ -1044,40 +1141,35 @@ function renderList(
 
 All test cases remain the same — just update imports and the `renderList` helper above.
 
-**Step 5: Run tests**
+**Step 4: Run tests**
 
 ```bash
 nvm use 20 && pnpm --filter enforma-mui test List
 ```
 Expected: PASS (same behavior, new architecture)
 
-**Step 6: Run full test suite**
+**Step 5: Run full test suite**
 
 ```bash
 nvm use 20 && pnpm test
 ```
 Expected: PASS
 
-**Step 7: Commit**
+**Step 6: Commit**
 
 ```bash
 git add packages/enforma/src/components/List.tsx \
-        packages/enforma/src/components/ListItemSlot.tsx \
-        packages/enforma/src/components/ListFormSlot.tsx \
-        packages/enforma/src/index.ts \
         packages/enforma-mui/src/components/List.test.tsx
 git commit -m "feat: core List owns modal orchestration, dispatches to registered slot components"
 ```
 
 ---
 
-### Task 8: Update enforma-mui index and remove old MUI List
+### Task 9: Update enforma-mui index and remove old MUI List
 
 **Files:**
 - Modify: `packages/enforma-mui/src/index.ts`
-- Delete: `packages/enforma-mui/src/components/List.tsx` (replaced by slot components)
-- Delete: `packages/enforma-mui/src/components/ListItemSlot.tsx` (moved to core)
-- Delete: `packages/enforma-mui/src/components/ListFormSlot.tsx` (moved to core)
+- Delete: `packages/enforma-mui/src/components/List.tsx` (replaced by slot components in Task 6; local slot files already removed in Task 7)
 
 **Step 1: Update enforma-mui index.ts**
 
@@ -1127,12 +1219,10 @@ export { ClassicProvider, OutlinedProvider, StandardProvider };
 export type { MuiVariant } from './context/MuiVariantContext';
 ```
 
-**Step 2: Delete old MUI files**
+**Step 2: Delete old MUI List**
 
 ```bash
-rm packages/enforma-mui/src/components/List.tsx
-rm packages/enforma-mui/src/components/ListItemSlot.tsx
-rm packages/enforma-mui/src/components/ListFormSlot.tsx
+git rm packages/enforma-mui/src/components/List.tsx
 ```
 
 **Step 3: Run full test suite**
@@ -1168,7 +1258,7 @@ git commit -m "feat: update enforma-mui exports, remove old List (replaced by sl
 
 ---
 
-### Task 9: Final verification
+### Task 10: Final verification
 
 **Step 1: Run full test suite**
 
