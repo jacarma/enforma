@@ -4,3 +4,4 @@ dist
 *.local
 coverage
 CLAUDE.local.md
+.worktrees
