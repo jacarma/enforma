@@ -2,11 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Enforma, { Form, registerComponents, clearRegistry, SelectOption } from 'enforma';
 import { Select } from './Select';
+import { SelectOption as SelectOptionMui } from './SelectOption';
 import { TextInput } from './TextInput';
 
 beforeEach(() => {
   clearRegistry();
-  registerComponents({ Select, TextInput });
+  registerComponents({ Select, TextInput, SelectOption: SelectOptionMui });
 });
 
 describe('MUI Select', () => {
