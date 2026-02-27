@@ -40,7 +40,7 @@ export type ComponentPropsMap = {
   Checkbox: ResolvedCheckboxProps;
   Fieldset: ResolvedFieldsetProps;
   FormWrap: FormWrapProps;
-  ListWrap: ResolvedListProps;
+  List: ResolvedListProps;
   ListItem: ResolvedListItemProps;
   FormModal: ResolvedFormModalProps;
   AddButton: ResolvedAddButtonProps;

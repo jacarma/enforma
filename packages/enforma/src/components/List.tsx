@@ -153,14 +153,14 @@ function ListMain({ bind, defaultItem, disabled = false, children }: ListProps) 
     </FormModalImpl>
   ) : null;
 
-  // Dispatch to registered ListWrap
-  const ListWrapImpl = getComponent('ListWrap');
-  if (!ListWrapImpl) {
-    throw new Error('Enforma: component "ListWrap" is not registered.');
+  // Dispatch to registered List
+  const ListImpl = getComponent('List');
+  if (!ListImpl) {
+    throw new Error('Enforma: component "List" is not registered.');
   }
 
   return (
-    <ListWrapImpl
+    <ListImpl
       items={items}
       addButton={addButton}
       modal={modalNode}

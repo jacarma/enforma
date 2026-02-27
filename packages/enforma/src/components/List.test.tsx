@@ -101,7 +101,7 @@ beforeEach(() => {
   // setup.tsx beforeEach already clears registry and registers TextInput.
   // We add the List slot components on top.
   registerComponents({
-    ListWrap: StubListWrap,
+    List: StubListWrap,
     ListItem: StubListItem,
     AddButton: StubAddButton,
     FormModal: StubFormModal,
