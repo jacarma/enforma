@@ -3,13 +3,11 @@ import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
   registerComponents,
-  type ResolvedSelectProps,
   type DataSourceDefinition,
   type DataSourceParams,
 } from 'enforma';
 import { classic, outlined, standard } from 'enforma-mui';
 
-// Minimal Select adapter for demo purposes
 type OptionItem = Record<string, string>;
 
 const allCities: OptionItem[] = [
@@ -60,37 +58,10 @@ const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
   },
 };
 
-function DemoSelect({
-  value,
-  setValue,
-  label,
-  error,
-  showError,
-  children,
-  isLoading,
-}: ResolvedSelectProps) {
-  return (
-    <div style={{ marginBottom: '1rem' }}>
-      {label && <label>{label}</label>}
-      <select
-        value={typeof value === 'string' ? value : ''}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
-        disabled={isLoading}
-      >
-        <option value="">— select —</option>
-        {children}
-      </select>
-      {showError && error && <span style={{ color: 'red' }}>{error}</span>}
-    </div>
-  );
-}
-
 const bundleMap = { classic, outlined, standard };
 type VariantKey = keyof typeof bundleMap;
 
-registerComponents({ ...classic, Select: DemoSelect });
+registerComponents(classic);
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],

@@ -83,6 +83,7 @@ export type ResolvedSelectProps = ResolvedCommonProps & {
   value: unknown;
   setValue: (value: unknown) => void;
   children: ReactNode;
+  displayValue: string;
   isLoading: boolean;
   dataSourceError: Error | null;
 };

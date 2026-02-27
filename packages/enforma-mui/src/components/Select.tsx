@@ -18,6 +18,7 @@ export function Select({
   showError,
   onBlur,
   children,
+  displayValue,
   isLoading,
   dataSourceError,
 }: ResolvedSelectProps) {
@@ -41,6 +42,7 @@ export function Select({
         onBlur={onBlur}
         variant={variant === 'classic' ? 'outlined' : variant}
         size={variant === 'classic' ? 'small' : 'medium'}
+        renderValue={() => displayValue}
       >
         {children}
       </MuiSelect>

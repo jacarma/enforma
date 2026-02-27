@@ -139,9 +139,12 @@ function SelectDispatch(props: SelectProps) {
   const renderedOptions = options.map((opt) => (
     <SelectOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
+  const matched = options.find((opt) => opt.value === resolved.value);
+  const displayValue = matched?.label ?? (typeof resolved.value === 'string' ? resolved.value : '');
   return dispatchComponent('Select', {
     ...resolved,
     children: renderedOptions,
+    displayValue,
     isLoading,
     dataSourceError: dataSourceError ?? null,
   });

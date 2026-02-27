@@ -1,6 +1,14 @@
-import { MenuItem } from '@mui/material';
+import { MenuItem, type MenuItemProps } from '@mui/material';
 import { type ResolvedSelectOptionProps } from 'enforma';
 
-export function SelectOption({ value, label }: ResolvedSelectOptionProps) {
-  return <MenuItem value={value as string}>{label}</MenuItem>;
+export function SelectOption({
+  value,
+  label,
+  ...rest
+}: ResolvedSelectOptionProps & Omit<MenuItemProps, 'value'>) {
+  return (
+    <MenuItem value={value as string} {...rest}>
+      {label}
+    </MenuItem>
+  );
 }
