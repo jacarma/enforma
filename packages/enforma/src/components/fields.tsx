@@ -132,12 +132,18 @@ function SelectDispatch(props: SelectProps) {
     bind: props.bind,
   });
   const options = buildSelectOptions(items, props.children);
+  const SelectOptionImpl = getComponent('SelectOption');
+  if (!SelectOptionImpl) {
+    throw new Error('Enforma: component "SelectOption" is not registered.');
+  }
+  const renderedOptions = options.map((opt) => (
+    <SelectOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
+  ));
   return dispatchComponent('Select', {
     ...resolved,
-    options,
+    children: renderedOptions,
     isLoading,
     dataSourceError: dataSourceError ?? null,
-    children: props.children,
   });
 }
 
