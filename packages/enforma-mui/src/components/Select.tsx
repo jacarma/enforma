@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import {
   CircularProgress,
-  MenuItem,
   Select as MuiSelect,
   InputLabel,
   FormHelperText,
@@ -18,7 +17,7 @@ export function Select({
   error,
   showError,
   onBlur,
-  options,
+  children,
   isLoading,
   dataSourceError,
 }: ResolvedSelectProps) {
@@ -43,11 +42,7 @@ export function Select({
         variant={variant === 'classic' ? 'outlined' : variant}
         size={variant === 'classic' ? 'small' : 'medium'}
       >
-        {options.map((opt) => (
-          <MenuItem key={String(opt.value)} value={opt.value as string}>
-            {opt.label}
-          </MenuItem>
-        ))}
+        {children}
       </MuiSelect>
       {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
     </MuiFormControl>

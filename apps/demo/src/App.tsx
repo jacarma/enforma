@@ -66,7 +66,7 @@ function DemoSelect({
   label,
   error,
   showError,
-  options,
+  children,
   isLoading,
 }: ResolvedSelectProps) {
   return (
@@ -80,11 +80,7 @@ function DemoSelect({
         disabled={isLoading}
       >
         <option value="">— select —</option>
-        {options.map((opt, i) => (
-          <option key={i} value={typeof opt.value === 'string' ? opt.value : ''}>
-            {opt.label}
-          </option>
-        ))}
+        {children}
       </select>
       {showError && error && <span style={{ color: 'red' }}>{error}</span>}
     </div>
