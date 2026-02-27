@@ -46,6 +46,7 @@ export type {
   ResolvedTextareaProps,
   ResolvedCheckboxProps,
   ResolvedSelectProps,
+  ResolvedSelectOptionProps,
   ResolvedFieldsetProps,
   ResolvedListProps,
   ResolvedListItemProps,
