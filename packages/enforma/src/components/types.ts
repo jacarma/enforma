@@ -37,6 +37,7 @@ export type ComponentPropsMap = {
   TextInput: ResolvedTextInputProps;
   Textarea: ResolvedTextareaProps;
   Select: ResolvedSelectProps;
+  SelectOption: ResolvedSelectOptionProps;
   Checkbox: ResolvedCheckboxProps;
   Fieldset: ResolvedFieldsetProps;
   FormWrap: FormWrapProps;
@@ -81,10 +82,14 @@ export type ResolvedCheckboxProps = Omit<ResolvedCommonProps, 'value' | 'setValu
 export type ResolvedSelectProps = ResolvedCommonProps & {
   value: unknown;
   setValue: (value: unknown) => void;
-  options: { value: unknown; label: string }[];
+  children: ReactNode;
   isLoading: boolean;
   dataSourceError: Error | null;
-  children?: ReactNode;
+};
+
+export type ResolvedSelectOptionProps = {
+  value: unknown;
+  label: string;
 };
 
 export type ResolvedFieldsetProps = {
