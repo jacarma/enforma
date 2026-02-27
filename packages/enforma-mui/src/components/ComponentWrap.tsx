@@ -7,15 +7,24 @@ export function ComponentWrap({
   component = 'div',
   margin = 'dense',
   disabled = false,
+  variant,
 }: {
   error?: boolean;
   children: ReactNode;
   component?: FormControlProps['component'];
   margin?: FormControlProps['margin'];
   disabled?: boolean;
+  variant?: FormControlProps['variant'];
 }) {
   return (
-    <FormControl error={error} fullWidth margin={margin} component={component} disabled={disabled}>
+    <FormControl
+      error={error}
+      fullWidth
+      margin={margin}
+      component={component}
+      disabled={disabled}
+      {...(variant !== undefined ? { variant } : {})}
+    >
       {children}
     </FormControl>
   );

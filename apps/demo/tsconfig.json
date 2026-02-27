@@ -9,6 +9,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
+    "noEmit": true,
     "paths": {
       "enforma": ["../../packages/enforma/src/index.ts"],
       "enforma-mui": ["../../packages/enforma-mui/src/index.ts"]

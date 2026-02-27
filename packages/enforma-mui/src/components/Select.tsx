@@ -1,12 +1,13 @@
-import { useContext } from 'react';
+import { useId, useContext } from 'react';
 import {
   CircularProgress,
   Select as MuiSelect,
   InputLabel,
   FormHelperText,
-  FormControl as MuiFormControl,
+  FormLabel,
 } from '@mui/material';
 import { type ResolvedSelectProps } from 'enforma';
+import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
 export function Select({
@@ -23,30 +24,43 @@ export function Select({
   dataSourceError,
 }: ResolvedSelectProps) {
   const variant = useContext(MuiVariantContext);
-  const labelId = `select-label-${Math.random().toString(36).slice(2)}`;
+  const labelId = useId();
+  const isClassic = variant === 'classic';
 
   if (isLoading) {
     return <CircularProgress size={20} />;
   }
 
+  const muiVariant = isClassic ? 'outlined' : variant;
+
+  const labelEl =
+    label !== undefined ? (
+      isClassic ? (
+        <FormLabel id={labelId}>{label}</FormLabel>
+      ) : (
+        <InputLabel id={labelId}>{label}</InputLabel>
+      )
+    ) : null;
+
+  const variantProps = isClassic ? { labelId, size: 'small' as const } : { labelId, label };
+
   return (
-    <MuiFormControl fullWidth margin="dense" error={showError} disabled={disabled}>
-      {label !== undefined && <InputLabel id={labelId}>{label}</InputLabel>}
+    <ComponentWrap error={showError} disabled={disabled} variant={muiVariant}>
+      {labelEl}
       <MuiSelect
-        labelId={labelId}
-        label={label}
         value={value ?? ''}
         onChange={(e) => {
           setValue(e.target.value);
         }}
         onBlur={onBlur}
-        variant={variant === 'classic' ? 'outlined' : variant}
-        size={variant === 'classic' ? 'small' : 'medium'}
+        fullWidth
         renderValue={() => displayValue}
+        variant={muiVariant}
+        {...variantProps}
       >
         {children}
       </MuiSelect>
       {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
-    </MuiFormControl>
+    </ComponentWrap>
   );
 }
