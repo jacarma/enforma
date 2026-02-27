@@ -4,14 +4,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Enforma, { Form, clearRegistry, registerComponents } from 'enforma';
 import { TextInput } from './TextInput';
-import { ListWrap } from './ListWrap';
+import { List } from './List';
 import { ListItem } from './ListItem';
 import { AddButton } from './AddButton';
 import { FormModal } from './FormModal';
 
 beforeEach(() => {
   clearRegistry();
-  registerComponents({ TextInput, ListWrap, ListItem, AddButton, FormModal });
+  registerComponents({ TextInput, List, ListItem, AddButton, FormModal });
 });
 
 const defaultProps = {

@@ -2,7 +2,7 @@ import type { EnformaComponentRegistry } from 'enforma';
 import { TextInput } from './components/TextInput';
 import { Fieldset } from './components/Fieldset';
 import { Select } from './components/Select';
-import { ListWrap } from './components/ListWrap';
+import { List } from './components/List';
 import { ListItem } from './components/ListItem';
 import { AddButton } from './components/AddButton';
 import { FormModal } from './components/FormModal';
@@ -11,7 +11,7 @@ import { OutlinedProvider } from './context/OutlinedProvider';
 import { StandardProvider } from './context/StandardProvider';
 
 const listComponents = {
-  ListWrap,
+  List,
   ListItem,
   AddButton,
   FormModal,
@@ -41,6 +41,6 @@ export const standard: Partial<EnformaComponentRegistry> = {
   ...listComponents,
 };
 
-export { TextInput, Fieldset, Select, ListWrap, ListItem, AddButton, FormModal };
+export { TextInput, Fieldset, Select, List, ListItem, AddButton, FormModal };
 export { ClassicProvider, OutlinedProvider, StandardProvider };
 export type { MuiVariant } from './context/MuiVariantContext';
