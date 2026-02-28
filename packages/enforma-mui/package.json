@@ -36,8 +36,14 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^6.4.6",
+    "imask": "^7",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-imask": "^7"
+  },
+  "peerDependenciesMeta": {
+    "imask": { "optional": true },
+    "react-imask": { "optional": true }
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",

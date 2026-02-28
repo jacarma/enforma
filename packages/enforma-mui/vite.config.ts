@@ -27,6 +27,8 @@ export default defineConfig({
         '@emotion/react',
         '@emotion/styled',
         'enforma',
+        'react-imask',
+        'imask',
       ],
       output: {
         globals: {
@@ -37,6 +39,8 @@ export default defineConfig({
           '@emotion/react': 'emotionReact',
           '@emotion/styled': 'emotionStyled',
           enforma: 'Enforma',
+          'react-imask': 'ReactIMask',
+          imask: 'IMask',
         },
       },
     },
