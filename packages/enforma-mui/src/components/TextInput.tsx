@@ -14,7 +14,7 @@ const LazyMaskedTextInput = lazy(() =>
     }),
 );
 
-function UnmaskedTextInput({
+export function UnmaskedTextInput({
   value,
   setValue,
   label,
@@ -24,7 +24,9 @@ function UnmaskedTextInput({
   error,
   showError,
   onBlur,
-}: ResolvedTextInputProps) {
+  mask,
+  inputComponent,
+}: ResolvedTextInputProps & { inputComponent?: React.ComponentType<object> }) {
   const variant = useContext(MuiVariantContext);
   const id = useId();
 
@@ -43,13 +45,27 @@ function UnmaskedTextInput({
     color: showError ? ('error' as const) : ('primary' as const),
   };
 
+  const maskSlotProps =
+    inputComponent !== undefined
+      ? {
+          input: { inputComponent },
+          htmlInput: { mask } as unknown as React.InputHTMLAttributes<HTMLInputElement>,
+        }
+      : null;
+
   if (variant === 'classic') {
     return (
       <ComponentWrap error={showError} disabled={disabled}>
         {label !== undefined && <FormLabel htmlFor={id}>{label}</FormLabel>}
         <TextField
           {...commonProps}
-          slotProps={{ htmlInput: { id } }}
+          slotProps={{
+            ...(maskSlotProps !== null && { input: maskSlotProps.input }),
+            htmlInput: {
+              ...(maskSlotProps !== null ? (maskSlotProps.htmlInput as object) : {}),
+              id,
+            } as unknown as React.InputHTMLAttributes<HTMLInputElement>,
+          }}
           variant="outlined"
           size="small"
         />
@@ -59,7 +75,12 @@ function UnmaskedTextInput({
 
   return (
     <ComponentWrap error={showError} disabled={disabled}>
-      <TextField {...commonProps} label={label} variant={variant} />
+      <TextField
+        {...commonProps}
+        label={label}
+        variant={variant}
+        {...(maskSlotProps !== null && { slotProps: maskSlotProps })}
+      />
     </ComponentWrap>
   );
 }
