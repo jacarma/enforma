@@ -264,7 +264,7 @@ export function App() {
           label="City"
           dataSource={{
             source: 'cities',
-            filters: (scope) => ({ country: scope.country }),
+            filters: (scope) => ({ country: scope.country as string }),
           }}
         >
           <Enforma.Select.Option label="name" value="code" />
@@ -296,7 +296,7 @@ export function App() {
         <Enforma.Select
           bind="pokemon"
           label="Pokémon"
-          dataSource={{ source: 'pokemon', filters: (scope) => ({ type: scope.type }) }}
+          dataSource={{ source: 'pokemon', filters: (scope) => ({ type: scope.type as string }) }}
         >
           <Enforma.Select.Option label="label" value="name" />
         </Enforma.Select>

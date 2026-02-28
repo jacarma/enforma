@@ -137,6 +137,52 @@ describe('useDataSource — named source with filters', () => {
   });
 });
 
+describe('useDataSource — named source with rich filter predicates', () => {
+  type Product = { code: string; name: string; price: number; category: string };
+  const products: Product[] = [
+    { code: 'a', name: 'Apple', price: 1.5, category: 'fruit' },
+    { code: 'b', name: 'Banana', price: 0.8, category: 'fruit' },
+    { code: 'c', name: 'Carrot', price: 2.0, category: 'vegetable' },
+  ];
+
+  it('filters by gt predicate', () => {
+    const { result } = renderHook(
+      () =>
+        useDataSource<Product>({
+          source: 'products',
+          filters: () => ({ price: { gt: 1.0 } }),
+        }),
+      { wrapper: makeWrapper({ products }) },
+    );
+    expect(result.current.items).toEqual([products[0], products[2]]);
+  });
+
+  it('filters by in predicate', () => {
+    const { result } = renderHook(
+      () =>
+        useDataSource<Product>({
+          source: 'products',
+          filters: () => ({ category: { in: ['fruit'] } }),
+        }),
+      { wrapper: makeWrapper({ products }) },
+    );
+    expect(result.current.items).toEqual([products[0], products[1]]);
+  });
+
+  it('filters by contains predicate (case-insensitive)', () => {
+    const { result } = renderHook(
+      () =>
+        useDataSource<Product>({
+          source: 'products',
+          filters: () => ({ name: { contains: 'an' } }),
+        }),
+      { wrapper: makeWrapper({ products }) },
+    );
+    // 'Banana' contains 'an'; 'Apple' and 'Carrot' do not.
+    expect(result.current.items).toEqual([products[1]]);
+  });
+});
+
 describe('useDataSource — query DataSource', () => {
   it('starts with isLoading:true and resolves to items', async () => {
     const queryFn = vi.fn().mockResolvedValue([{ code: 'us', name: 'United States' }]);
@@ -243,7 +289,7 @@ describe('useDataSource — query DataSource', () => {
       () =>
         useDataSource<Country>({
           source: 'cities',
-          filters: (scope) => ({ country: scope.country }),
+          filters: (scope) => ({ country: scope.country as string }),
         }),
       {
         wrapper: ({ children }) => (
@@ -299,7 +345,7 @@ describe('useDataSource — auto-clear on items change', () => {
     renderHook(
       () =>
         useDataSource<City>(
-          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          { source: 'cities', filters: (scope) => ({ country: scope.country as string }) },
           { bind: 'city' },
         ),
       { wrapper: Wrapper },
@@ -324,7 +370,7 @@ describe('useDataSource — auto-clear on items change', () => {
     renderHook(
       () =>
         useDataSource<City>(
-          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          { source: 'cities', filters: (scope) => ({ country: scope.country as string }) },
           { bind: 'city' },
         ),
       { wrapper: Wrapper },
@@ -340,7 +386,7 @@ describe('useDataSource — auto-clear on items change', () => {
     renderHook(
       () =>
         useDataSource<City>(
-          { source: 'cities', filters: (scope) => ({ country: scope.country }) },
+          { source: 'cities', filters: (scope) => ({ country: scope.country as string }) },
           // no bind
         ),
       { wrapper: Wrapper },
@@ -395,7 +441,7 @@ describe('useDataSource — auto-clear on filter change for query datasource', (
     renderHook(
       () =>
         useDataSource<PokemonItem>(
-          { source: 'pokemon', filters: (scope) => ({ type: scope.type }) },
+          { source: 'pokemon', filters: (scope) => ({ type: scope.type as string }) },
           { bind: 'pokemon' },
         ),
       { wrapper: Wrapper },
@@ -421,7 +467,7 @@ describe('useDataSource — auto-clear on filter change for query datasource', (
     renderHook(
       () =>
         useDataSource<PokemonItem>(
-          { source: 'pokemon', filters: (scope) => ({ type: scope.type }) },
+          { source: 'pokemon', filters: (scope) => ({ type: scope.type as string }) },
           { bind: 'pokemon' },
         ),
       { wrapper: Wrapper },
@@ -438,7 +484,7 @@ describe('useDataSource — auto-clear on filter change for query datasource', (
       () =>
         useDataSource<PokemonItem>({
           source: 'pokemon',
-          filters: (scope) => ({ type: scope.type }),
+          filters: (scope) => ({ type: scope.type as string }),
         }),
       { wrapper: Wrapper },
     );

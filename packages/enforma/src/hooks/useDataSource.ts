@@ -3,12 +3,14 @@ import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'reac
 import { useScope, joinPath } from '../context/ScopeContext';
 import { useDataSources } from '../context/DataSourceContext';
 import type { FormValues } from '../store/FormStore';
+import { applyFilters } from '../datasource/applyFilters';
 import type {
   DataSourceDefinition,
   DataSourceProp,
   DataSourceResult,
   DataSourceParams,
   QueryResult,
+  FilterSpec,
 } from '../datasource/types';
 
 type ComponentParams = {
@@ -112,7 +114,7 @@ export function useDataSource<TItem>(
   const pagination = params.pagination ?? { page: 0, pageSize: 20 };
 
   // Compute form-derived filters (if applicable).
-  const filters: Record<string, unknown> =
+  const filters: FilterSpec =
     dataSource !== undefined &&
     typeof dataSource === 'object' &&
     !Array.isArray(dataSource) &&
@@ -133,9 +135,7 @@ export function useDataSource<TItem>(
     const hasFilters =
       typeof dataSource === 'object' && !Array.isArray(dataSource) && 'filters' in dataSource;
     if (!hasFilters) return definition;
-    return definition.filter((item) =>
-      Object.entries(filters).every(([k, v]) => (item as Record<string, unknown>)[k] === v),
-    );
+    return applyFilters(definition, filters);
     // definition and filtersKey capture the two things that can change the result.
     // dataSource and filters are intentionally omitted — they change every render
     // but their semantics are captured by definition (resolved array ref) and filtersKey.
