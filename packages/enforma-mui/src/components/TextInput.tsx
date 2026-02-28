@@ -1,12 +1,52 @@
-import { useId, useContext, lazy, Suspense } from 'react';
+import { useId, useContext, lazy, Suspense, forwardRef } from 'react';
 import { FormLabel, TextField } from '@mui/material';
 import { type ResolvedTextInputProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
+type IMaskInputType = React.ComponentType<{
+  value: string;
+  mask: string | RegExp;
+  inputRef: React.Ref<HTMLInputElement>;
+  onAccept: (value: string) => void;
+  [key: string]: unknown;
+}>;
+
+type MaskAdapterProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  inputRef: React.Ref<HTMLInputElement>;
+  mask: string | RegExp;
+};
+
 const LazyMaskedTextInput = lazy(() =>
-  import('./MaskedTextInput')
-    .then((m) => ({ default: m.MaskedTextInput }))
+  import('react-imask')
+    .then(({ IMaskInput: rawIMaskInput }) => {
+      const IMaskInput = rawIMaskInput as unknown as IMaskInputType;
+
+      const MaskAdapter = forwardRef<HTMLInputElement, MaskAdapterProps>(
+        ({ onChange, inputRef, mask, value, ...other }) => (
+          <IMaskInput
+            {...other}
+            value={typeof value === 'string' ? value : ''}
+            mask={mask}
+            inputRef={inputRef}
+            onAccept={(v) => {
+              onChange?.({ target: { value: v } } as React.ChangeEvent<HTMLInputElement>);
+            }}
+          />
+        ),
+      );
+      MaskAdapter.displayName = 'MaskAdapter';
+
+      const MaskedComponent = (props: ResolvedTextInputProps & { mask: string | RegExp }) => (
+        <UnmaskedTextInput
+          {...props}
+          inputComponent={MaskAdapter as unknown as React.ComponentType<object>}
+        />
+      );
+      MaskedComponent.displayName = 'MaskedTextInput';
+
+      return { default: MaskedComponent };
+    })
     .catch(() => {
       throw new Error(
         'enforma-mui: the `mask` prop requires `react-imask`. Run: pnpm add react-imask imask',

@@ -184,9 +184,9 @@ describe('MUI TextInput with mask', () => {
   });
 
   it('throws a clear error when mask is set but react-imask is not installed', async () => {
-    // React.lazy caches the resolved module; resetting modules forces a fresh load
+    // Module-level cache in MaskAdapter must be cleared for a fresh load
     vi.resetModules();
-    vi.doMock('./MaskedTextInput', () => {
+    vi.doMock('react-imask', () => {
       throw new Error("Cannot find module 'react-imask'");
     });
 
