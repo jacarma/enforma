@@ -1,3 +1,4 @@
+import React, { forwardRef } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -129,5 +130,56 @@ describe('MUI TextInput variants', () => {
       </Form>,
     );
     expect(screen.getByLabelText('Full name')).toBeInTheDocument();
+  });
+});
+
+describe('MUI TextInput with mask', () => {
+  beforeEach(() => {
+    vi.mock('react-imask', () => ({
+      IMaskInput: forwardRef(
+        ({
+          onAccept,
+          inputRef,
+          ...rest
+        }: {
+          onAccept: (v: string) => void;
+          inputRef: React.Ref<HTMLInputElement>;
+          mask: string | RegExp;
+        }) => (
+          <input
+            {...rest}
+            ref={inputRef}
+            data-testid="imask-input"
+            onChange={(e) => {
+              onAccept(e.target.value);
+            }}
+          />
+        ),
+      ),
+    }));
+  });
+
+  it('renders an IMaskInput when mask prop is provided', async () => {
+    render(
+      <Form values={{ phone: '' }} onChange={() => undefined}>
+        <Enforma.TextInput bind="phone" label="Phone" mask="000-000-0000" />
+      </Form>,
+    );
+    expect(await screen.findByTestId('imask-input')).toBeInTheDocument();
+  });
+
+  it('calls setValue with the masked value when user types', async () => {
+    const onChange = vi.fn();
+    render(
+      <Form values={{ phone: '' }} onChange={onChange}>
+        <Enforma.TextInput bind="phone" label="Phone" mask="000-000-0000" />
+      </Form>,
+    );
+    const input = await screen.findByTestId('imask-input');
+    await userEvent.type(input, '5');
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ phone: '5' }),
+      expect.anything(),
+    );
   });
 });
