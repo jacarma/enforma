@@ -72,6 +72,7 @@ export function App() {
   const [variant, setVariant] = useState<VariantKey>('classic');
   const [values, setValues] = useState<FormValues>(EMPTY_VALUES);
   const [reactiveValues, setReactiveValues] = useState<FormValues>(EMPTY_VALUES);
+  const [maskedValues, setMaskedValues] = useState<FormValues>(EMPTY_VALUES);
   const [signupValues, setSignupValues] = useState<FormValues>(EMPTY_VALUES);
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
@@ -158,6 +159,37 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(reactiveValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Masked Input</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        The <code>mask</code> prop accepts an IMask pattern string. <code>react-imask</code> is
+        loaded lazily — only when a masked field is rendered.
+      </p>
+
+      <Enforma.Form
+        values={maskedValues}
+        onChange={setMaskedValues}
+        aria-label="masked input demo form"
+      >
+        <Enforma.TextInput
+          bind="phone"
+          label="Phone"
+          mask="(000) 000-0000"
+          placeholder="(555) 000-0000"
+        />
+        <Enforma.TextInput
+          bind="dob"
+          label="Date of birth"
+          mask="00/00/0000"
+          placeholder="MM/DD/YYYY"
+        />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(maskedValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
