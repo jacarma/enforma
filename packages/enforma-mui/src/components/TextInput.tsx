@@ -1,10 +1,20 @@
-import { useId, useContext } from 'react';
+import { useId, useContext, lazy, Suspense } from 'react';
 import { FormLabel, TextField } from '@mui/material';
 import { type ResolvedTextInputProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
-export function TextInput({
+const LazyMaskedTextInput = lazy(() =>
+  import('./MaskedTextInput')
+    .then((m) => ({ default: m.MaskedTextInput }))
+    .catch(() => {
+      throw new Error(
+        'enforma-mui: the `mask` prop requires `react-imask`. Run: pnpm add react-imask imask',
+      );
+    }),
+);
+
+function UnmaskedTextInput({
   value,
   setValue,
   label,
@@ -52,4 +62,16 @@ export function TextInput({
       <TextField {...commonProps} label={label} variant={variant} />
     </ComponentWrap>
   );
+}
+
+export function TextInput(props: ResolvedTextInputProps) {
+  if (props.mask !== undefined) {
+    return (
+      <Suspense fallback={<UnmaskedTextInput {...props} />}>
+        <LazyMaskedTextInput {...props} mask={props.mask} />
+      </Suspense>
+    );
+  }
+
+  return <UnmaskedTextInput {...props} />;
 }

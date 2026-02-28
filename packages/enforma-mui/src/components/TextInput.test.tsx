@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Enforma, { Form, registerComponents, clearRegistry } from 'enforma';
 import { TextInput } from './TextInput';
@@ -181,5 +181,54 @@ describe('MUI TextInput with mask', () => {
       expect.objectContaining({ phone: '5' }),
       expect.anything(),
     );
+  });
+
+  it('throws a clear error when mask is set but react-imask is not installed', async () => {
+    // React.lazy caches the resolved module; resetting modules forces a fresh load
+    vi.resetModules();
+    vi.doMock('./MaskedTextInput', () => {
+      throw new Error("Cannot find module 'react-imask'");
+    });
+
+    const { TextInput: FreshTextInput } = await import('./TextInput');
+
+    const errors: Error[] = [];
+    class ErrorBoundary extends React.Component<
+      { children: React.ReactNode },
+      { error: Error | null }
+    > {
+      state = { error: null as Error | null };
+      static getDerivedStateFromError(error: Error) {
+        return { error };
+      }
+      componentDidCatch(error: Error) {
+        errors.push(error);
+      }
+      render() {
+        if (this.state.error !== null) return null;
+        return this.props.children;
+      }
+    }
+
+    render(
+      <ErrorBoundary>
+        <FreshTextInput
+          value=""
+          setValue={() => undefined}
+          label="Phone"
+          mask="000-000-0000"
+          disabled={false}
+          placeholder={undefined}
+          description={undefined}
+          error={null}
+          showError={false}
+          onBlur={() => undefined}
+        />
+      </ErrorBoundary>,
+    );
+
+    await waitFor(() => {
+      expect(errors[0]?.message).toMatch('pnpm add react-imask imask');
+    });
   });
 });
