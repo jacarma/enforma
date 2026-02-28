@@ -13,9 +13,33 @@ type Item = {
 };
 
 const items: Item[] = [
-  { code: 'a', name: 'Alice', age: 30, country: 'us', active: true, score: 80, createdAt: new Date('2024-01-01') },
-  { code: 'b', name: 'Bob', age: 17, country: 'gb', active: false, score: 55, createdAt: new Date('2024-06-15') },
-  { code: 'c', name: 'Charlie', age: 45, country: 'us', active: true, score: 92, createdAt: new Date('2025-03-10') },
+  {
+    code: 'a',
+    name: 'Alice',
+    age: 30,
+    country: 'us',
+    active: true,
+    score: 80,
+    createdAt: new Date('2024-01-01'),
+  },
+  {
+    code: 'b',
+    name: 'Bob',
+    age: 17,
+    country: 'gb',
+    active: false,
+    score: 55,
+    createdAt: new Date('2024-06-15'),
+  },
+  {
+    code: 'c',
+    name: 'Charlie',
+    age: 45,
+    country: 'us',
+    active: true,
+    score: 92,
+    createdAt: new Date('2025-03-10'),
+  },
 ];
 
 describe('applyFilters — empty filters', () => {
@@ -78,7 +102,10 @@ describe('applyFilters — comparison operators (dates)', () => {
   });
 
   it('gte filters items with date on or after value', () => {
-    expect(applyFilters(items, { createdAt: { gte: new Date('2024-06-15') } })).toEqual([items[1], items[2]]);
+    expect(applyFilters(items, { createdAt: { gte: new Date('2024-06-15') } })).toEqual([
+      items[1],
+      items[2],
+    ]);
   });
 
   it('lt filters items with date before value', () => {

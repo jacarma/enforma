@@ -19,12 +19,24 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        '@mui/material',
+        '@emotion/react',
+        '@emotion/styled',
+        'enforma',
+      ],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',
+          '@mui/material': 'MuiMaterial',
+          '@emotion/react': 'emotionReact',
+          '@emotion/styled': 'emotionStyled',
+          enforma: 'Enforma',
         },
       },
     },

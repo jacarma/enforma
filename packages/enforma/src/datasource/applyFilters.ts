@@ -7,16 +7,20 @@ function toComparable(value: number | string | Date): number | string {
 
 function matchesPredicate(itemValue: unknown, predicate: FilterPredicate): boolean {
   if (predicate.gt !== undefined) {
-    if (toComparable(predicate.gt) >= toComparable(itemValue as number | string | Date)) return false;
+    if (toComparable(predicate.gt) >= toComparable(itemValue as number | string | Date))
+      return false;
   }
   if (predicate.gte !== undefined) {
-    if (toComparable(predicate.gte) > toComparable(itemValue as number | string | Date)) return false;
+    if (toComparable(predicate.gte) > toComparable(itemValue as number | string | Date))
+      return false;
   }
   if (predicate.lt !== undefined) {
-    if (toComparable(predicate.lt) <= toComparable(itemValue as number | string | Date)) return false;
+    if (toComparable(predicate.lt) <= toComparable(itemValue as number | string | Date))
+      return false;
   }
   if (predicate.lte !== undefined) {
-    if (toComparable(predicate.lte) < toComparable(itemValue as number | string | Date)) return false;
+    if (toComparable(predicate.lte) < toComparable(itemValue as number | string | Date))
+      return false;
   }
   if (predicate.in !== undefined) {
     if (!predicate.in.includes(itemValue)) return false;
@@ -28,7 +32,8 @@ function matchesPredicate(itemValue: unknown, predicate: FilterPredicate): boole
     if (!String(itemValue).toLowerCase().includes(predicate.contains.toLowerCase())) return false;
   }
   if (predicate.startsWith !== undefined) {
-    if (!String(itemValue).toLowerCase().startsWith(predicate.startsWith.toLowerCase())) return false;
+    if (!String(itemValue).toLowerCase().startsWith(predicate.startsWith.toLowerCase()))
+      return false;
   }
   if (predicate.endsWith !== undefined) {
     if (!String(itemValue).toLowerCase().endsWith(predicate.endsWith.toLowerCase())) return false;
