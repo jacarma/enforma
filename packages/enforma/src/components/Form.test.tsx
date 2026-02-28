@@ -210,6 +210,50 @@ describe('render isolation', () => {
   });
 });
 
+describe('TextInput mask prop', () => {
+  it('passes resolved mask to the adapter', () => {
+    const received: (string | RegExp | undefined)[] = [];
+
+    registerComponents({
+      TextInput: (props: ResolvedTextInputProps) => {
+        received.push(props.mask);
+        return <input aria-label={props.label ?? ''} />;
+      },
+    });
+
+    render(
+      <Form values={{}} onChange={vi.fn()}>
+        <TextInput bind="x" label="X" mask="000-000" />
+      </Form>,
+    );
+
+    expect(received[0]).toBe('000-000');
+  });
+
+  it('resolves a reactive mask function', () => {
+    const received: (string | RegExp | undefined)[] = [];
+
+    registerComponents({
+      TextInput: (props: ResolvedTextInputProps) => {
+        received.push(props.mask);
+        return <input aria-label={props.label ?? ''} />;
+      },
+    });
+
+    render(
+      <Form values={{ type: 'phone' }} onChange={vi.fn()}>
+        <TextInput
+          bind="x"
+          label="X"
+          mask={({ type }) => (type === 'phone' ? '000-000-0000' : /\d+/)}
+        />
+      </Form>,
+    );
+
+    expect(received[0]).toBe('000-000-0000');
+  });
+});
+
 describe('Form dataSources', () => {
   it('makes named DataSources available to descendants via useDataSources', () => {
     const countries = [{ code: 'us', name: 'United States' }];

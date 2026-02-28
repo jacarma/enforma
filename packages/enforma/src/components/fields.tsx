@@ -11,7 +11,7 @@ import {
   TextareaProps,
   TextInputProps,
 } from './types';
-import { useFieldProps } from '../hooks/useField';
+import { useFieldProps, useReactiveProp } from '../hooks/useField';
 import { useDataSource } from '../hooks/useDataSource';
 import { Scope } from './Scope';
 
@@ -46,9 +46,13 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
   return <Impl {...props} />;
 }
 
-function TextInputDispatch(props: TextInputProps) {
+function TextInputDispatch({ mask, ...props }: TextInputProps) {
   const resolved = useFieldProps<string>(props);
-  return dispatchComponent('TextInput', resolved);
+  const resolvedMask = useReactiveProp(mask);
+  return dispatchComponent('TextInput', {
+    ...resolved,
+    ...(resolvedMask !== undefined && { mask: resolvedMask }),
+  });
 }
 
 function TextareaDispatch(props: TextareaProps) {

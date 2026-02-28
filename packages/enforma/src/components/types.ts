@@ -15,7 +15,9 @@ export type CommonProps = {
   messages?: Partial<Record<string, string>>;
 };
 
-export type TextInputProps = CommonProps;
+export type TextInputProps = CommonProps & {
+  mask?: Reactive<string | RegExp>;
+};
 export type TextareaProps = CommonProps;
 export type SelectProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
@@ -70,6 +72,7 @@ export type ResolvedCommonProps = {
 export type ResolvedTextInputProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
   value: string | undefined;
   setValue: (value: string) => void;
+  mask?: string | RegExp;
 };
 
 export type ResolvedTextareaProps = ResolvedTextInputProps;
