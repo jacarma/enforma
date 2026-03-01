@@ -13,35 +13,31 @@
 ```tsx
 import Enforma from 'enforma';
 
-export function ContactForm() {
+export function CheckoutForm() {
   return (
     <Enforma.Form
       values={{}}
-      onSubmit={(values) => fetch('/api/contact', { method: 'POST', body: JSON.stringify(values) })}
+      onSubmit={(values) => fetch('/api/order', { method: 'POST', body: JSON.stringify(values) })}
     >
+      <Enforma.Select bind="method" label="Delivery method">
+        <Enforma.Select.Option value="delivery" label="Delivery" />
+        <Enforma.Select.Option value="pickup" label="Pickup in store" />
+      </Enforma.Select>
       <Enforma.TextInput
-        bind="name"
-        label="Name"
-        validate={(value) => (!value ? 'Name is required' : null)}
+        bind="address"
+        label="Delivery address"
+        disabled={({ method }) => method !== 'delivery'}
+        validate={(value, { method }) =>
+          method === 'delivery' && !value ? 'Address is required' : null
+        }
       />
-      <Enforma.TextInput
-        bind="email"
-        label="Email"
-        placeholder={({ name }) => (name ? `Email for ${name}` : 'Enter your name first')}
-        disabled={({ name }) => !name}
-        validate={(value) => {
-          if (!value) return 'Email is required';
-          if (!value.includes('@')) return 'Invalid email';
-          return null;
-        }}
-      />
-      <button type="submit">Send</button>
+      <button type="submit">Place order</button>
     </Enforma.Form>
   );
 }
 ```
 
-[See the same form in plain React (96 lines)](docs/plain-react-comparison.md)
+[See the same form in plain React (75 lines)](docs/plain-react-comparison.md)
 
 ## Installation
 

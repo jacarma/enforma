@@ -1,101 +1,77 @@
 # The same form in plain React
 
-This is the ContactForm from the [README](../README.md) implemented without enforma, using standard React state and hooks.
+This is the CheckoutForm from the [README](../README.md) implemented without enforma, using standard React state and hooks.
 
 ```tsx
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
-export function ContactForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [nameTouched, setNameTouched] = useState(false);
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
+export function CheckoutForm() {
+  const [method, setMethod] = useState("");
+  const [address, setAddress] = useState("");
+  const [addressTouched, setAddressTouched] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateName = useCallback((value: string) => {
-    if (!value) return "Name is required";
-    return null;
-  }, []);
+  const validateAddress = (value: string, currentMethod: string) =>
+    currentMethod === "delivery" && !value ? "Address is required" : null;
 
-  const validateEmail = useCallback((value: string) => {
-    if (!value) return "Email is required";
-    if (!value.includes("@")) return "Invalid email";
-    return null;
-  }, []);
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setName(value);
-    if (nameTouched) setNameError(validateName(value));
+    setMethod(value);
+    if (value !== "delivery") setAddressError(null);
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEmail(value);
-    if (emailTouched) setEmailError(validateEmail(value));
+    setAddress(value);
+    if (addressTouched) setAddressError(validateAddress(value, method));
   };
 
-  const handleNameBlur = () => {
-    setNameTouched(true);
-    setNameError(validateName(name));
-  };
-
-  const handleEmailBlur = () => {
-    setEmailTouched(true);
-    setEmailError(validateEmail(email));
+  const handleAddressBlur = () => {
+    setAddressTouched(true);
+    setAddressError(validateAddress(address, method));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const nErr = validateName(name);
-    const eErr = validateEmail(email);
-    setNameError(nErr);
-    setEmailError(eErr);
-    setNameTouched(true);
-    setEmailTouched(true);
-    if (nErr || eErr) return;
+    const aErr = validateAddress(address, method);
+    setAddressError(aErr);
+    setAddressTouched(true);
+    if (aErr) return;
     setIsSubmitting(true);
     try {
-      await fetch("/api/contact", {
+      await fetch("/api/order", {
         method: "POST",
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ method, address }),
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const emailPlaceholder = name ? `Email for ${name}` : "Enter your name first";
-  const emailDisabled = !name;
-
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="name">Name</label>
-        <input
-          id="name"
-          value={name}
-          onChange={handleNameChange}
-          onBlur={handleNameBlur}
-        />
-        {nameTouched && nameError && <span>{nameError}</span>}
+        <label htmlFor="method">Delivery method</label>
+        <select id="method" value={method} onChange={handleMethodChange}>
+          <option value="">Select...</option>
+          <option value="delivery">Delivery</option>
+          <option value="pickup">Pickup in store</option>
+        </select>
       </div>
       <div>
-        <label htmlFor="email">Email</label>
+        <label htmlFor="address">Delivery address</label>
         <input
-          id="email"
-          value={email}
-          onChange={handleEmailChange}
-          onBlur={handleEmailBlur}
-          placeholder={emailPlaceholder}
-          disabled={emailDisabled}
+          id="address"
+          value={address}
+          onChange={handleAddressChange}
+          onBlur={handleAddressBlur}
+          disabled={method !== "delivery"}
         />
-        {emailTouched && emailError && <span>{emailError}</span>}
+        {addressTouched && addressError && <span>{addressError}</span>}
       </div>
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Sending..." : "Send"}
+        {isSubmitting ? "Placing order..." : "Place order"}
       </button>
     </form>
   );
