@@ -70,7 +70,7 @@ Requires React 18+.
 
 **Adding custom fields** — Use `useFieldProps` and `useListState` to build your own components that integrate with the form store. [Custom components guide →](docs/custom-components.md)
 
-**Building an adapter** — Wrap any component library once and reuse it across all your forms. [Adapter authoring guide →](docs/adapting.md)
+**Publishing an adapter** — For component library authors: wrap your library once and let your users plug it into enforma with a single call. [Adapter authoring guide →](docs/adapting.md)
 
 ## Packages
 
