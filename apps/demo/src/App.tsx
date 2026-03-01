@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
+  type FieldResolved,
   registerComponents,
   useFieldProps,
   type TextInputProps,
@@ -10,7 +11,8 @@ import Enforma, {
 } from 'enforma';
 
 function StarRating(props: TextInputProps) {
-  const { value, setValue, label, error, showError, disabled } = useFieldProps<number>(props);
+  const { value, setValue, label, error, showError, disabled } =
+    useFieldProps<FieldResolved<number>>(props);
   return (
     <div>
       {label && <label>{label}</label>}
@@ -127,7 +129,7 @@ export function App() {
         </select>
       </div>
 
-      <Enforma.Form onChange={setValues} aria-label="demo form">
+      <Enforma.Form values={values} onChange={setValues} aria-label="demo form">
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
 
