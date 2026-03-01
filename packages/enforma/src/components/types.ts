@@ -7,7 +7,7 @@ export type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) 
 // Maps a resolved type back to its component props type.
 // Extra keys (beyond ResolvedCommonProps) become optional Reactive<...> props.
 // Used to constrain and type-check useFieldProps<R> call sites.
-export type ToComponentProps<R extends { value: unknown; setValue: (v: unknown) => void }> =
+export type ToComponentProps<R extends { value: unknown; setValue: (v: never) => void }> =
   CommonProps & {
     [K in Exclude<keyof R, keyof ResolvedCommonProps>]?: Reactive<NonNullable<R[K]>>;
   };

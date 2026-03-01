@@ -41,7 +41,7 @@ export function useReactiveProp<T>(prop: Reactive<T> | undefined): T | undefined
   );
 }
 
-export function useFieldProps<R extends { value: unknown; setValue: (v: unknown) => void }>(
+export function useFieldProps<R extends { value: unknown; setValue: (v: never) => void }>(
   props: ToComponentProps<R>,
 ): R {
   // Destructure non-reactive / specially-handled props out of the spread.
@@ -106,7 +106,7 @@ export function useFieldProps<R extends { value: unknown; setValue: (v: unknown)
     setValue,
     ...resolvedExtras,
     ...useFieldValidation(bind, validate, messages),
-  } as R;
+  } as unknown as R;
 }
 
 export function useFieldValidation(
