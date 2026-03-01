@@ -1,6 +1,3 @@
 # TODO
 
-## DataSources
-
-- Improve filter semantics in DataSources beyond simple equality. Support richer predicates (range, contains, `$gt`, `$lt`, etc.) so static array filtering and query filtering share a common, expressive filter language.
-
+- [ ] Once a Checkbox component exists, update the `StarRating` example in `docs/custom-components.md` and the demo: replace the comment `TextInput` with a Checkbox that controls the `disabled` reactive prop on the star rating field.

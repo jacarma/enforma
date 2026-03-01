@@ -3,9 +3,37 @@ import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
   registerComponents,
+  useFieldProps,
+  type TextInputProps,
   type DataSourceDefinition,
   type DataSourceParams,
 } from 'enforma';
+
+function StarRating(props: TextInputProps) {
+  const { value, setValue, label, error, showError, disabled } = useFieldProps<number>(props);
+  return (
+    <div>
+      {label && <label>{label}</label>}
+      <div>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => {
+              setValue(star);
+            }}
+            disabled={disabled ?? false}
+            aria-pressed={value === star}
+            style={{ fontSize: '1.5rem', cursor: 'pointer', background: 'none', border: 'none' }}
+          >
+            {star <= (value ?? 0) ? '★' : '☆'}
+          </button>
+        ))}
+      </div>
+      {showError && error && <span style={{ color: 'red' }}>{error}</span>}
+    </div>
+  );
+}
 import { classic, outlined, standard } from 'enforma-mui';
 
 type OptionItem = Record<string, string>;
@@ -70,6 +98,7 @@ const EMPTY_VALUES = {};
 
 export function App() {
   const [variant, setVariant] = useState<VariantKey>('classic');
+  const [customValues, setCustomValues] = useState<FormValues>(EMPTY_VALUES);
   const [values, setValues] = useState<FormValues>(EMPTY_VALUES);
   const [reactiveValues, setReactiveValues] = useState<FormValues>(EMPTY_VALUES);
   const [maskedValues, setMaskedValues] = useState<FormValues>(EMPTY_VALUES);
@@ -98,7 +127,7 @@ export function App() {
         </select>
       </div>
 
-      <Enforma.Form values={values} onChange={setValues} aria-label="demo form">
+      <Enforma.Form onChange={setValues} aria-label="demo form">
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
 
@@ -112,6 +141,37 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(values, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Custom Components</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Use <code>useFieldProps</code> to build your own fields. No registration needed — use them
+        directly inside a form.
+      </p>
+
+      <Enforma.Form
+        values={customValues}
+        onChange={setCustomValues}
+        aria-label="custom components demo form"
+      >
+        <StarRating
+          bind="rating"
+          label="Rating"
+          validate={(v) => (!v ? 'Rating is required' : null)}
+        />
+        <Enforma.TextInput
+          bind="comment"
+          label="Comment"
+          placeholder="Tell us more..."
+          disabled={({ rating }) => !rating}
+        />
+        <button type="submit">Submit</button>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(customValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />

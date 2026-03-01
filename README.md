@@ -1,369 +1,98 @@
 # Enforma
 
-**Healthy forms for React.** A modern, type-safe form management library built on React 18's `useSyncExternalStore` for fine-grained reactivity and minimal re-renders.
+**Healthy forms for React.** Write only your business logic — enforma handles the rest.
 
-## Philosophy
+## Why Enforma
 
-Enforma is designed with a single core principle: **forms should be simple to reason about, type-safe, and performant**.
+**Only write what's yours.** No state management, no touched/error tracking, no blur handlers. Declare your fields, validations, and submit logic — enforma handles the plumbing.
 
-Rather than spread form state across scattered hooks and context, Enforma centralizes everything in a plain JavaScript object store that lives outside React. Components subscribe to specific pieces of state and re-render **only when their bound data changes**—not when unrelated fields are touched.
+**Your form logic doesn't change when your UI does.** Enforma is a facade over your component library. Swap MUI for shadcn, or build your own components — your form code is untouched.
 
-This architecture enables:
-
-- **Granular re-renders** — Each field re-renders only when its value changes, not when siblings update
-- **Type safety** — Full TypeScript support from form definition to validation
-- **Minimal boilerplate** — Reactive fields, cross-field validation, and dynamic props without extra wiring
-- **Hierarchical and list support** — Scope nesting and dynamic field arrays built in from the ground up
-- **Framework-agnostic validation** — Plug in your own validation logic or use reactive validators that respond to form state changes
-
-## Key Features
-
-- ✅ **useSyncExternalStore-powered** — Fine-grained subscriptions eliminate unnecessary re-renders
-- ✅ **Reactive attributes** — `disabled`, `label`, `placeholder` can be static values or functions that respond to form state
-- ✅ **Cross-field validation** — Validators have access to the entire form state
-- ✅ **Hierarchical scopes** — Nest forms and sections with automatic path prefixing
-- ✅ **List/array support** — Dynamic field arrays with proper indexing
-- ✅ **Validation timing control** — Show errors on blur, on submit, or always
-- ✅ **TypeScript strict mode** — Built with `strict: true` and `noUncheckedIndexedAccess`
-
-## Why Enforma?
-
-### The Simplicity Difference
-
-Consider a simple form with one text input that has a label, description, and custom validation. Here's how much code you'd write:
-
-**Standard React** (~80 lines):
+## Example
 
 ```tsx
-import { useState, useCallback } from "react";
+import Enforma from 'enforma';
 
-export function MyForm() {
-  const [email, setEmail] = useState("");
-  const [touched, setTouched] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validate = useCallback((value: string) => {
-    if (!value) return "Email is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return "Please enter a valid email";
-    }
-    if (!value.includes("company.com")) {
-      return "Must be a company email";
-    }
-    return null;
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    if (touched) {
-      setError(validate(value));
-    }
-  };
-
-  const handleBlur = () => {
-    setTouched(true);
-    setError(validate(email));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const err = validate(email);
-    if (err) {
-      setError(err);
-      setTouched(true);
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await fetch("/api/subscribe", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email</label>
-      <p className="description">We'll only use this to send updates.</p>
-      <input
-        id="email"
-        type="email"
-        value={email}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        aria-invalid={touched && error ? "true" : "false"}
-      />
-      {touched && error && <p className="error">{error}</p>}
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Subscribing..." : "Subscribe"}
-      </button>
-    </form>
-  );
-}
-```
-
-**Enforma** (~15 lines):
-
-```tsx
-import Enforma from "enforma";
-
-export function MyForm() {
+export function ContactForm() {
   return (
     <Enforma.Form
-      values={{ email: "" }}
-      onSubmit={(values) =>
-        fetch("/api/subscribe", {
-          method: "POST",
-          body: JSON.stringify(values),
-        })
-      }
-      showErrors={true}
+      values={{}}
+      onSubmit={(values) => fetch('/api/contact', { method: 'POST', body: JSON.stringify(values) })}
     >
+      <Enforma.TextInput
+        bind="name"
+        label="Name"
+        validate={(value) => (!value ? 'Name is required' : null)}
+      />
       <Enforma.TextInput
         bind="email"
         label="Email"
-        description="We'll only use this to send updates."
+        placeholder={({ name }) => (name ? `Email for ${name}` : 'Enter your name first')}
+        disabled={({ name }) => !name}
         validate={(value) => {
-          if (!value) return "Email is required";
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-            return "Please enter a valid email";
-          if (!value.includes("company.com")) return "Must be a company email";
+          if (!value) return 'Email is required';
+          if (!value.includes('@')) return 'Invalid email';
           return null;
         }}
       />
-      <button type="submit">Subscribe</button>
+      <button type="submit">Send</button>
     </Enforma.Form>
   );
 }
 ```
 
-That's **~5x less boilerplate**. No manual state management, no touched/error tracking, no blur handlers—just declare what you want.
+[See the same form in plain React (96 lines)](docs/plain-react-comparison.md)
 
-## Getting Started
-
-### Installation
+## Installation
 
 ```bash
+# Core
 npm install enforma
-# or
-pnpm add enforma
+
+# With Material UI
+npm install enforma-mui @mui/material @emotion/react @emotion/styled
 ```
 
-### Basic Usage
+Requires React 18+.
 
-```tsx
-import Enforma from "enforma";
+## Features
 
-export function MyForm() {
-  return (
-    <Enforma.Form
-      values={{ name: "", email: "" }}
-      onChange={(values) => console.log(values)}
-      onSubmit={(values) => {
-        // Handle form submission
-        console.log("Submitted:", values);
-      }}
-    >
-      <Enforma.TextInput bind="name" label="Full Name" />
-      <Enforma.TextInput bind="email" label="Email" />
-      <button type="submit">Submit</button>
-    </Enforma.Form>
-  );
-}
-```
+- **High performance** — each field re-renders only when its own value changes, not when siblings update (powered by `useSyncExternalStore`)
+- **Minimal boilerplate** — only write your business logic, enforma handles the rest
+- **UI library agnostic** — swap your component library without touching form logic
+- **Reactive attributes** — `disabled`, `label`, `placeholder` accept static values or functions that respond to form state
+- **Cross-field validation** — validators have access to the entire form state
+- **Hierarchical scopes** — nest sections with automatic path prefixing
+- **Dynamic lists** — field arrays with proper indexing
+- **Validation timing** — show errors on blur, on submit, or always
 
-### Reactive Props
+## Extending Enforma
 
-Props like `disabled`, `label`, and `placeholder` can be dynamic functions:
+**Adding custom fields** — Use `useFieldProps` and `useListState` to build your own components that integrate with the form store. [Custom components guide →](docs/custom-components.md)
 
-```tsx
-<Enforma.TextInput
-  bind="email"
-  label="Email"
-  disabled={(scopeValues, allValues) => allValues.name === ""}
-  placeholder={(scopeValues, allValues) =>
-    allValues.name
-      ? `Email for ${allValues.name}`
-      : "Please enter your name first"
-  }
-/>
-```
+**Building an adapter** — Wrap any component library once and reuse it across all your forms. [Adapter authoring guide →](docs/adapting.md)
 
-### Validation
+## Packages
 
-```tsx
-<Enforma.Form
-  values={{ email: "" }}
-  onChange={(values, state) => {
-    console.log("Valid:", state.isValid);
-    console.log("Errors:", state.errors);
-  }}
-  showErrors={true}
-  messages={{
-    email_required: "Email is required",
-    email_invalid: "Please enter a valid email",
-  }}
->
-  <Enforma.TextInput
-    bind="email"
-    label="Email"
-    validate={(value, allValues) => {
-      if (!value) return "email_required";
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "email_invalid";
-      return null;
-    }}
-  />
-</Enforma.Form>
-```
-
-### Hierarchical Scopes
-
-Group related fields with `Scope`:
-
-```tsx
-<Enforma.Form values={{ user: { name: '', email: '' }, billing: { ... } }}>
-  <Enforma.Scope prefix="user">
-    <Enforma.TextInput bind="name" label="Name" />
-    <Enforma.TextInput bind="email" label="Email" />
-  </Enforma.Scope>
-
-  <Enforma.Scope prefix="billing">
-    <Enforma.TextInput bind="address" label="Address" />
-  </Enforma.Scope>
-</Enforma.Form>
-```
-
-### Dynamic Lists
-
-Use `List` for arrays of items:
-
-```tsx
-<Enforma.Form
-  values={{ items: [{ name: "" }, { name: "" }] }}
-  onChange={handleChange}
->
-  <Enforma.List bind="items">
-    {(item, index) => (
-      <Enforma.Scope prefix={String(index)} key={index}>
-        <Enforma.TextInput bind="name" label={`Item ${index + 1} Name`} />
-      </Enforma.Scope>
-    )}
-  </Enforma.List>
-</Enforma.Form>
-```
-
-## Architecture
-
-### Form Store
-
-The `FormStore` is a plain JavaScript object that holds:
-
-- Form values
-- Validation state (touched fields, submission status)
-- Error messages
-- Validator registry
-
-Components subscribe to specific fields via `useSyncExternalStore`, so only affected components re-render.
-
-### Context Stack
-
-- **FormContext** — Provides access to the store and submission state
-- **ScopeContext** — Manages hierarchical path prefixing
-- **FormSettingsContext** — Distributes validation settings (show errors, messages) without prop-drilling
-
-## Authoring Adapters
-
-Enforma ships without UI — you bring your own component library by calling `registerComponents`. Each registered component receives typed props and is expected to use `useFieldProps` to read them.
-
-```tsx
-import { registerComponents, useFieldProps } from 'enforma';
-import type { TextInputProps } from 'enforma';
-
-registerComponents({
-  TextInput: function MyTextInput(props: TextInputProps) {
-    const { value, setValue, label, error, disabled, placeholder } =
-      useFieldProps<string>(props);
-
-    return (
-      <div>
-        <label>{label}</label>
-        <input
-          value={value ?? ''}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={disabled ?? false}
-          placeholder={placeholder}
-        />
-        {error && <span className="error">{error}</span>}
-      </div>
-    );
-  },
-});
-```
-
-### Always use `useFieldProps` for reactive props
-
-Props like `validate`, `label`, `disabled`, and `placeholder` can be either static values or functions `(scopeValues, allValues) => T`. The field wrappers intentionally suppress re-renders when a function prop changes reference — because the function is evaluated lazily inside the adapter via `useSyncExternalStore`.
-
-**Never read function-capable props directly:**
-
-```tsx
-// ❌ Wrong — will silently receive stale closures
-function MyTextInput(props: TextInputProps) {
-  const label = typeof props.label === 'function'
-    ? props.label(scopeValues, allValues)
-    : props.label;
-  ...
-}
-
-// ✅ Correct — useFieldProps handles reactivity via useSyncExternalStore
-function MyTextInput(props: TextInputProps) {
-  const { label } = useFieldProps<string>(props);
-  ...
-}
-```
-
-`useFieldProps` subscribes to the form store and re-evaluates reactive props automatically whenever the relevant form state changes.
-
-## Component Library
-
-A set of pre-built, accessible form components is coming soon.
+| Package                               | Description         |
+| ------------------------------------- | ------------------- |
+| [`enforma`](packages/enforma)         | Core library        |
+| [`enforma-mui`](packages/enforma-mui) | Material UI adapter |
 
 ## Development
 
-This monorepo contains:
-
-- **`packages/enforma`** — The core library (Vite, TypeScript strict, Vitest)
-- **`apps/demo`** — Development playground and examples
-
-### Scripts
-
 ```bash
-pnpm dev          # Run the demo app
-pnpm test         # Run all tests
-pnpm test:watch   # Run tests in watch mode
-pnpm lint         # Run ESLint
-pnpm build        # Build the library
-pnpm coverage     # Generate test coverage
+pnpm dev      # Run the demo app
+pnpm test     # Run all tests
+pnpm lint     # Run ESLint
+pnpm build    # Build the library
 ```
 
-### Requirements
-
-- **Node.js** >= 20
-- **pnpm** >= 9
+Requires Node.js >= 20 and pnpm >= 9.
 
 ## Contributing
 
-This project uses strict TypeScript and ESLint. All tests must pass before committing:
-
-```bash
-pnpm lint   # No errors or warnings
-pnpm test   # All tests pass
-```
+PRs must pass lint and tests before merging.
 
 ## License
 

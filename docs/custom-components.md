@@ -1,0 +1,111 @@
+# Adding custom fields
+
+You can build your own field components that integrate fully with the form store — receiving reactive props, validation, and error display — using `useFieldProps` and `useListState`.
+
+## `useFieldProps`
+
+Use this hook inside any custom field component. It reads props from the form store, evaluates reactive props, and handles validation state.
+
+```tsx
+import { useFieldProps } from "enforma";
+import type { TextInputProps } from "enforma";
+
+export function StarRating(props: TextInputProps) {
+  const { value, setValue, label, error, showError, disabled } =
+    useFieldProps<number>(props);
+
+  return (
+    <div>
+      {label && <label>{label}</label>}
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => setValue(star)}
+          disabled={disabled ?? false}
+          aria-pressed={value === star}
+        >
+          {star <= (value ?? 0) ? "★" : "☆"}
+        </button>
+      ))}
+      {showError && error && <span>{error}</span>}
+    </div>
+  );
+}
+```
+
+Use it directly inside any `Enforma.Form` — no registration needed:
+
+```tsx
+<Enforma.Form values={{}}>
+  <StarRating bind="rating" label="Rate your experience" validate={(v) => (!v ? "Rating is required" : null)} />
+  <Enforma.TextInput bind="comment" label="Comment" />
+</Enforma.Form>
+```
+
+Registration via `registerComponents` is only needed if you want `Enforma.TextInput` (or another built-in) to dispatch to your component instead of the default.
+
+### What `useFieldProps` returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `value` | `T \| undefined` | Current field value |
+| `setValue` | `(value: T) => void` | Update the field value |
+| `label` | `string \| undefined` | Resolved label |
+| `disabled` | `boolean \| undefined` | Resolved disabled state |
+| `placeholder` | `string \| undefined` | Resolved placeholder |
+| `description` | `string \| undefined` | Resolved description |
+| `error` | `string \| null` | Current validation error |
+| `showError` | `boolean` | Whether to display the error |
+| `onBlur` | `() => void` | Mark field as touched |
+
+### Reactive props
+
+Props like `label`, `disabled`, and `placeholder` can be static values or functions `(scopeValues, allValues) => T`. Always use `useFieldProps` to read them — never access them directly from `props`. The hook evaluates them reactively via `useSyncExternalStore`.
+
+## `useListState`
+
+Use this hook to build custom list field components that manage arrays of items.
+
+```tsx
+import { useListState } from "enforma";
+
+interface Props {
+  bind: string;
+}
+
+export function TagList({ bind }: Props) {
+  const { arr, keys, append, remove } = useListState({
+    bind,
+    defaultItem: { label: "" },
+  });
+
+  return (
+    <ul>
+      {arr.map((item, index) => (
+        <li key={keys[index]}>
+          <span>{(item as { label: string }).label}</span>
+          <button type="button" onClick={() => remove(index)}>
+            Remove
+          </button>
+        </li>
+      ))}
+      <button type="button" onClick={() => append()}>
+        Add tag
+      </button>
+    </ul>
+  );
+}
+```
+
+### What `useListState` returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `arr` | `unknown[]` | Current array value |
+| `keys` | `string[]` | Stable keys for React reconciliation |
+| `append` | `(item?: unknown) => void` | Add item (uses `defaultItem` if omitted) |
+| `remove` | `(index: number) => void` | Remove item at index |
+| `update` | `(index: number, item: unknown) => void` | Replace item at index |
+| `containerRef` | `RefObject<HTMLDivElement>` | Attach to list container for focus management |
+| `handleMouseDown` | `() => void` | Call on delete button `mousedown` for correct focus restore |
