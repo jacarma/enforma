@@ -1,8 +1,8 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import type { FormValues } from '../store/FormStore';
 import { useScope, joinPath } from '../context/ScopeContext';
 import { useFormSettings } from '../context/FormSettingsContext';
-import type { CommonProps, Reactive } from '../components/types';
+import type { Reactive, ToComponentProps } from '../components/types';
 
 // No-op unsubscribe for useSyncExternalStore when a prop is static (no store subscription needed).
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -41,26 +41,72 @@ export function useReactiveProp<T>(prop: Reactive<T> | undefined): T | undefined
   );
 }
 
-export function useFieldProps<T>({
-  bind,
-  label,
-  disabled,
-  placeholder,
-  description,
-  validate,
-  messages,
-}: CommonProps) {
-  const [value, setValue] = useFormValue<T>(bind);
+export function useFieldProps<R extends { value: unknown; setValue: (v: unknown) => void }>(
+  props: ToComponentProps<R>,
+): R {
+  // Destructure non-reactive / specially-handled props out of the spread.
+  // `validate` and `messages` go to useFieldValidation.
+  // `bind` goes to useFormValue and useFieldValidation.
+  // Everything else is a potentially-reactive prop that the loop will resolve.
+  // `id` is excluded from the loop below — it's CommonProps-only and not in ResolvedCommonProps.
+  const { bind, validate, messages, ...reactiveProps } = props;
+
+  const { store, prefix } = useScope();
+
+  type ValueType = NonNullable<R['value']>;
+  const [value, setValue] = useFormValue<ValueType>(bind);
+
+  // Always-current ref — the subscribe/snapshot closures read this
+  // instead of closing over `reactiveProps` directly, avoiding stale values.
+  const propsRef = useRef(reactiveProps);
+  propsRef.current = reactiveProps;
+
+  // Stable reference cache for the snapshot return value.
+  // useSyncExternalStore compares snapshots with Object.is; returning the same
+  // object reference when nothing changed prevents unnecessary re-renders.
+  const lastRef = useRef<Record<string, unknown> | null>(null);
+
+  // Always subscribe — the snapshot caching handles the no-change bail-out.
+  // Using useCallback([store]) makes the function reference stable so React
+  // does not unnecessarily re-subscribe on every render.
+  const subscribe = useCallback((cb: () => void) => store.subscribe(cb), [store]);
+
+  const resolvedExtras = useSyncExternalStore(subscribe, () => {
+    const allValues = store.getSnapshot();
+    const raw = store.getField(prefix);
+    const scopeValues: FormValues =
+      prefix === '' || raw === null || typeof raw !== 'object' ? allValues : (raw as FormValues);
+
+    const current = propsRef.current;
+    const next: Record<string, unknown> = {};
+    for (const key of Object.keys(current)) {
+      // `id` is a CommonProps-only field — skip it so it never appears in resolved output.
+      if (key === 'id') continue;
+      const val = current[key as keyof typeof current];
+      next[key] =
+        typeof val === 'function'
+          ? (val as (s: FormValues, a: FormValues) => unknown)(scopeValues, allValues)
+          : val;
+    }
+
+    // Return cached reference if all values are unchanged.
+    const last = lastRef.current;
+    if (
+      last !== null &&
+      Object.keys(last).length === Object.keys(next).length &&
+      Object.keys(next).every((k) => Object.is(last[k], next[k]))
+    ) {
+      return last;
+    }
+    return (lastRef.current = next);
+  });
 
   return {
     value,
     setValue,
-    label: useReactiveProp(label),
-    disabled: useReactiveProp(disabled),
-    placeholder: useReactiveProp(placeholder),
-    description: useReactiveProp(description),
+    ...resolvedExtras,
     ...useFieldValidation(bind, validate, messages),
-  };
+  } as R;
 }
 
 export function useFieldValidation(
