@@ -6,7 +6,7 @@ import { Form } from './Form';
 import { TextInput } from './fields';
 import { registerComponents } from './registry';
 import { useFieldProps } from '../hooks/useField';
-import type { ResolvedTextInputProps } from './types';
+import type { FieldResolved, ResolvedTextInputProps } from './types';
 import type { ReactNode } from 'react';
 import { useDataSources } from '../context/DataSourceContext';
 
@@ -133,7 +133,7 @@ describe('render isolation', () => {
     // which is exactly what this test guards against.
     const EmailField = memo(function EmailField() {
       emailRenderSpy();
-      const { value, setValue } = useFieldProps<string>({ bind: 'email' });
+      const { value, setValue } = useFieldProps<FieldResolved<string>>({ bind: 'email' });
       return (
         <input
           aria-label="email"

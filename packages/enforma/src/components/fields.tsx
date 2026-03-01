@@ -3,15 +3,19 @@ import React from 'react';
 import { getComponent } from './registry';
 import { SelectOption } from './SelectOption';
 import type { SelectOptionProps } from './SelectOption';
-import {
+import type {
   CheckboxProps,
   ComponentPropsMap,
   FieldsetProps,
   SelectProps,
   TextareaProps,
   TextInputProps,
+  ResolvedCheckboxProps,
+  ResolvedTextInputProps,
+  ResolvedTextareaProps,
+  FieldResolved,
 } from './types';
-import { useFieldProps, useReactiveProp } from '../hooks/useField';
+import { useFieldProps } from '../hooks/useField';
 import { useDataSource } from '../hooks/useDataSource';
 import { Scope } from './Scope';
 
@@ -46,23 +50,16 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
   return <Impl {...props} />;
 }
 
-function TextInputDispatch({ mask, ...props }: TextInputProps) {
-  const resolved = useFieldProps<string>(props);
-  const resolvedMask = useReactiveProp(mask);
-  return dispatchComponent('TextInput', {
-    ...resolved,
-    ...(resolvedMask !== undefined && { mask: resolvedMask }),
-  });
+function TextInputDispatch(props: TextInputProps) {
+  return dispatchComponent('TextInput', useFieldProps<ResolvedTextInputProps>(props));
 }
 
 function TextareaDispatch(props: TextareaProps) {
-  const resolved = useFieldProps<string>(props);
-  return dispatchComponent('Textarea', resolved);
+  return dispatchComponent('Textarea', useFieldProps<ResolvedTextareaProps>(props));
 }
 
 function CheckboxDispatch(props: CheckboxProps) {
-  const resolved = useFieldProps<boolean>(props);
-  return dispatchComponent('Checkbox', resolved);
+  return dispatchComponent('Checkbox', useFieldProps<ResolvedCheckboxProps>(props));
 }
 
 function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
@@ -127,7 +124,7 @@ function buildSelectOptions(
 }
 
 function SelectDispatch(props: SelectProps) {
-  const resolved = useFieldProps<unknown>(props);
+  const resolved = useFieldProps<FieldResolved<unknown>>(props);
   const {
     items,
     isLoading,
