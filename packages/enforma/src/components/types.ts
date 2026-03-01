@@ -4,6 +4,22 @@ import type { DataSourceProp } from '../datasource/types';
 
 export type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) => T);
 
+// Maps a resolved type back to its component props type.
+// Extra keys (beyond ResolvedCommonProps) become optional Reactive<...> props.
+// Used to constrain and type-check useFieldProps<R> call sites.
+export type ToComponentProps<R extends { value: unknown; setValue: (v: unknown) => void }> =
+  CommonProps & {
+    [K in Exclude<keyof R, keyof ResolvedCommonProps>]?: Reactive<NonNullable<R[K]>>;
+  };
+
+// Convenience type for custom component authors who want a typed value
+// without defining a full resolved type. Replaces the old useFieldProps<T> pattern.
+// Usage: useFieldProps<FieldResolved<number>>(props)
+export type FieldResolved<T> = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
+  value: T | undefined;
+  setValue: (value: T) => void;
+};
+
 export type CommonProps = {
   bind: string;
   label?: Reactive<string>;

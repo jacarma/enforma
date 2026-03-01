@@ -20,6 +20,8 @@ export type {
   FieldsetProps,
   FormWrapProps,
   ValidationState,
+  ToComponentProps,
+  FieldResolved,
 } from './components/types';
 export type { EnformaComponentRegistry } from './components/registry';
 export type { FormSettings } from './context/FormSettingsContext';
