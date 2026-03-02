@@ -52,6 +52,17 @@ export const standard: Partial<EnformaComponentRegistry> = {
   ...booleanComponents,
 };
 
-export { TextInput, Checkbox, Switch, Fieldset, Select, SelectOption, List, ListItem, AddButton, FormModal };
+export {
+  TextInput,
+  Checkbox,
+  Switch,
+  Fieldset,
+  Select,
+  SelectOption,
+  List,
+  ListItem,
+  AddButton,
+  FormModal,
+};
 export { ClassicProvider, OutlinedProvider, StandardProvider };
 export type { MuiVariant } from './context/MuiVariantContext';

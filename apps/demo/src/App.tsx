@@ -107,6 +107,7 @@ export function App() {
   const [signupValues, setSignupValues] = useState<FormValues>(EMPTY_VALUES);
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
+  const [boolValues, setBoolValues] = useState<FormValues>({});
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
@@ -221,6 +222,43 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(reactiveValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Boolean Fields</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>Checkbox</code> and <code>Switch</code> both bind to a boolean value. The{' '}
+        <code>labelPlacement</code> prop controls where the label appears.
+      </p>
+
+      <Enforma.Form
+        values={boolValues}
+        onChange={setBoolValues}
+        aria-label="boolean fields demo form"
+      >
+        <Enforma.Checkbox
+          bind="agree"
+          label="I agree to the terms"
+          description="Required to continue"
+        />
+        <Enforma.Checkbox
+          bind="newsletter"
+          label="Subscribe to newsletter"
+          labelPlacement="start"
+          disabled={({ agree }) => !agree}
+        />
+        <Enforma.Switch bind="darkMode" label="Dark mode" />
+        <Enforma.Switch
+          bind="notifications"
+          label="Email notifications"
+          labelPlacement="start"
+          validate={(v) => (!v ? 'Notifications must be enabled' : null)}
+        />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(boolValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />

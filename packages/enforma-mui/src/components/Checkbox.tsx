@@ -30,9 +30,7 @@ export function Checkbox({
         }
       />
       {showError && error && <FormHelperText>{error}</FormHelperText>}
-      {!showError && description !== undefined && (
-        <FormHelperText>{description}</FormHelperText>
-      )}
+      {!showError && description !== undefined && <FormHelperText>{description}</FormHelperText>}
     </ComponentWrap>
   );
 }
