@@ -8,9 +8,11 @@ import type {
   ComponentPropsMap,
   FieldsetProps,
   SelectProps,
+  SwitchProps,
   TextareaProps,
   TextInputProps,
   ResolvedCheckboxProps,
+  ResolvedSwitchProps,
   ResolvedTextInputProps,
   ResolvedTextareaProps,
   FieldResolved,
@@ -60,6 +62,10 @@ function TextareaDispatch(props: TextareaProps) {
 
 function CheckboxDispatch(props: CheckboxProps) {
   return dispatchComponent('Checkbox', useFieldProps<ResolvedCheckboxProps>(props));
+}
+
+function SwitchDispatch(props: SwitchProps) {
+  return dispatchComponent('Switch', useFieldProps<ResolvedSwitchProps>(props));
 }
 
 function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
@@ -154,6 +160,7 @@ function SelectDispatch(props: SelectProps) {
 export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);
+export const Switch = memo(SwitchDispatch, stablePropsEqual);
 export const Fieldset = memo(FieldsetDispatch, stablePropsEqual);
 export const Select = Object.assign(memo(SelectDispatch, stablePropsEqual), {
   Option: SelectOption,
