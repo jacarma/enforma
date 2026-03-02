@@ -39,7 +39,10 @@ export type SelectProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
   children?: ReactNode;
 };
-export type CheckboxProps = CommonProps;
+export type CheckboxProps = CommonProps & {
+  labelPlacement?: Reactive<'end' | 'start' | 'top' | 'bottom'>;
+};
+export type SwitchProps = CheckboxProps;
 
 export type FieldsetProps = {
   bind?: string;
@@ -57,6 +60,7 @@ export type ComponentPropsMap = {
   Select: ResolvedSelectProps;
   SelectOption: ResolvedSelectOptionProps;
   Checkbox: ResolvedCheckboxProps;
+  Switch: ResolvedSwitchProps;
   Fieldset: ResolvedFieldsetProps;
   FormWrap: FormWrapProps;
   List: ResolvedListProps;
@@ -96,7 +100,9 @@ export type ResolvedTextareaProps = ResolvedTextInputProps;
 export type ResolvedCheckboxProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
   value: boolean | undefined;
   setValue: (value: boolean) => void;
+  labelPlacement?: 'end' | 'start' | 'top' | 'bottom';
 };
+export type ResolvedSwitchProps = ResolvedCheckboxProps;
 
 export type ResolvedSelectProps = ResolvedCommonProps & {
   value: unknown;
