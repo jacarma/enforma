@@ -1,4 +1,14 @@
-import { forwardRef, lazy, Suspense, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  lazy,
+  Suspense,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormLabel, TextField } from '@mui/material';
 import type { ResolvedNumberInputProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
@@ -103,7 +113,7 @@ const LazyNumberInput = lazy(() =>
 
       // forwardRef adapter — bridges MUI TextField's inputComponent slot to IMaskInput
       const NumberMaskAdapter = forwardRef<HTMLInputElement, NumberMaskAdapterProps>(
-        ({ onChange, onTypedValueChange, inputRef, maskOptions, value, ...other }, _ref) => (
+        ({ onChange, onTypedValueChange, inputRef, maskOptions, value, ...other }) => (
           <IMaskInput
             {...other}
             {...(maskOptions as Record<string, unknown>)}
@@ -161,8 +171,8 @@ const LazyNumberInput = lazy(() =>
         };
 
         // Keep a local display string so IMask never loses mid-type chars (e.g. "1.")
-        const [displayValue, setDisplayValue] = useState(
-          () => (value !== undefined ? String(value) : ''),
+        const [displayValue, setDisplayValue] = useState(() =>
+          value !== undefined ? String(value) : '',
         );
 
         // Sync from external form changes (form reset, programmatic update).

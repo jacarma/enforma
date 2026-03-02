@@ -2,6 +2,7 @@ import type { EnformaComponentRegistry } from 'enforma';
 import { TextInput } from './components/TextInput';
 import { Checkbox } from './components/Checkbox';
 import { Switch } from './components/Switch';
+import { NumberInput } from './components/NumberInput';
 import { Fieldset } from './components/Fieldset';
 import { Select } from './components/Select';
 import { SelectOption } from './components/SelectOption';
@@ -22,6 +23,8 @@ const listComponents = {
 
 const booleanComponents = { Checkbox, Switch } satisfies Partial<EnformaComponentRegistry>;
 
+const numericComponents = { NumberInput } satisfies Partial<EnformaComponentRegistry>;
+
 export const classic: Partial<EnformaComponentRegistry> = {
   TextInput,
   Select,
@@ -30,6 +33,7 @@ export const classic: Partial<EnformaComponentRegistry> = {
   FormWrap: ClassicProvider,
   ...listComponents,
   ...booleanComponents,
+  ...numericComponents,
 };
 
 export const outlined: Partial<EnformaComponentRegistry> = {
@@ -40,6 +44,7 @@ export const outlined: Partial<EnformaComponentRegistry> = {
   FormWrap: OutlinedProvider,
   ...listComponents,
   ...booleanComponents,
+  ...numericComponents,
 };
 
 export const standard: Partial<EnformaComponentRegistry> = {
@@ -50,12 +55,14 @@ export const standard: Partial<EnformaComponentRegistry> = {
   FormWrap: StandardProvider,
   ...listComponents,
   ...booleanComponents,
+  ...numericComponents,
 };
 
 export {
   TextInput,
   Checkbox,
   Switch,
+  NumberInput,
   Fieldset,
   Select,
   SelectOption,

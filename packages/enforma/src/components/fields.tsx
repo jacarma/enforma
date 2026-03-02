@@ -76,7 +76,7 @@ function NumberInputDispatch(props: NumberInputProps) {
     useFieldProps<ResolvedNumberInputProps>(props, {
       typeValidator: (v): string | null => {
         if (v === undefined) return null;
-        if (typeof v !== 'number' || isNaN(v as number)) return 'invalidNumber';
+        if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
         return null;
       },
     }),

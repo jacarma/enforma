@@ -46,8 +46,8 @@ export type SwitchProps = CheckboxProps;
 
 export type NumberInputProps = CommonProps & {
   decimalScale?: Reactive<number>;
-  decimalSeparator?: Reactive<'intl' | string>;
-  thousandSeparator?: Reactive<false | 'intl' | string>;
+  decimalSeparator?: Reactive<'intl' | (string & Record<never, never>)>;
+  thousandSeparator?: Reactive<false | 'intl' | (string & Record<never, never>)>;
   allowNegative?: Reactive<boolean>;
   min?: Reactive<number>;
   max?: Reactive<number>;
@@ -118,8 +118,8 @@ export type ResolvedNumberInputProps = Omit<ResolvedCommonProps, 'value' | 'setV
   value: number | undefined;
   setValue: (value: number | undefined) => void;
   decimalScale?: number;
-  decimalSeparator?: 'intl' | string;
-  thousandSeparator?: false | 'intl' | string;
+  decimalSeparator?: 'intl' | (string & Record<never, never>);
+  thousandSeparator?: false | 'intl' | (string & Record<never, never>);
   allowNegative?: boolean;
   min?: number;
   max?: number;
