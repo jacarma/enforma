@@ -108,6 +108,7 @@ export function App() {
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
   const [boolValues, setBoolValues] = useState<FormValues>({});
+  const [numericValues, setNumericValues] = useState<FormValues>({});
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
@@ -259,6 +260,42 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(boolValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Numeric Fields</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>NumberInput</code> stores a <code>number | undefined</code> and formats using IMask's
+        Number mask. Separators default to the browser locale (<code>Intl.NumberFormat</code>).
+      </p>
+
+      <Enforma.Form
+        values={numericValues}
+        onChange={setNumericValues}
+        aria-label="numeric fields demo form"
+      >
+        <Enforma.NumberInput bind="price" label="Price (locale default)" />
+        <Enforma.NumberInput
+          bind="quantity"
+          label="Quantity (integer)"
+          decimalScale={0}
+          thousandSeparator={false}
+          allowNegative={false}
+          validate={(v) => (v === undefined ? 'Required' : null)}
+        />
+        <Enforma.NumberInput
+          bind="rate"
+          label="Rate (0–100%)"
+          decimalScale={2}
+          min={0}
+          max={100}
+          allowNegative={false}
+        />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(numericValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
