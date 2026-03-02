@@ -1,0 +1,61 @@
+# Enforma — Component Roadmap
+
+## Already implemented
+
+- [x] TextInput (with mask support)
+- [x] Textarea
+- [x] Select (single, with datasource)
+- [x] Fieldset
+- [x] List (repeating items with modal)
+
+## Repeating data
+
+- [ ] Table — repeating items rendered as a data table (columns defined via props/children); same data model as List but tabular layout with inline or modal editing
+
+---
+
+## Boolean / toggle
+
+- [x] Checkbox — boolean check
+- [x] Switch — styled boolean toggle, same value shape as Checkbox
+
+## Single selection
+
+- [ ] RadioList — radio button group bound to a single value
+- [ ] Autocomplete — combobox with type-ahead filter; single selection; supports datasource
+- [ ] ExclusiveToggle — segmented control / button group for single selection from a small fixed set
+
+## Multiple selection
+
+- [ ] MultiSelect — dropdown that produces an array of values; supports datasource
+- [ ] CheckboxList — group of checkboxes that produces an array of selected values; supports datasource
+- [ ] TagsInput — free-form entry of multiple string values displayed as chips/tags
+
+## Numeric
+
+- [ ] NumberInput — numeric-only text input with min/max/step; no spinner arrows
+- [ ] Spinner — numeric input with increment/decrement buttons (stepper)
+- [ ] Slider — single-handle range slider bound to a number
+- [ ] RangeSlider — dual-handle slider bound to `[min, max]` tuple
+
+## Date / time
+
+- [ ] DatePicker — calendar-based date selection
+- [ ] TimePicker — clock/scroll-based time selection
+- [ ] DateTimePicker — combined date + time
+
+## File
+
+- [ ] FileUpload — single or multiple file attachment; value is `File[]` or URL strings after upload
+
+## Text (enhanced)
+
+- [ ] RichText — WYSIWYG / markdown editor for formatted content fields
+
+## Utility / misc
+
+- [ ] Hidden — renders nothing; stores a value in form state programmatically
+- [ ] Rating — star or score selector (e.g., 1–5); common in surveys and reviews
+- [ ] ColorPicker — hex/rgb color selection
+- [ ] OtpInput — fixed-length code entry (PIN, verification code); alternative to masked TextInput
+- [ ] TransferList — move items between "available" and "selected" pools; produces an array
