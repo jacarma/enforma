@@ -1,5 +1,7 @@
 import type { EnformaComponentRegistry } from 'enforma';
 import { TextInput } from './components/TextInput';
+import { Checkbox } from './components/Checkbox';
+import { Switch } from './components/Switch';
 import { Fieldset } from './components/Fieldset';
 import { Select } from './components/Select';
 import { SelectOption } from './components/SelectOption';
@@ -18,6 +20,8 @@ const listComponents = {
   FormModal,
 } satisfies Partial<EnformaComponentRegistry>;
 
+const booleanComponents = { Checkbox, Switch } satisfies Partial<EnformaComponentRegistry>;
+
 export const classic: Partial<EnformaComponentRegistry> = {
   TextInput,
   Select,
@@ -25,6 +29,7 @@ export const classic: Partial<EnformaComponentRegistry> = {
   Fieldset,
   FormWrap: ClassicProvider,
   ...listComponents,
+  ...booleanComponents,
 };
 
 export const outlined: Partial<EnformaComponentRegistry> = {
@@ -34,6 +39,7 @@ export const outlined: Partial<EnformaComponentRegistry> = {
   Fieldset,
   FormWrap: OutlinedProvider,
   ...listComponents,
+  ...booleanComponents,
 };
 
 export const standard: Partial<EnformaComponentRegistry> = {
@@ -43,8 +49,9 @@ export const standard: Partial<EnformaComponentRegistry> = {
   Fieldset,
   FormWrap: StandardProvider,
   ...listComponents,
+  ...booleanComponents,
 };
 
-export { TextInput, Fieldset, Select, SelectOption, List, ListItem, AddButton, FormModal };
+export { TextInput, Checkbox, Switch, Fieldset, Select, SelectOption, List, ListItem, AddButton, FormModal };
 export { ClassicProvider, OutlinedProvider, StandardProvider };
 export type { MuiVariant } from './context/MuiVariantContext';
