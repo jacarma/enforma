@@ -7,11 +7,13 @@ import type {
   CheckboxProps,
   ComponentPropsMap,
   FieldsetProps,
+  NumberInputProps,
   SelectProps,
   SwitchProps,
   TextareaProps,
   TextInputProps,
   ResolvedCheckboxProps,
+  ResolvedNumberInputProps,
   ResolvedSwitchProps,
   ResolvedTextInputProps,
   ResolvedTextareaProps,
@@ -66,6 +68,19 @@ function CheckboxDispatch(props: CheckboxProps) {
 
 function SwitchDispatch(props: SwitchProps) {
   return dispatchComponent('Switch', useFieldProps<ResolvedSwitchProps>(props));
+}
+
+function NumberInputDispatch(props: NumberInputProps) {
+  return dispatchComponent(
+    'NumberInput',
+    useFieldProps<ResolvedNumberInputProps>(props, {
+      typeValidator: (v): string | null => {
+        if (v === undefined) return null;
+        if (typeof v !== 'number' || isNaN(v as number)) return 'invalidNumber';
+        return null;
+      },
+    }),
+  );
 }
 
 function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
@@ -161,6 +176,7 @@ export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);
 export const Switch = memo(SwitchDispatch, stablePropsEqual);
+export const NumberInput = memo(NumberInputDispatch, stablePropsEqual);
 export const Fieldset = memo(FieldsetDispatch, stablePropsEqual);
 export const Select = Object.assign(memo(SelectDispatch, stablePropsEqual), {
   Option: SelectOption,

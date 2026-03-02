@@ -44,6 +44,15 @@ export type CheckboxProps = CommonProps & {
 };
 export type SwitchProps = CheckboxProps;
 
+export type NumberInputProps = CommonProps & {
+  decimalScale?: Reactive<number>;
+  decimalSeparator?: Reactive<'intl' | string>;
+  thousandSeparator?: Reactive<false | 'intl' | string>;
+  allowNegative?: Reactive<boolean>;
+  min?: Reactive<number>;
+  max?: Reactive<number>;
+};
+
 export type FieldsetProps = {
   bind?: string;
   children: ReactNode;
@@ -61,6 +70,7 @@ export type ComponentPropsMap = {
   SelectOption: ResolvedSelectOptionProps;
   Checkbox: ResolvedCheckboxProps;
   Switch: ResolvedSwitchProps;
+  NumberInput: ResolvedNumberInputProps;
   Fieldset: ResolvedFieldsetProps;
   FormWrap: FormWrapProps;
   List: ResolvedListProps;
@@ -103,6 +113,17 @@ export type ResolvedCheckboxProps = Omit<ResolvedCommonProps, 'value' | 'setValu
   labelPlacement?: 'end' | 'start' | 'top' | 'bottom';
 };
 export type ResolvedSwitchProps = ResolvedCheckboxProps;
+
+export type ResolvedNumberInputProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
+  value: number | undefined;
+  setValue: (value: number | undefined) => void;
+  decimalScale?: number;
+  decimalSeparator?: 'intl' | string;
+  thousandSeparator?: false | 'intl' | string;
+  allowNegative?: boolean;
+  min?: number;
+  max?: number;
+};
 
 export type ResolvedSelectProps = ResolvedCommonProps & {
   value: unknown;
