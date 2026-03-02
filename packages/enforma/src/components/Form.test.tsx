@@ -254,6 +254,90 @@ describe('TextInput mask prop', () => {
   });
 });
 
+describe('typeValidator', () => {
+  it('shows the message key as error after blur when typeValidator fails', async () => {
+    function TypedField({ bind }: { bind: string }) {
+      const { error, showError, onBlur } = useFieldProps<FieldResolved<number>>(
+        { bind },
+        { typeValidator: (v) => (typeof v === 'number' || v === undefined ? null : 'badType') },
+      );
+      return (
+        <div>
+          <button aria-label={bind} onBlur={onBlur} />
+          {showError && <span>{error}</span>}
+        </div>
+      );
+    }
+
+    render(
+      <Form values={{ qty: 'not-a-number' }} onChange={vi.fn()}>
+        <TypedField bind="qty" />
+      </Form>,
+    );
+
+    screen.getByRole('button', { name: 'qty' }).focus();
+    await userEvent.tab();
+    expect(await screen.findByText('badType')).toBeInTheDocument();
+  });
+
+  it('resolves the message key through the messages prop', async () => {
+    function TypedField({ bind }: { bind: string }) {
+      const { error, showError, onBlur } = useFieldProps<FieldResolved<number>>(
+        { bind, messages: { badType: 'Not a valid number' } },
+        { typeValidator: (v) => (typeof v === 'number' || v === undefined ? null : 'badType') },
+      );
+      return (
+        <div>
+          <button aria-label={bind} onBlur={onBlur} />
+          {showError && <span>{error}</span>}
+        </div>
+      );
+    }
+
+    render(
+      <Form values={{ qty: 'bad' }} onChange={vi.fn()}>
+        <TypedField bind="qty" />
+      </Form>,
+    );
+
+    screen.getByRole('button', { name: 'qty' }).focus();
+    await userEvent.tab();
+    expect(await screen.findByText('Not a valid number')).toBeInTheDocument();
+  });
+
+  it('reports isValid=false in onChange when typeValidator fails', () => {
+    const onChange = vi.fn();
+
+    function TypedField({ bind }: { bind: string }) {
+      const { onBlur, setValue } = useFieldProps<FieldResolved<number>>(
+        { bind },
+        { typeValidator: (v) => (typeof v === 'number' || v === undefined ? null : 'badType') },
+      );
+      return (
+        <input
+          aria-label={bind}
+          onChange={(e) => {
+            setValue(e.target.value as unknown as number);
+          }}
+          onBlur={onBlur}
+        />
+      );
+    }
+
+    render(
+      <Form values={{ qty: 'bad' }} onChange={onChange}>
+        <TypedField bind="qty" />
+      </Form>,
+    );
+
+    // onChange fires on mount for initial value — check it reports invalid
+    expect(onChange).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ isValid: false }),
+    );
+  });
+});
+
 describe('Form dataSources', () => {
   it('makes named DataSources available to descendants via useDataSources', () => {
     const countries = [{ code: 'us', name: 'United States' }];

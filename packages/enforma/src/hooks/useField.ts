@@ -43,6 +43,7 @@ export function useReactiveProp<T>(prop: Reactive<T> | undefined): T | undefined
 
 export function useFieldProps<R extends { value: unknown; setValue: (v: never) => void }>(
   props: ToComponentProps<R>,
+  options?: { typeValidator?: (value: unknown) => string | null },
 ): R {
   // Destructure non-reactive / specially-handled props out of the spread.
   // `validate` and `messages` go to useFieldValidation.
@@ -105,7 +106,7 @@ export function useFieldProps<R extends { value: unknown; setValue: (v: never) =
     value,
     setValue,
     ...resolvedExtras,
-    ...useFieldValidation(bind, validate, messages),
+    ...useFieldValidation(bind, validate, messages, undefined, options?.typeValidator),
   } as unknown as R;
 }
 
@@ -116,6 +117,7 @@ export function useFieldValidation(
     | undefined,
   localMessages: Partial<Record<string, string>> | undefined,
   implicitValidator?: () => string | null,
+  typeValidator?: (value: unknown) => string | null,
 ): { error: string | null; showError: boolean; onBlur: () => void } {
   const { store, prefix } = useScope();
   const { showErrors: formShowErrors, messages: formMessages } = useFormSettings();
@@ -134,10 +136,28 @@ export function useFieldValidation(
   const implicitValidatorRef = useRef(implicitValidator);
   implicitValidatorRef.current = implicitValidator;
 
+  const typeValidatorRef = useRef(typeValidator);
+  typeValidatorRef.current = typeValidator;
+
   useEffect(() => {
-    if (validateRef.current === undefined && implicitValidatorRef.current === undefined) return;
+    if (
+      validateRef.current === undefined &&
+      implicitValidatorRef.current === undefined &&
+      typeValidatorRef.current === undefined
+    )
+      return;
 
     const combinedValidator = (): string | null => {
+      // 0. Type validator — runs before user validators; error is shown after blur like all others.
+      const typeValidatorFn = typeValidatorRef.current;
+      if (typeValidatorFn !== undefined) {
+        const fieldValue = store.getField(fullPath);
+        const key = typeValidatorFn(fieldValue);
+        if (key !== null) {
+          return localMessagesRef.current?.[key] ?? formMessagesRef.current[key] ?? key;
+        }
+      }
+
       // 1. Implicit check — returns a message key (e.g. "invalidDate") or null.
       const implicitFn = implicitValidatorRef.current;
       if (implicitFn !== undefined) {
