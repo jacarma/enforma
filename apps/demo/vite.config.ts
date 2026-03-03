@@ -10,4 +10,11 @@ export default defineConfig({
       'enforma-mui': resolve(__dirname, '../../packages/enforma-mui/src'),
     },
   },
+  optimizeDeps: {
+    exclude: [
+      '@mui/x-date-pickers/AdapterDateFns',
+      '@mui/x-date-pickers/AdapterLuxon',
+      '@mui/x-date-pickers/AdapterMoment',
+    ],
+  },
 });
