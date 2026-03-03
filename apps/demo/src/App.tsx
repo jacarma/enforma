@@ -36,7 +36,7 @@ function StarRating(props: TextInputProps) {
     </div>
   );
 }
-import { classic, outlined, standard } from 'enforma-mui';
+import muiComponents from 'enforma-mui';
 
 type OptionItem = Record<string, string>;
 
@@ -88,10 +88,9 @@ const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
   },
 };
 
-const bundleMap = { classic, outlined, standard };
-type VariantKey = keyof typeof bundleMap;
+type VariantKey = 'classic' | 'outlined' | 'standard';
 
-registerComponents(classic);
+registerComponents(muiComponents, { variant: 'classic' });
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
@@ -112,7 +111,7 @@ export function App() {
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
-    registerComponents(bundleMap[v]);
+    registerComponents(muiComponents, { variant: v });
     setVariant(v);
   };
 

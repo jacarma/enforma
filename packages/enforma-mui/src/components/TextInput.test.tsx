@@ -6,8 +6,7 @@ import userEvent from '@testing-library/user-event';
 import Enforma, { Form, registerComponents, clearRegistry } from 'enforma';
 import { TextInput } from './TextInput';
 import { Fieldset } from './Fieldset';
-import { ClassicProvider } from '../context/ClassicProvider';
-import { StandardProvider } from '../context/StandardProvider';
+import { MuiFormWrap } from './MuiFormWrap';
 
 beforeEach(() => {
   clearRegistry();
@@ -88,7 +87,7 @@ describe('MUI TextInput', () => {
 describe('MUI TextInput variants', () => {
   it('classic: renders an input accessible by label text', () => {
     clearRegistry();
-    registerComponents({ TextInput, Fieldset, FormWrap: ClassicProvider });
+    registerComponents({ TextInput, Fieldset, FormWrap: MuiFormWrap }, { variant: 'classic' });
     render(
       <Form values={{}} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Full name" />
@@ -99,7 +98,7 @@ describe('MUI TextInput variants', () => {
 
   it('classic: uses compact size', () => {
     clearRegistry();
-    registerComponents({ TextInput, Fieldset, FormWrap: ClassicProvider });
+    registerComponents({ TextInput, Fieldset, FormWrap: MuiFormWrap }, { variant: 'classic' });
     render(
       <Form values={{ name: 'x' }} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" />
@@ -113,7 +112,7 @@ describe('MUI TextInput variants', () => {
 
   it('standard: renders an input accessible by label text', () => {
     clearRegistry();
-    registerComponents({ TextInput, Fieldset, FormWrap: StandardProvider });
+    registerComponents({ TextInput, Fieldset, FormWrap: MuiFormWrap }, { variant: 'standard' });
     render(
       <Form values={{}} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Full name" />
@@ -122,8 +121,8 @@ describe('MUI TextInput variants', () => {
     expect(screen.getByLabelText('Full name')).toBeInTheDocument();
   });
 
-  it('classic (default): renders an input accessible by label text without FormWrap', () => {
-    // No FormWrap registered — context defaults to 'classic'
+  it('outlined (default): renders an input accessible by label text without FormWrap', () => {
+    // No FormWrap registered — context defaults to 'outlined'
     render(
       <Form values={{}} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Full name" />
