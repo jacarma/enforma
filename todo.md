@@ -40,9 +40,9 @@
 
 ## Date / time
 
-- [ ] DatePicker — calendar-based date selection
-- [ ] TimePicker — clock/scroll-based time selection
-- [ ] DateTimePicker — combined date + time
+- [x] DatePicker — calendar-based date selection
+- [x] TimePicker — clock/scroll-based time selection
+- [x] DateTimePicker — combined date + time
 
 ## File
 

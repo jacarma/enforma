@@ -108,6 +108,7 @@ export function App() {
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
   const [boolValues, setBoolValues] = useState<FormValues>({});
   const [numericValues, setNumericValues] = useState<FormValues>({});
+  const [dateValues, setDateValues] = useState<FormValues>({});
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
@@ -295,6 +296,26 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(numericValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Date &amp; Time Fields</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>DatePicker</code> stores a <code>Date</code> when valid, a <code>string</code> during
+        partial entry. <code>TimePicker</code> stores <code>&quot;HH:mm&quot;</code>. Requires{' '}
+        <code>@mui/x-date-pickers</code> and a date adapter (e.g.{' '}
+        <code>registerComponents(muiComponents, {"{ dateAdapter: 'dayjs' }"})</code>).
+      </p>
+
+      <Enforma.Form values={dateValues} onChange={setDateValues} aria-label="date time demo form">
+        <Enforma.DatePicker bind="birthday" label="Birthday" />
+        <Enforma.TimePicker bind="meetingTime" label="Meeting time" ampm={false} />
+        <Enforma.DateTimePicker bind="deadline" label="Deadline" />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(dateValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />

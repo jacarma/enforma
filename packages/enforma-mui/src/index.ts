@@ -3,6 +3,9 @@ import { TextInput } from './components/TextInput';
 import { Checkbox } from './components/Checkbox';
 import { Switch } from './components/Switch';
 import { NumberInput } from './components/NumberInput';
+import { DatePicker } from './components/DatePicker';
+import { TimePicker } from './components/TimePicker';
+import { DateTimePicker } from './components/DateTimePicker';
 import { Fieldset } from './components/Fieldset';
 import { Select } from './components/Select';
 import { SelectOption } from './components/SelectOption';
@@ -17,6 +20,9 @@ const muiComponents = {
   Checkbox,
   Switch,
   NumberInput,
+  DatePicker,
+  TimePicker,
+  DateTimePicker,
   Fieldset,
   Select,
   SelectOption,
@@ -34,6 +40,9 @@ export {
   Checkbox,
   Switch,
   NumberInput,
+  DatePicker,
+  TimePicker,
+  DateTimePicker,
   Fieldset,
   Select,
   SelectOption,
