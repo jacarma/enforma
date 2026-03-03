@@ -7,6 +7,7 @@ import type {
   CheckboxProps,
   ComponentPropsMap,
   DatePickerProps,
+  DateTimePickerProps,
   FieldsetProps,
   NumberInputProps,
   SelectProps,
@@ -16,6 +17,7 @@ import type {
   TimePickerProps,
   ResolvedCheckboxProps,
   ResolvedDatePickerProps,
+  ResolvedDateTimePickerProps,
   ResolvedNumberInputProps,
   ResolvedSwitchProps,
   ResolvedTextInputProps,
@@ -113,6 +115,19 @@ function TimePickerDispatch(props: TimePickerProps) {
   );
 }
 
+function DateTimePickerDispatch(props: DateTimePickerProps) {
+  return dispatchComponent(
+    'DateTimePicker',
+    useFieldProps<ResolvedDateTimePickerProps>(props, {
+      typeValidator: (v): string | null => {
+        if (v === undefined) return null;
+        if (v instanceof Date) return null;
+        return 'invalidDateTime';
+      },
+    }),
+  );
+}
+
 function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
   const content = bind !== undefined ? <Scope bind={bind}>{children}</Scope> : children;
   return dispatchComponent('Fieldset', {
@@ -204,6 +219,7 @@ function SelectDispatch(props: SelectProps) {
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);
+export const DateTimePicker = memo(DateTimePickerDispatch, stablePropsEqual);
 export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);
