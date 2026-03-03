@@ -1,16 +1,26 @@
+import type React from 'react';
 import { ComponentPropsMap } from './types';
 
 export type EnformaComponentRegistry = {
   [K in keyof ComponentPropsMap]?: React.ComponentType<ComponentPropsMap[K]>;
 };
 
-let registry: Partial<EnformaComponentRegistry> = {};
+export type RegisterOptions = {
+  variant?: 'classic' | 'outlined' | 'standard';
+  dateAdapter?: 'dayjs' | 'date-fns' | 'luxon' | 'moment';
+};
 
-export function registerComponents(components: Partial<EnformaComponentRegistry>) {
-  registry = {
-    ...registry,
-    ...components,
-  };
+let registry: Partial<EnformaComponentRegistry> = {};
+let options: RegisterOptions = {};
+
+export function registerComponents(
+  components: Partial<EnformaComponentRegistry>,
+  opts?: RegisterOptions,
+) {
+  registry = { ...registry, ...components };
+  if (opts !== undefined) {
+    options = { ...options, ...opts };
+  }
 }
 
 export function getComponent<K extends keyof ComponentPropsMap>(
@@ -19,6 +29,11 @@ export function getComponent<K extends keyof ComponentPropsMap>(
   return registry[type];
 }
 
+export function getRegistryOptions(): RegisterOptions {
+  return options;
+}
+
 export function clearRegistry() {
   registry = {};
+  options = {};
 }

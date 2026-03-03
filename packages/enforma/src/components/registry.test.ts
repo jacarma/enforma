@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerComponents, getComponent, clearRegistry } from './registry';
+import { registerComponents, getComponent, clearRegistry, getRegistryOptions } from './registry';
 import type { ResolvedTextInputProps } from './types';
 import React from 'react';
 
@@ -32,5 +32,37 @@ describe('registry', () => {
     registerComponents({ TextInput: FakeA });
     registerComponents({ TextInput: FakeB });
     expect(getComponent('TextInput')).toBe(FakeB);
+  });
+});
+
+describe('RegisterOptions', () => {
+  beforeEach(() => {
+    clearRegistry();
+  });
+
+  it('returns empty options when nothing is registered', () => {
+    expect(getRegistryOptions()).toEqual({});
+  });
+
+  it('stores options passed to registerComponents', () => {
+    registerComponents({}, { variant: 'classic' });
+    expect(getRegistryOptions()).toEqual({ variant: 'classic' });
+  });
+
+  it('stores dateAdapter option', () => {
+    registerComponents({}, { dateAdapter: 'dayjs' });
+    expect(getRegistryOptions().dateAdapter).toBe('dayjs');
+  });
+
+  it('merges options across multiple registerComponents calls', () => {
+    registerComponents({}, { variant: 'outlined' });
+    registerComponents({}, { dateAdapter: 'dayjs' });
+    expect(getRegistryOptions()).toEqual({ variant: 'outlined', dateAdapter: 'dayjs' });
+  });
+
+  it('clearRegistry resets options to empty', () => {
+    registerComponents({}, { variant: 'classic' });
+    clearRegistry();
+    expect(getRegistryOptions()).toEqual({});
   });
 });
