@@ -365,3 +365,87 @@ describe('Form dataSources', () => {
     expect(result.current).toEqual({});
   });
 });
+
+describe('DatePicker typeValidator', () => {
+  it('shows no error when value is undefined', () => {
+    function Field({ bind }: { bind: string }) {
+      const { showError } = useFieldProps<FieldResolved<Date | string>>(
+        { bind },
+        { typeValidator: (v) => (v === undefined || v instanceof Date ? null : 'invalidDate') },
+      );
+      return <div>{showError && <span>error</span>}</div>;
+    }
+
+    render(
+      <Form values={{ d: undefined }} onChange={vi.fn()} showErrors>
+        <Field bind="d" />
+      </Form>,
+    );
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
+  });
+
+  it('shows no error when value is a Date', () => {
+    function Field({ bind }: { bind: string }) {
+      const { showError } = useFieldProps<FieldResolved<Date | string>>(
+        { bind },
+        { typeValidator: (v) => (v === undefined || v instanceof Date ? null : 'invalidDate') },
+      );
+      return <div>{showError && <span>error</span>}</div>;
+    }
+
+    render(
+      <Form values={{ d: new Date() }} onChange={vi.fn()} showErrors>
+        <Field bind="d" />
+      </Form>,
+    );
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
+  });
+
+  it('shows invalidDate error when value is a string', async () => {
+    function Field({ bind }: { bind: string }) {
+      const { error, showError, onBlur } = useFieldProps<FieldResolved<Date | string>>(
+        { bind },
+        { typeValidator: (v) => (v === undefined || v instanceof Date ? null : 'invalidDate') },
+      );
+      return (
+        <div>
+          <button aria-label={bind} onBlur={onBlur} />
+          {showError && <span>{error}</span>}
+        </div>
+      );
+    }
+
+    render(
+      <Form values={{ d: '03/03/' }} onChange={vi.fn()}>
+        <Field bind="d" />
+      </Form>,
+    );
+
+    screen.getByRole('button', { name: 'd' }).focus();
+    await userEvent.tab();
+    expect(await screen.findByText('invalidDate')).toBeInTheDocument();
+  });
+
+  it('reports isValid=false in onChange when value is a string', () => {
+    const onChange = vi.fn();
+
+    function Field({ bind }: { bind: string }) {
+      useFieldProps<FieldResolved<Date | string>>(
+        { bind },
+        { typeValidator: (v) => (v === undefined || v instanceof Date ? null : 'invalidDate') },
+      );
+      return null;
+    }
+
+    render(
+      <Form values={{ d: '03/03/' }} onChange={onChange}>
+        <Field bind="d" />
+      </Form>,
+    );
+
+    expect(onChange).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ isValid: false }),
+    );
+  });
+});

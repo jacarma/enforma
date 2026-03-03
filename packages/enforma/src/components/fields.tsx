@@ -6,6 +6,7 @@ import type { SelectOptionProps } from './SelectOption';
 import type {
   CheckboxProps,
   ComponentPropsMap,
+  DatePickerProps,
   FieldsetProps,
   NumberInputProps,
   SelectProps,
@@ -13,6 +14,7 @@ import type {
   TextareaProps,
   TextInputProps,
   ResolvedCheckboxProps,
+  ResolvedDatePickerProps,
   ResolvedNumberInputProps,
   ResolvedSwitchProps,
   ResolvedTextInputProps,
@@ -78,6 +80,19 @@ function NumberInputDispatch(props: NumberInputProps) {
         if (v === undefined) return null;
         if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
         return null;
+      },
+    }),
+  );
+}
+
+function DatePickerDispatch(props: DatePickerProps) {
+  return dispatchComponent(
+    'DatePicker',
+    useFieldProps<ResolvedDatePickerProps>(props, {
+      typeValidator: (v): string | null => {
+        if (v === undefined) return null;
+        if (v instanceof Date) return null;
+        return 'invalidDate';
       },
     }),
   );
@@ -172,6 +187,7 @@ function SelectDispatch(props: SelectProps) {
   });
 }
 
+export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);

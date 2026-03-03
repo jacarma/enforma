@@ -53,6 +53,13 @@ export type NumberInputProps = CommonProps & {
   max?: Reactive<number>;
 };
 
+export type DatePickerProps = CommonProps & {
+  minDate?: Reactive<Date>;
+  maxDate?: Reactive<Date>;
+  disableFuture?: Reactive<boolean>;
+  disablePast?: Reactive<boolean>;
+};
+
 export type FieldsetProps = {
   bind?: string;
   children: ReactNode;
@@ -77,6 +84,7 @@ export type ComponentPropsMap = {
   ListItem: ResolvedListItemProps;
   FormModal: ResolvedFormModalProps;
   AddButton: ResolvedAddButtonProps;
+  DatePicker: ResolvedDatePickerProps;
 };
 
 export type ValidationState = {
@@ -123,6 +131,15 @@ export type ResolvedNumberInputProps = Omit<ResolvedCommonProps, 'value' | 'setV
   allowNegative?: boolean;
   min?: number;
   max?: number;
+};
+
+export type ResolvedDatePickerProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
+  value: Date | string | undefined;
+  setValue: (value: Date | string | undefined) => void;
+  minDate?: Date;
+  maxDate?: Date;
+  disableFuture?: boolean;
+  disablePast?: boolean;
 };
 
 export type ResolvedSelectProps = ResolvedCommonProps & {
