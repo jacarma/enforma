@@ -1,0 +1,134 @@
+import { lazy, Suspense, useContext, useId, useRef } from 'react';
+import { FormLabel, TextField } from '@mui/material';
+import type { ResolvedTimePickerProps } from 'enforma';
+import { ComponentWrap } from './ComponentWrap';
+import { MuiVariantContext } from '../context/MuiVariantContext';
+
+function timeToDate(hhmm: string): Date | null {
+  const parts = hhmm.split(':');
+  if (parts.length !== 2) return null;
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  if (isNaN(h) || isNaN(m)) return null;
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+function dateToHHMM(date: Date): string {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function TimePickerSkeleton({
+  label,
+  disabled = false,
+  description,
+  error,
+  showError,
+  onBlur,
+  value,
+}: ResolvedTimePickerProps) {
+  const variant = useContext(MuiVariantContext);
+  const id = useId();
+  const displayValue = value ?? '';
+
+  const commonProps = {
+    value: displayValue,
+    onChange: () => undefined,
+    onBlur,
+    disabled: true,
+    fullWidth: true,
+    error: showError,
+    helperText: showError ? error : description,
+  } as const;
+
+  if (variant === 'classic') {
+    return (
+      <ComponentWrap error={showError} disabled={disabled}>
+        {label !== undefined && <FormLabel htmlFor={id}>{label}</FormLabel>}
+        <TextField
+          {...commonProps}
+          variant="outlined"
+          size="small"
+          slotProps={{ htmlInput: { id } }}
+        />
+      </ComponentWrap>
+    );
+  }
+  return (
+    <ComponentWrap error={showError} disabled={disabled}>
+      <TextField {...commonProps} label={label} variant={variant} />
+    </ComponentWrap>
+  );
+}
+
+const LazyTimePicker = lazy(() =>
+  import('@mui/x-date-pickers')
+    .then(({ TimePicker: MuiTimePicker }) => {
+      function TimePickerImpl({
+        value,
+        setValue,
+        label,
+        disabled = false,
+        description,
+        error,
+        showError,
+        onBlur,
+        minTime,
+        maxTime,
+        ampm,
+      }: ResolvedTimePickerProps) {
+        const rawInputRef = useRef('');
+        const timeValue =
+          typeof value === 'string' && /^\d{2}:\d{2}$/.test(value) ? timeToDate(value) : null;
+
+        return (
+          <ComponentWrap error={showError} disabled={disabled}>
+            <MuiTimePicker
+              value={timeValue}
+              label={label}
+              disabled={disabled}
+              {...(minTime !== undefined && { minTime })}
+              {...(maxTime !== undefined && { maxTime })}
+              {...(ampm !== undefined && { ampm })}
+              onChange={(date) => {
+                if (date instanceof Date && !isNaN(date.getTime())) {
+                  setValue(dateToHHMM(date));
+                } else if (rawInputRef.current === '') {
+                  setValue(undefined);
+                } else {
+                  setValue(rawInputRef.current);
+                }
+              }}
+              slotProps={{
+                textField: {
+                  error: showError,
+                  helperText: showError ? error : description,
+                  fullWidth: true,
+                  onBlur,
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    rawInputRef.current = e.target.value;
+                  },
+                },
+              }}
+            />
+          </ComponentWrap>
+        );
+      }
+      TimePickerImpl.displayName = 'TimePicker';
+      return { default: TimePickerImpl };
+    })
+    .catch(() => {
+      throw new Error(
+        'enforma-mui: TimePicker requires `@mui/x-date-pickers`. Run: pnpm add @mui/x-date-pickers dayjs',
+      );
+    }),
+);
+
+export function TimePicker(props: ResolvedTimePickerProps) {
+  return (
+    <Suspense fallback={<TimePickerSkeleton {...props} />}>
+      <LazyTimePicker {...props} />
+    </Suspense>
+  );
+}
