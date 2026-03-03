@@ -449,3 +449,66 @@ describe('DatePicker typeValidator', () => {
     );
   });
 });
+
+describe('TimePicker typeValidator', () => {
+  const timeValidator = (v: unknown): string | null => {
+    if (v === undefined) return null;
+    if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
+    return 'invalidTime';
+  };
+
+  it('shows no error when value is undefined', () => {
+    function Field({ bind }: { bind: string }) {
+      const { showError } = useFieldProps<FieldResolved<string>>(
+        { bind },
+        { typeValidator: timeValidator },
+      );
+      return <div>{showError && <span>error</span>}</div>;
+    }
+    render(
+      <Form values={{ t: undefined }} onChange={vi.fn()} showErrors>
+        <Field bind="t" />
+      </Form>,
+    );
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
+  });
+
+  it('shows no error when value is a valid HH:mm string', () => {
+    function Field({ bind }: { bind: string }) {
+      const { showError } = useFieldProps<FieldResolved<string>>(
+        { bind },
+        { typeValidator: timeValidator },
+      );
+      return <div>{showError && <span>error</span>}</div>;
+    }
+    render(
+      <Form values={{ t: '14:30' }} onChange={vi.fn()} showErrors>
+        <Field bind="t" />
+      </Form>,
+    );
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
+  });
+
+  it('shows invalidTime error when value is a partial time string', async () => {
+    function Field({ bind }: { bind: string }) {
+      const { error, showError, onBlur } = useFieldProps<FieldResolved<string>>(
+        { bind },
+        { typeValidator: timeValidator },
+      );
+      return (
+        <div>
+          <button aria-label={bind} onBlur={onBlur} />
+          {showError && <span>{error}</span>}
+        </div>
+      );
+    }
+    render(
+      <Form values={{ t: '14:' }} onChange={vi.fn()}>
+        <Field bind="t" />
+      </Form>,
+    );
+    screen.getByRole('button', { name: 't' }).focus();
+    await userEvent.tab();
+    expect(await screen.findByText('invalidTime')).toBeInTheDocument();
+  });
+});

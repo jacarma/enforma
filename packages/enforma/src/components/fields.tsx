@@ -13,12 +13,14 @@ import type {
   SwitchProps,
   TextareaProps,
   TextInputProps,
+  TimePickerProps,
   ResolvedCheckboxProps,
   ResolvedDatePickerProps,
   ResolvedNumberInputProps,
   ResolvedSwitchProps,
   ResolvedTextInputProps,
   ResolvedTextareaProps,
+  ResolvedTimePickerProps,
   FieldResolved,
 } from './types';
 import { useFieldProps } from '../hooks/useField';
@@ -93,6 +95,19 @@ function DatePickerDispatch(props: DatePickerProps) {
         if (v === undefined) return null;
         if (v instanceof Date) return null;
         return 'invalidDate';
+      },
+    }),
+  );
+}
+
+function TimePickerDispatch(props: TimePickerProps) {
+  return dispatchComponent(
+    'TimePicker',
+    useFieldProps<ResolvedTimePickerProps>(props, {
+      typeValidator: (v): string | null => {
+        if (v === undefined) return null;
+        if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
+        return 'invalidTime';
       },
     }),
   );
@@ -188,6 +203,7 @@ function SelectDispatch(props: SelectProps) {
 }
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
+export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);
 export const TextInput = memo(TextInputDispatch, stablePropsEqual);
 export const Textarea = memo(TextareaDispatch, stablePropsEqual);
 export const Checkbox = memo(CheckboxDispatch, stablePropsEqual);

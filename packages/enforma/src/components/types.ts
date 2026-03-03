@@ -60,6 +60,12 @@ export type DatePickerProps = CommonProps & {
   disablePast?: Reactive<boolean>;
 };
 
+export type TimePickerProps = CommonProps & {
+  minTime?: Reactive<Date>;
+  maxTime?: Reactive<Date>;
+  ampm?: Reactive<boolean>;
+};
+
 export type FieldsetProps = {
   bind?: string;
   children: ReactNode;
@@ -85,6 +91,7 @@ export type ComponentPropsMap = {
   FormModal: ResolvedFormModalProps;
   AddButton: ResolvedAddButtonProps;
   DatePicker: ResolvedDatePickerProps;
+  TimePicker: ResolvedTimePickerProps;
 };
 
 export type ValidationState = {
@@ -140,6 +147,14 @@ export type ResolvedDatePickerProps = Omit<ResolvedCommonProps, 'value' | 'setVa
   maxDate?: Date;
   disableFuture?: boolean;
   disablePast?: boolean;
+};
+
+export type ResolvedTimePickerProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
+  value: string | undefined; // "HH:mm" when valid, partial string during entry
+  setValue: (value: string | undefined) => void;
+  minTime?: Date;
+  maxTime?: Date;
+  ampm?: boolean;
 };
 
 export type ResolvedSelectProps = ResolvedCommonProps & {
