@@ -9,6 +9,8 @@ import { DateTimePicker } from './components/DateTimePicker';
 import { Fieldset } from './components/Fieldset';
 import { Select } from './components/Select';
 import { SelectOption } from './components/SelectOption';
+import { RadioGroup } from './components/RadioGroup';
+import { RadioGroupOption } from './components/RadioGroupOption';
 import { List } from './components/List';
 import { ListItem } from './components/ListItem';
 import { AddButton } from './components/AddButton';
@@ -26,6 +28,8 @@ const muiComponents = {
   Fieldset,
   Select,
   SelectOption,
+  RadioGroup,
+  RadioGroupOption,
   List,
   ListItem,
   AddButton,
@@ -46,6 +50,8 @@ export {
   Fieldset,
   Select,
   SelectOption,
+  RadioGroup,
+  RadioGroupOption,
   List,
   ListItem,
   AddButton,
