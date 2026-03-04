@@ -3,6 +3,7 @@ import React from 'react';
 import { getComponent } from './registry';
 import { SelectOption } from './SelectOption';
 import type { SelectOptionProps } from './SelectOption';
+import { RadioGroupOption } from './RadioGroupOption';
 import type {
   CheckboxProps,
   ComponentPropsMap,
@@ -10,6 +11,8 @@ import type {
   DateTimePickerProps,
   FieldsetProps,
   NumberInputProps,
+  RadioGroupProps,
+  ResolvedRadioGroupProps,
   SelectProps,
   SwitchProps,
   TextareaProps,
@@ -25,7 +28,7 @@ import type {
   ResolvedTimePickerProps,
   FieldResolved,
 } from './types';
-import { useFieldProps } from '../hooks/useField';
+import { useFieldProps, useReactiveProp } from '../hooks/useField';
 import { useDataSource } from '../hooks/useDataSource';
 import { Scope } from './Scope';
 
@@ -217,6 +220,33 @@ function SelectDispatch(props: SelectProps) {
   });
 }
 
+function RadioGroupDispatch(props: RadioGroupProps) {
+  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const {
+    items,
+    isLoading,
+    error: dataSourceError,
+  } = useDataSource(props.dataSource, {
+    bind: props.bind,
+  });
+  const options = buildSelectOptions(items, props.children);
+  const RadioGroupOptionImpl = getComponent('RadioGroupOption');
+  if (!RadioGroupOptionImpl) {
+    throw new Error('Enforma: component "RadioGroupOption" is not registered.');
+  }
+  const renderedOptions = options.map((opt) => (
+    <RadioGroupOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
+  ));
+  const row = useReactiveProp(props.row) ?? false;
+  return dispatchComponent('RadioGroup', {
+    ...resolved,
+    children: renderedOptions,
+    row,
+    isLoading,
+    dataSourceError: dataSourceError ?? null,
+  } as ResolvedRadioGroupProps);
+}
+
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);
 export const DateTimePicker = memo(DateTimePickerDispatch, stablePropsEqual);
@@ -229,5 +259,9 @@ export const Fieldset = memo(FieldsetDispatch, stablePropsEqual);
 export const Select = Object.assign(memo(SelectDispatch, stablePropsEqual), {
   Option: SelectOption,
 });
+export const RadioGroup = Object.assign(memo(RadioGroupDispatch, stablePropsEqual), {
+  Option: RadioGroupOption,
+});
 
 export { SelectOption };
+export { RadioGroupOption };
