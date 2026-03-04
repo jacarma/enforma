@@ -44,6 +44,26 @@ export type CheckboxProps = CommonProps & {
 };
 export type SwitchProps = CheckboxProps;
 
+export type RadioGroupProps = CommonProps & {
+  dataSource?: DataSourceProp<unknown>;
+  children?: ReactNode;
+  row?: Reactive<boolean>;
+};
+
+export type ResolvedRadioGroupProps = ResolvedCommonProps & {
+  value: unknown;
+  setValue: (value: unknown) => void;
+  children: ReactNode;
+  row: boolean;
+  isLoading: boolean;
+  dataSourceError: Error | null;
+};
+
+export type ResolvedRadioGroupOptionProps = {
+  value: unknown;
+  label: string;
+};
+
 export type NumberInputProps = CommonProps & {
   decimalScale?: Reactive<number>;
   decimalSeparator?: Reactive<'intl' | (string & Record<never, never>)>;
@@ -95,6 +115,8 @@ export type ComponentPropsMap = {
   DatePicker: ResolvedDatePickerProps;
   TimePicker: ResolvedTimePickerProps;
   DateTimePicker: ResolvedDateTimePickerProps;
+  RadioGroup: ResolvedRadioGroupProps;
+  RadioGroupOption: ResolvedRadioGroupOptionProps;
 };
 
 export type ValidationState = {
