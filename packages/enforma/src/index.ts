@@ -36,6 +36,8 @@ export { registerComponents, clearRegistry, getRegistryOptions } from './compone
 export { useListState } from './hooks/useListState';
 export { useDataSource } from './hooks/useDataSource';
 export { SelectOption } from './components/SelectOption';
+export { RadioGroupOption } from './components/RadioGroupOption';
+export type { RadioGroupOptionProps } from './components/RadioGroupOption';
 export { ListItemSlot } from './components/ListItemSlot';
 export type { ListItemSlotProps } from './components/ListItemSlot';
 export { ListFormSlot } from './components/ListFormSlot';
@@ -64,4 +66,7 @@ export type {
   ResolvedListItemProps,
   ResolvedFormModalProps,
   ResolvedAddButtonProps,
+  RadioGroupProps,
+  ResolvedRadioGroupProps,
+  ResolvedRadioGroupOptionProps,
 } from './components/types';
