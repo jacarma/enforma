@@ -90,7 +90,7 @@ const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
 
 type VariantKey = 'classic' | 'outlined' | 'standard';
 
-registerComponents(muiComponents, { variant: 'classic' });
+registerComponents(muiComponents, { variant: 'classic', dateAdapter: 'dayjs' });
 
 const LIST_INITIAL: FormValues = {
   members: [{ name: 'Alice' }, { name: 'Bob' }],
@@ -112,7 +112,7 @@ export function App() {
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
-    registerComponents(muiComponents, { variant: v });
+    registerComponents(muiComponents, { variant: v, dateAdapter: 'dayjs' });
     setVariant(v);
   };
 
@@ -205,7 +205,7 @@ export function App() {
           placeholder={({ name }) =>
             String(name) === '' ? 'Fill in your name first' : `Email for ${String(name)}`
           }
-          disabled={({ name }) => String(name) === ''}
+          disabled={({ name }) => !name}
         />
 
         {/* Reactive label driven by another field */}

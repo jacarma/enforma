@@ -4,13 +4,25 @@ import { MuiVariantContext } from '../context/MuiVariantContext';
 
 const adapterLoaders = {
   dayjs: () =>
-    Promise.all([import('@mui/x-date-pickers'), import('@mui/x-date-pickers/AdapterDayjs')]),
+    Promise.all([
+      import('@mui/x-date-pickers').then((mod) => mod.LocalizationProvider),
+      import('@mui/x-date-pickers/AdapterDayjs').then((mod) => mod.AdapterDayjs),
+    ]),
   'date-fns': () =>
-    Promise.all([import('@mui/x-date-pickers'), import('@mui/x-date-pickers/AdapterDateFns')]),
+    Promise.all([
+      import('@mui/x-date-pickers').then((mod) => mod.LocalizationProvider),
+      import('@mui/x-date-pickers/AdapterDateFns').then((mod) => mod.AdapterDateFns),
+    ]),
   luxon: () =>
-    Promise.all([import('@mui/x-date-pickers'), import('@mui/x-date-pickers/AdapterLuxon')]),
+    Promise.all([
+      import('@mui/x-date-pickers').then((mod) => mod.LocalizationProvider),
+      import('@mui/x-date-pickers/AdapterLuxon').then((mod) => mod.AdapterLuxon),
+    ]),
   moment: () =>
-    Promise.all([import('@mui/x-date-pickers'), import('@mui/x-date-pickers/AdapterMoment')]),
+    Promise.all([
+      import('@mui/x-date-pickers').then((mod) => mod.LocalizationProvider),
+      import('@mui/x-date-pickers/AdapterMoment').then((mod) => mod.AdapterMoment),
+    ]),
 } as const;
 
 type AdapterKey = keyof typeof adapterLoaders;
@@ -23,12 +35,7 @@ function getLocalizationWrapper(key: AdapterKey): React.LazyExoticComponent<Wrap
   if (cached !== undefined) return cached;
 
   const wrapper = lazy(async () => {
-    const [{ LocalizationProvider }, adapterMod] = await adapterLoaders[key]();
-    // Module interop: default export is the adapter class constructor
-    type DateAdapter = NonNullable<
-      React.ComponentProps<typeof LocalizationProvider>['dateAdapter']
-    >;
-    const Adapter = (adapterMod as unknown as { default: DateAdapter }).default;
+    const [LocalizationProvider, Adapter] = await adapterLoaders[key]();
     const Wrapper: WrapperComponent = ({ children }) => (
       <LocalizationProvider dateAdapter={Adapter}>{children}</LocalizationProvider>
     );

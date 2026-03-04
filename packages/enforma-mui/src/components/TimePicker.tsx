@@ -1,5 +1,6 @@
 import { lazy, Suspense, useContext, useId, useRef } from 'react';
 import { FormLabel, TextField } from '@mui/material';
+import { getRegistryOptions } from 'enforma';
 import type { ResolvedTimePickerProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
@@ -78,6 +79,13 @@ const LazyTimePicker = lazy(() =>
         maxTime,
         ampm,
       }: ResolvedTimePickerProps) {
+        if (!getRegistryOptions().dateAdapter) {
+          throw new Error(
+            "enforma-mui: TimePicker requires a date adapter. Pass { dateAdapter: 'dayjs'|'date-fns'|'luxon'|'moment' } to " +
+              'registerComponents() and install the adapter:\n' +
+              '  pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
+          );
+        }
         const rawInputRef = useRef('');
         const timeValue =
           typeof value === 'string' && /^\d{2}:\d{2}$/.test(value) ? timeToDate(value) : null;
@@ -120,7 +128,7 @@ const LazyTimePicker = lazy(() =>
     })
     .catch(() => {
       throw new Error(
-        'enforma-mui: TimePicker requires `@mui/x-date-pickers`. Run: pnpm add @mui/x-date-pickers dayjs',
+        'enforma-mui: TimePicker requires `@mui/x-date-pickers`. Run: pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
       );
     }),
 );

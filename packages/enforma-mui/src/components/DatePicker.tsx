@@ -1,5 +1,6 @@
 import { lazy, Suspense, useContext, useId, useRef } from 'react';
 import { FormLabel, TextField } from '@mui/material';
+import { getRegistryOptions } from 'enforma';
 import type { ResolvedDatePickerProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
@@ -65,6 +66,13 @@ const LazyDatePicker = lazy(() =>
         disableFuture,
         disablePast,
       }: ResolvedDatePickerProps) {
+        if (!getRegistryOptions().dateAdapter) {
+          throw new Error(
+            "enforma-mui: DatePicker requires a date adapter. Pass { dateAdapter: 'dayjs'|'date-fns'|'luxon'|'moment' } to " +
+              'registerComponents() and install the adapter:\n' +
+              '  pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
+          );
+        }
         const rawInputRef = useRef('');
         const dateValue = value instanceof Date ? value : null;
 
@@ -107,7 +115,7 @@ const LazyDatePicker = lazy(() =>
     })
     .catch(() => {
       throw new Error(
-        'enforma-mui: DatePicker requires `@mui/x-date-pickers`. Run: pnpm add @mui/x-date-pickers dayjs',
+        'enforma-mui: DatePicker requires `@mui/x-date-pickers`. Run: pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
       );
     }),
 );

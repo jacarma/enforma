@@ -21,7 +21,7 @@ vi.mock('@mui/x-date-pickers', () => ({
 
 vi.mock('@mui/x-date-pickers/AdapterDayjs', () => ({
   // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-  default: class AdapterDayjs {},
+  AdapterDayjs: class AdapterDayjs {},
 }));
 
 beforeEach(() => {

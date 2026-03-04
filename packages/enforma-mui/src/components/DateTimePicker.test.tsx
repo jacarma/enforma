@@ -54,7 +54,7 @@ vi.mock('@mui/x-date-pickers', () => ({
 
 beforeEach(() => {
   clearRegistry();
-  registerComponents({ DateTimePicker });
+  registerComponents({ DateTimePicker }, { dateAdapter: 'dayjs' });
 });
 
 describe('MUI DateTimePicker', () => {
