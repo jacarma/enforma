@@ -107,6 +107,7 @@ export function App() {
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
   const [boolValues, setBoolValues] = useState<FormValues>({});
+  const [radioValues, setRadioValues] = useState<FormValues>({ size: '', country: '' });
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [dateValues, setDateValues] = useState<FormValues>({});
 
@@ -260,6 +261,43 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(boolValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Radio Group</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>RadioGroup</code> works like <code>Select</code> — inline children or a datasource,
+        with optional <code>row</code> layout and reactive <code>disabled</code>.
+      </p>
+
+      <Enforma.Form
+        values={radioValues}
+        onChange={setRadioValues}
+        aria-label="radio group demo form"
+        dataSources={DATASOURCE_DEMO_SOURCES}
+      >
+        {/* RadioGroup — inline options */}
+        <Enforma.RadioGroup bind="size" label="Size">
+          <Enforma.RadioGroup.Option value="s" label="Small" />
+          <Enforma.RadioGroup.Option value="m" label="Medium" />
+          <Enforma.RadioGroup.Option value="l" label="Large" />
+        </Enforma.RadioGroup>
+
+        {/* RadioGroup — datasource, row layout, reactive disabled */}
+        <Enforma.RadioGroup
+          bind="country"
+          label="Country (row)"
+          dataSource="countries"
+          row
+          disabled={(scope) => Boolean(scope.disableCountry)}
+        >
+          <Enforma.RadioGroup.Option label="name" value="code" />
+        </Enforma.RadioGroup>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(radioValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />

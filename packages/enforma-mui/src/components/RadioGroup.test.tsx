@@ -88,11 +88,7 @@ describe('MUI RadioGroup', () => {
   it('shows error message when showError is true', async () => {
     render(
       <Form values={{ size: '' }} onChange={() => undefined}>
-        <Enforma.RadioGroup
-          bind="size"
-          label="Size"
-          validate={(v) => (!v ? 'Required' : null)}
-        >
+        <Enforma.RadioGroup bind="size" label="Size" validate={(v) => (!v ? 'Required' : null)}>
           <RadioGroupOption value="s" label="Small" />
         </Enforma.RadioGroup>
       </Form>,

@@ -37,9 +37,7 @@ export function RadioGroup({
       >
         {children}
       </MuiRadioGroup>
-      {showError && (
-        <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>
-      )}
+      {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
     </FormControl>
   );
 }
