@@ -33,7 +33,7 @@
 
 ## Numeric
 
-- [ ] NumberInput — numeric-only text input with min/max/step; no spinner arrows
+- [x] NumberInput — numeric-only text input with min/max/step; no spinner arrows
 - [ ] Spinner — numeric input with increment/decrement buttons (stepper)
 - [ ] Slider — single-handle range slider bound to a number
 - [ ] RangeSlider — dual-handle slider bound to `[min, max]` tuple
@@ -59,3 +59,11 @@
 - [ ] ColorPicker — hex/rgb color selection
 - [ ] OtpInput — fixed-length code entry (PIN, verification code); alternative to masked TextInput
 - [ ] TransferList — move items between "available" and "selected" pools; produces an array
+
+---
+
+## Notes / investigations
+
+- [ ] **StarRating demo**: Checkbox is now implemented — update `docs/custom-components.md` and the demo to replace the placeholder `TextInput` with a Checkbox that controls the `disabled` reactive prop on the star rating field.
+
+- [ ] **Validator performance**: the `onChange(values, { valid })` architecture runs all validators (type + user) on every value change. Measure whether this is a bottleneck for forms with many fields or expensive validators. If so, consider debouncing validator execution (e.g. 100–200 ms) while keeping the last known `valid` state stable between runs.
