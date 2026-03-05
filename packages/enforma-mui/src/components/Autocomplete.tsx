@@ -1,5 +1,10 @@
 // packages/enforma-mui/src/components/Autocomplete.tsx
-import { CircularProgress, Autocomplete as MuiAutocomplete, TextField } from '@mui/material';
+import {
+  CircularProgress,
+  Autocomplete as MuiAutocomplete,
+  TextField,
+  type TextFieldProps,
+} from '@mui/material';
 import { type ResolvedAutocompleteProps } from 'enforma';
 
 type OptionItem = { value: unknown; label: string };
@@ -36,7 +41,7 @@ export function Autocomplete({
       fullWidth
       renderInput={(params) => (
         <TextField
-          {...params}
+          {...(params as TextFieldProps)}
           label={label}
           error={showError}
           helperText={showError ? (dataSourceError?.message ?? error) : undefined}

@@ -11,6 +11,10 @@ import { Select } from './components/Select';
 import { SelectOption } from './components/SelectOption';
 import { RadioGroup } from './components/RadioGroup';
 import { RadioGroupOption } from './components/RadioGroupOption';
+import { Autocomplete } from './components/Autocomplete';
+import { AutocompleteOption } from './components/AutocompleteOption';
+import { ExclusiveToggle } from './components/ExclusiveToggle';
+import { ExclusiveToggleOption } from './components/ExclusiveToggleOption';
 import { List } from './components/List';
 import { ListItem } from './components/ListItem';
 import { AddButton } from './components/AddButton';
@@ -30,6 +34,10 @@ const muiComponents = {
   SelectOption,
   RadioGroup,
   RadioGroupOption,
+  Autocomplete,
+  AutocompleteOption,
+  ExclusiveToggle,
+  ExclusiveToggleOption,
   List,
   ListItem,
   AddButton,
@@ -52,6 +60,10 @@ export {
   SelectOption,
   RadioGroup,
   RadioGroupOption,
+  Autocomplete,
+  AutocompleteOption,
+  ExclusiveToggle,
+  ExclusiveToggleOption,
   List,
   ListItem,
   AddButton,
