@@ -62,28 +62,42 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+let cachedTypes: PokemonItem[] | null = null;
+const cachedPokemon = new Map<string, PokemonItem[]>();
+
 const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
   types: {
-    query: async (): Promise<PokemonItem[]> => {
-      const res = await fetch('https://pokeapi.co/api/v2/type?limit=20');
-      const data = (await res.json()) as { results: { name: string }[] };
-      return data.results
-        .filter((t) => t.name !== 'unknown' && t.name !== 'shadow')
-        .map((t) => ({ name: t.name, label: capitalize(t.name) }));
+    query: async ({ search }: DataSourceParams): Promise<PokemonItem[]> => {
+      if (!cachedTypes) {
+        const res = await fetch('https://pokeapi.co/api/v2/type?limit=20');
+        const data = (await res.json()) as { results: { name: string }[] };
+        cachedTypes = data.results
+          .filter((t) => t.name !== 'unknown' && t.name !== 'shadow')
+          .map((t) => ({ name: t.name, label: capitalize(t.name) }));
+      }
+      if (!search) return cachedTypes;
+      const q = search.toLowerCase();
+      return cachedTypes.filter((t) => t.name.includes(q));
     },
   },
   pokemon: {
     query: async ({ filters, search }: DataSourceParams): Promise<PokemonItem[]> => {
       const type = filters.type as string;
       if (!type) return [];
-      const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
-      const data = (await res.json()) as {
-        pokemon: { pokemon: { name: string } }[];
-      };
-      const all = data.pokemon.map(({ pokemon }) => ({
-        name: pokemon.name,
-        label: capitalize(pokemon.name),
-      }));
+      if (!cachedPokemon.has(type)) {
+        const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+        const data = (await res.json()) as {
+          pokemon: { pokemon: { name: string } }[];
+        };
+        cachedPokemon.set(
+          type,
+          data.pokemon.map(({ pokemon }) => ({
+            name: pokemon.name,
+            label: capitalize(pokemon.name),
+          })),
+        );
+      }
+      const all = cachedPokemon.get(type) ?? [];
       if (!search) return all;
       const q = search.toLowerCase();
       return all.filter((p) => p.name.includes(q));
