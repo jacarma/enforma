@@ -108,6 +108,14 @@ export function App() {
   const [listValues, setListValues] = useState<FormValues>(LIST_INITIAL);
   const [boolValues, setBoolValues] = useState<FormValues>({});
   const [radioValues, setRadioValues] = useState<FormValues>({ size: '', country: '' });
+  const [autocompleteValues, setAutocompleteValues] = useState<Record<string, unknown>>({
+    country: '',
+    plan: '',
+  });
+  const [toggleValues, setToggleValues] = useState<Record<string, unknown>>({
+    size: '',
+    plan: '',
+  });
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [dateValues, setDateValues] = useState<FormValues>({});
 
@@ -298,6 +306,68 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(radioValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Autocomplete</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>Autocomplete</code> is a searchable combobox — constrained to options, supports
+        datasource and inline children.
+      </p>
+
+      <Enforma.Form
+        values={autocompleteValues}
+        onChange={setAutocompleteValues}
+        aria-label="autocomplete demo form"
+        dataSources={DATASOURCE_DEMO_SOURCES}
+      >
+        {/* Autocomplete — inline options */}
+        <Enforma.Autocomplete bind="country" label="Country">
+          <Enforma.Autocomplete.Option value="au" label="Australia" />
+          <Enforma.Autocomplete.Option value="nz" label="New Zealand" />
+          <Enforma.Autocomplete.Option value="us" label="United States" />
+        </Enforma.Autocomplete>
+
+        {/* Autocomplete — datasource with template mapping */}
+        <Enforma.Autocomplete bind="plan" label="Plan (datasource)" dataSource="countries">
+          <Enforma.Autocomplete.Option label="name" value="code" />
+        </Enforma.Autocomplete>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(autocompleteValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Exclusive Toggle</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>ExclusiveToggle</code> is a segmented button group for single selection from a small
+        fixed set — inline children or datasource.
+      </p>
+
+      <Enforma.Form
+        values={toggleValues}
+        onChange={setToggleValues}
+        aria-label="exclusive toggle demo form"
+        dataSources={DATASOURCE_DEMO_SOURCES}
+      >
+        {/* ExclusiveToggle — inline options */}
+        <Enforma.ExclusiveToggle bind="size" label="Size">
+          <Enforma.ExclusiveToggle.Option value="s" label="S" />
+          <Enforma.ExclusiveToggle.Option value="m" label="M" />
+          <Enforma.ExclusiveToggle.Option value="l" label="L" />
+        </Enforma.ExclusiveToggle>
+
+        {/* ExclusiveToggle — datasource with template mapping */}
+        <Enforma.ExclusiveToggle bind="plan" label="Country (datasource)" dataSource="countries">
+          <Enforma.ExclusiveToggle.Option label="name" value="code" />
+        </Enforma.ExclusiveToggle>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(toggleValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
