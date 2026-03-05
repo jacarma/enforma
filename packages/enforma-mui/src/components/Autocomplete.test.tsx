@@ -81,6 +81,30 @@ describe('MUI Autocomplete', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
+  it('forwards typed text as search to the datasource query', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    render(
+      <Form
+        values={{ item: '' }}
+        onChange={() => undefined}
+        dataSources={{ items: { query } }}
+      >
+        <Enforma.Autocomplete bind="item" label="Item" dataSource="items" />
+      </Form>,
+    );
+    // Wait for initial query (search='')
+    await vi.waitFor(() => expect(query).toHaveBeenCalledTimes(1));
+    query.mockClear();
+
+    await userEvent.type(screen.getByRole('combobox'), 'bul');
+
+    await vi.waitFor(() =>
+      expect(query).toHaveBeenCalledWith(
+        expect.objectContaining({ search: 'bul' }),
+      ),
+    );
+  });
+
   it('shows error message after blur with failed validation', async () => {
     render(
       <Form values={{ country: '' }} onChange={() => undefined}>

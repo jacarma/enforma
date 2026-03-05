@@ -256,6 +256,7 @@ function RadioGroupDispatch(props: RadioGroupProps) {
 }
 
 function AutocompleteDispatch(props: AutocompleteProps) {
+  const [inputValue, setInputValue] = React.useState('');
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
   const {
     items,
@@ -263,6 +264,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     error: dataSourceError,
   } = useDataSource(props.dataSource, {
     bind: props.bind,
+    search: inputValue,
   });
   const options = buildSelectOptions(items, props.children);
   const AutocompleteOptionImpl = getComponent('AutocompleteOption');
@@ -281,6 +283,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     displayValue,
     isLoading,
     dataSourceError: dataSourceError ?? null,
+    onInputChange: setInputValue,
   } as ResolvedAutocompleteProps);
 }
 

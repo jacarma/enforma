@@ -83,6 +83,7 @@ export type ResolvedAutocompleteProps = ResolvedCommonProps & {
   displayValue: string;
   isLoading: boolean;
   dataSourceError: Error | null;
+  onInputChange: (value: string) => void;
 };
 
 export type ResolvedAutocompleteOptionProps = {
