@@ -25,7 +25,7 @@ export function ExclusiveToggle({
   }
 
   return (
-    <FormControl disabled={disabled} error={showError}>
+    <FormControl disabled={disabled} error={showError} fullWidth>
       {label !== undefined && <FormLabel>{label}</FormLabel>}
       <ToggleButtonGroup
         value={value ?? null}

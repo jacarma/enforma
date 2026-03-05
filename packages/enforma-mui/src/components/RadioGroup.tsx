@@ -25,7 +25,7 @@ export function RadioGroup({
   }
 
   return (
-    <FormControl disabled={disabled} error={showError}>
+    <FormControl disabled={disabled} error={showError} fullWidth>
       {label !== undefined && <FormLabel>{label}</FormLabel>}
       <MuiRadioGroup
         value={value ?? ''}
