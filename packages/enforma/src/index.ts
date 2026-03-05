@@ -38,6 +38,10 @@ export { useDataSource } from './hooks/useDataSource';
 export { SelectOption } from './components/SelectOption';
 export { RadioGroupOption } from './components/RadioGroupOption';
 export type { RadioGroupOptionProps } from './components/RadioGroupOption';
+export { AutocompleteOption } from './components/AutocompleteOption';
+export type { AutocompleteOptionProps } from './components/AutocompleteOption';
+export { ExclusiveToggleOption } from './components/ExclusiveToggleOption';
+export type { ExclusiveToggleOptionProps } from './components/ExclusiveToggleOption';
 export { ListItemSlot } from './components/ListItemSlot';
 export type { ListItemSlotProps } from './components/ListItemSlot';
 export { ListFormSlot } from './components/ListFormSlot';
@@ -69,4 +73,10 @@ export type {
   RadioGroupProps,
   ResolvedRadioGroupProps,
   ResolvedRadioGroupOptionProps,
+  AutocompleteProps,
+  ResolvedAutocompleteProps,
+  ResolvedAutocompleteOptionProps,
+  ExclusiveToggleProps,
+  ResolvedExclusiveToggleProps,
+  ResolvedExclusiveToggleOptionProps,
 } from './components/types';
