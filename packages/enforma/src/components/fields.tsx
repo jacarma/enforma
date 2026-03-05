@@ -4,14 +4,20 @@ import { getComponent } from './registry';
 import { SelectOption } from './SelectOption';
 import type { SelectOptionProps } from './SelectOption';
 import { RadioGroupOption } from './RadioGroupOption';
+import { AutocompleteOption } from './AutocompleteOption';
+import { ExclusiveToggleOption } from './ExclusiveToggleOption';
 import type {
+  AutocompleteProps,
   CheckboxProps,
   ComponentPropsMap,
   DatePickerProps,
   DateTimePickerProps,
+  ExclusiveToggleProps,
   FieldsetProps,
   NumberInputProps,
   RadioGroupProps,
+  ResolvedAutocompleteProps,
+  ResolvedExclusiveToggleProps,
   ResolvedRadioGroupProps,
   SelectProps,
   SwitchProps,
@@ -213,6 +219,7 @@ function SelectDispatch(props: SelectProps) {
   const displayValue = matched?.label ?? (typeof resolved.value === 'string' ? resolved.value : '');
   return dispatchComponent('Select', {
     ...resolved,
+    options,
     children: renderedOptions,
     displayValue,
     isLoading,
@@ -240,11 +247,67 @@ function RadioGroupDispatch(props: RadioGroupProps) {
   const row = useReactiveProp(props.row) ?? false;
   return dispatchComponent('RadioGroup', {
     ...resolved,
+    options,
     children: renderedOptions,
     row,
     isLoading,
     dataSourceError: dataSourceError ?? null,
   } as ResolvedRadioGroupProps);
+}
+
+function AutocompleteDispatch(props: AutocompleteProps) {
+  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const {
+    items,
+    isLoading,
+    error: dataSourceError,
+  } = useDataSource(props.dataSource, {
+    bind: props.bind,
+  });
+  const options = buildSelectOptions(items, props.children);
+  const AutocompleteOptionImpl = getComponent('AutocompleteOption');
+  if (!AutocompleteOptionImpl) {
+    throw new Error('Enforma: component "AutocompleteOption" is not registered.');
+  }
+  const renderedOptions = options.map((opt) => (
+    <AutocompleteOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
+  ));
+  const matched = options.find((opt) => opt.value === resolved.value);
+  const displayValue = matched?.label ?? (typeof resolved.value === 'string' ? resolved.value : '');
+  return dispatchComponent('Autocomplete', {
+    ...resolved,
+    options,
+    children: renderedOptions,
+    displayValue,
+    isLoading,
+    dataSourceError: dataSourceError ?? null,
+  } as ResolvedAutocompleteProps);
+}
+
+function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
+  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const {
+    items,
+    isLoading,
+    error: dataSourceError,
+  } = useDataSource(props.dataSource, {
+    bind: props.bind,
+  });
+  const options = buildSelectOptions(items, props.children);
+  const ExclusiveToggleOptionImpl = getComponent('ExclusiveToggleOption');
+  if (!ExclusiveToggleOptionImpl) {
+    throw new Error('Enforma: component "ExclusiveToggleOption" is not registered.');
+  }
+  const renderedOptions = options.map((opt) => (
+    <ExclusiveToggleOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
+  ));
+  return dispatchComponent('ExclusiveToggle', {
+    ...resolved,
+    options,
+    children: renderedOptions,
+    isLoading,
+    dataSourceError: dataSourceError ?? null,
+  } as ResolvedExclusiveToggleProps);
 }
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
@@ -262,6 +325,14 @@ export const Select = Object.assign(memo(SelectDispatch, stablePropsEqual), {
 export const RadioGroup = Object.assign(memo(RadioGroupDispatch, stablePropsEqual), {
   Option: RadioGroupOption,
 });
+export const Autocomplete = Object.assign(memo(AutocompleteDispatch, stablePropsEqual), {
+  Option: AutocompleteOption,
+});
+export const ExclusiveToggle = Object.assign(memo(ExclusiveToggleDispatch, stablePropsEqual), {
+  Option: ExclusiveToggleOption,
+});
 
 export { SelectOption };
 export { RadioGroupOption };
+export { AutocompleteOption };
+export { ExclusiveToggleOption };

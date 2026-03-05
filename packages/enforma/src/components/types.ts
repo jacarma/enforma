@@ -53,6 +53,7 @@ export type RadioGroupProps = CommonProps & {
 export type ResolvedRadioGroupProps = ResolvedCommonProps & {
   value: unknown;
   setValue: (value: unknown) => void;
+  options: { value: unknown; label: string }[];
   children: ReactNode;
   row: boolean;
   isLoading: boolean;
@@ -60,6 +61,45 @@ export type ResolvedRadioGroupProps = ResolvedCommonProps & {
 };
 
 export type ResolvedRadioGroupOptionProps = {
+  value: unknown;
+  label: string;
+};
+
+export type AutocompleteProps = CommonProps & {
+  dataSource?: DataSourceProp<unknown>;
+  children?: ReactNode;
+};
+
+export type ExclusiveToggleProps = CommonProps & {
+  dataSource?: DataSourceProp<unknown>;
+  children?: ReactNode;
+};
+
+export type ResolvedAutocompleteProps = ResolvedCommonProps & {
+  value: unknown;
+  setValue: (value: unknown) => void;
+  options: { value: unknown; label: string }[];
+  children: ReactNode;
+  displayValue: string;
+  isLoading: boolean;
+  dataSourceError: Error | null;
+};
+
+export type ResolvedAutocompleteOptionProps = {
+  value: unknown;
+  label: string;
+};
+
+export type ResolvedExclusiveToggleProps = ResolvedCommonProps & {
+  value: unknown;
+  setValue: (value: unknown) => void;
+  options: { value: unknown; label: string }[];
+  children: ReactNode;
+  isLoading: boolean;
+  dataSourceError: Error | null;
+};
+
+export type ResolvedExclusiveToggleOptionProps = {
   value: unknown;
   label: string;
 };
@@ -117,6 +157,10 @@ export type ComponentPropsMap = {
   DateTimePicker: ResolvedDateTimePickerProps;
   RadioGroup: ResolvedRadioGroupProps;
   RadioGroupOption: ResolvedRadioGroupOptionProps;
+  Autocomplete: ResolvedAutocompleteProps;
+  AutocompleteOption: ResolvedAutocompleteOptionProps;
+  ExclusiveToggle: ResolvedExclusiveToggleProps;
+  ExclusiveToggleOption: ResolvedExclusiveToggleOptionProps;
 };
 
 export type ValidationState = {
@@ -195,6 +239,7 @@ export type ResolvedDateTimePickerProps = Omit<ResolvedCommonProps, 'value' | 's
 export type ResolvedSelectProps = ResolvedCommonProps & {
   value: unknown;
   setValue: (value: unknown) => void;
+  options: { value: unknown; label: string }[];
   children: ReactNode;
   displayValue: string;
   isLoading: boolean;
