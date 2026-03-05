@@ -73,17 +73,20 @@ const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
     },
   },
   pokemon: {
-    query: async ({ filters }: DataSourceParams): Promise<PokemonItem[]> => {
+    query: async ({ filters, search }: DataSourceParams): Promise<PokemonItem[]> => {
       const type = filters.type as string;
       if (!type) return [];
       const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
       const data = (await res.json()) as {
         pokemon: { pokemon: { name: string } }[];
       };
-      return data.pokemon.map(({ pokemon }) => ({
+      const all = data.pokemon.map(({ pokemon }) => ({
         name: pokemon.name,
         label: capitalize(pokemon.name),
       }));
+      if (!search) return all;
+      const q = search.toLowerCase();
+      return all.filter((p) => p.name.includes(q));
     },
   },
 };
@@ -111,6 +114,8 @@ export function App() {
   const [autocompleteValues, setAutocompleteValues] = useState<Record<string, unknown>>({
     country: '',
     plan: '',
+    type: '',
+    pokemon: '',
   });
   const [toggleValues, setToggleValues] = useState<Record<string, unknown>>({
     size: '',
@@ -320,7 +325,7 @@ export function App() {
         values={autocompleteValues}
         onChange={setAutocompleteValues}
         aria-label="autocomplete demo form"
-        dataSources={DATASOURCE_DEMO_SOURCES}
+        dataSources={{ ...DATASOURCE_DEMO_SOURCES, ...POKEMON_DATASOURCES }}
       >
         {/* Autocomplete — inline options */}
         <Enforma.Autocomplete bind="country" label="Country">
@@ -332,6 +337,19 @@ export function App() {
         {/* Autocomplete — datasource with template mapping */}
         <Enforma.Autocomplete bind="plan" label="Plan (datasource)" dataSource="countries">
           <Enforma.Autocomplete.Option label="name" value="code" />
+        </Enforma.Autocomplete>
+
+        {/* Autocomplete — async PokéAPI, server-side search */}
+        <Enforma.Autocomplete bind="type" label="Pokémon Type" dataSource="types">
+          <Enforma.Autocomplete.Option label="label" value="name" />
+        </Enforma.Autocomplete>
+
+        <Enforma.Autocomplete
+          bind="pokemon"
+          label="Pokémon (filtered by type)"
+          dataSource={{ source: 'pokemon', filters: (scope) => ({ type: scope.type as string }) }}
+        >
+          <Enforma.Autocomplete.Option label="label" value="name" />
         </Enforma.Autocomplete>
       </Enforma.Form>
 
