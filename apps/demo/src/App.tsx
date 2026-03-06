@@ -65,6 +65,58 @@ function capitalize(s: string): string {
 let cachedTypes: PokemonItem[] | null = null;
 const cachedPokemon = new Map<string, PokemonItem[]>();
 
+type BookItem = {
+  key: string;
+  title: string;
+  label: string;
+};
+
+interface OLSearchDoc {
+  key: string;
+  title: string;
+  author_name?: string[];
+}
+
+interface OLSearchResponse {
+  docs: OLSearchDoc[];
+}
+
+interface OLWorkResponse {
+  key: string;
+  title: string;
+}
+
+const OPEN_LIBRARY_DATASOURCES: Record<string, DataSourceDefinition<BookItem>> = {
+  books: {
+    query: async ({ search, filters }: DataSourceParams): Promise<BookItem[]> => {
+      if (!search) return [];
+      const params = new URLSearchParams({
+        q: search,
+        fields: 'key,title,author_name',
+        limit: '10',
+      });
+      const subject = filters.subject as string | undefined;
+      if (subject) params.set('subject', subject);
+      const res = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+      const data = (await res.json()) as OLSearchResponse;
+      return data.docs.map((doc) => {
+        const firstAuthor = doc.author_name?.[0];
+        return {
+          key: doc.key,
+          title: doc.title,
+          label: firstAuthor !== undefined ? `${doc.title} — ${firstAuthor}` : doc.title,
+        };
+      });
+    },
+    resolve: async (value: unknown): Promise<BookItem> => {
+      const id = (value as string).replace('/works/', '');
+      const res = await fetch(`https://openlibrary.org/works/${id}.json`);
+      const data = (await res.json()) as OLWorkResponse;
+      return { key: data.key, title: data.title, label: data.title };
+    },
+  },
+};
+
 const POKEMON_DATASOURCES: Record<string, DataSourceDefinition<PokemonItem>> = {
   types: {
     query: async ({ search }: DataSourceParams): Promise<PokemonItem[]> => {
@@ -128,8 +180,8 @@ export function App() {
   const [autocompleteValues, setAutocompleteValues] = useState<Record<string, unknown>>({
     country: '',
     plan: '',
-    type: '',
-    pokemon: '',
+    subject: 'fantasy',
+    book: '/works/OL82563W',
   });
   const [toggleValues, setToggleValues] = useState<Record<string, unknown>>({
     size: '',
@@ -331,17 +383,22 @@ export function App() {
 
       <h2>Autocomplete</h2>
       <p style={{ color: '#555', marginBottom: '1rem' }}>
-        <code>Autocomplete</code> is a searchable combobox — constrained to options, supports
-        datasource and inline children.
+        <code>Autocomplete</code> is a searchable combobox. Subject uses inline options with MUI
+        client-side filtering. Book uses{' '}
+        <a href="https://openlibrary.org" target="_blank" rel="noreferrer">
+          Open Library
+        </a>{' '}
+        server-side search — type 2+ chars to search, optional subject filter. Pre-selected book
+        resolves its label on mount.
       </p>
 
       <Enforma.Form
         values={autocompleteValues}
         onChange={setAutocompleteValues}
         aria-label="autocomplete demo form"
-        dataSources={{ ...DATASOURCE_DEMO_SOURCES, ...POKEMON_DATASOURCES }}
+        dataSources={{ ...DATASOURCE_DEMO_SOURCES, ...OPEN_LIBRARY_DATASOURCES }}
       >
-        {/* Autocomplete — inline options */}
+        {/* Autocomplete — inline options, MUI filters client-side */}
         <Enforma.Autocomplete bind="country" label="Country">
           <Enforma.Autocomplete.Option value="au" label="Australia" />
           <Enforma.Autocomplete.Option value="nz" label="New Zealand" />
@@ -353,17 +410,51 @@ export function App() {
           <Enforma.Autocomplete.Option label="name" value="code" />
         </Enforma.Autocomplete>
 
-        {/* Autocomplete — async PokéAPI, server-side search */}
-        <Enforma.Autocomplete bind="type" label="Pokémon Type" dataSource="types">
-          <Enforma.Autocomplete.Option label="label" value="name" />
+        {/* Autocomplete — inline subject options, MUI filters client-side */}
+        <Enforma.Autocomplete bind="subject" label="Subject">
+          <Enforma.Autocomplete.Option value="fantasy" label="Fantasy" />
+          <Enforma.Autocomplete.Option value="science_fiction" label="Science Fiction" />
+          <Enforma.Autocomplete.Option value="mystery" label="Mystery" />
+          <Enforma.Autocomplete.Option value="history" label="History" />
+          <Enforma.Autocomplete.Option value="romance" label="Romance" />
+        </Enforma.Autocomplete>
+
+        {/* Autocomplete — Open Library server-side search, minSearchLength=2, resolve for pre-selected */}
+        <Enforma.Autocomplete
+          bind="book"
+          label="Book (type 2+ chars to search)"
+          dataSource={{
+            source: 'books',
+            filters: (scope) => ({ subject: scope.subject as string }),
+          }}
+          minSearchLength={2}
+        >
+          <Enforma.Autocomplete.Option label="label" value="key" />
+        </Enforma.Autocomplete>
+
+        <p style={{ color: '#777', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+          Duplicate pair below is bound to the same values — changes sync instantly.
+        </p>
+
+        {/* Duplicate pair — same bindings, verifies sync and resolve */}
+        <Enforma.Autocomplete bind="subject" label="Subject (duplicate)">
+          <Enforma.Autocomplete.Option value="fantasy" label="Fantasy" />
+          <Enforma.Autocomplete.Option value="science_fiction" label="Science Fiction" />
+          <Enforma.Autocomplete.Option value="mystery" label="Mystery" />
+          <Enforma.Autocomplete.Option value="history" label="History" />
+          <Enforma.Autocomplete.Option value="romance" label="Romance" />
         </Enforma.Autocomplete>
 
         <Enforma.Autocomplete
-          bind="pokemon"
-          label="Pokémon (filtered by type)"
-          dataSource={{ source: 'pokemon', filters: (scope) => ({ type: scope.type as string }) }}
+          bind="book"
+          label="Book (duplicate)"
+          dataSource={{
+            source: 'books',
+            filters: (scope) => ({ subject: scope.subject as string }),
+          }}
+          minSearchLength={2}
         >
-          <Enforma.Autocomplete.Option label="label" value="name" />
+          <Enforma.Autocomplete.Option label="label" value="key" />
         </Enforma.Autocomplete>
       </Enforma.Form>
 
