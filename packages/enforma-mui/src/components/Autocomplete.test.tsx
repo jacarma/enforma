@@ -102,6 +102,43 @@ describe('MUI Autocomplete', () => {
     });
   });
 
+  it('resolves pre-selected value label via datasource resolve', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const resolve = vi.fn().mockResolvedValue({ value: 'au', label: 'Australia' });
+    render(
+      <Form
+        values={{ country: 'au' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query, resolve } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    await vi.waitFor(() => {
+      expect(screen.getByRole('combobox')).toHaveValue('Australia');
+    });
+  });
+
+  it('does not call resolve when value is already in query results', async () => {
+    const query = vi.fn().mockResolvedValue([{ value: 'au', label: 'Australia' }]);
+    const resolve = vi.fn();
+    render(
+      <Form
+        values={{ country: 'au' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query, resolve } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+    // Give resolve a chance to be called if it's going to be
+    await new Promise((r) => setTimeout(r, 50));
+    expect(resolve).not.toHaveBeenCalled();
+  });
+
   it('filters inline options client-side when not using a query datasource', async () => {
     render(
       <Form values={{ country: '' }} onChange={() => undefined}>

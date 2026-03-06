@@ -101,12 +101,20 @@ export function useDataSource<TItem>(
   );
 
   // Query async state — always present; no-op for static/reactive modes.
+  // Initialize isLoading=true for query datasources so consumers can wait for the first
+  // query before making decisions (e.g., deciding whether to call datasource.resolve).
   const [queryState, setQueryState] = useState<{
     items: TItem[];
     total: number | undefined;
     isLoading: boolean;
     error: Error | null;
-  }>({ items: emptyItems as TItem[], total: undefined, isLoading: false, error: null });
+  }>(() => {
+    if (dataSource === undefined)
+      return { items: emptyItems as TItem[], total: undefined, isLoading: false, error: null };
+    const def = resolveDefinition(dataSource, registry);
+    const hasQuery = def !== null && def !== 'reactive' && !Array.isArray(def) && 'query' in def;
+    return { items: emptyItems as TItem[], total: undefined, isLoading: hasQuery, error: null };
+  });
 
   const bind = params.bind;
   const search = params.search ?? '';
