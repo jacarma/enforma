@@ -81,6 +81,136 @@ describe('MUI Autocomplete', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
+  it('forwards typed text as search to the datasource query', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    render(
+      <Form values={{ item: '' }} onChange={() => undefined} dataSources={{ items: { query } }}>
+        <Enforma.Autocomplete bind="item" label="Item" dataSource="items" />
+      </Form>,
+    );
+    // Wait for initial query (search='') and loading to finish
+    const combobox = await screen.findByRole('combobox');
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+    query.mockClear();
+
+    await userEvent.type(combobox, 'bul');
+
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledWith(expect.objectContaining({ search: 'bul' }));
+    });
+  });
+
+  it('resolves pre-selected value label via datasource resolve', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const resolve = vi.fn().mockResolvedValue({ value: 'au', label: 'Australia' });
+    render(
+      <Form
+        values={{ country: 'au' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query, resolve } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    await vi.waitFor(() => {
+      expect(screen.getByRole('combobox')).toHaveValue('Australia');
+    });
+  });
+
+  it('does not call resolve when value is already in query results', async () => {
+    const query = vi.fn().mockResolvedValue([{ value: 'au', label: 'Australia' }]);
+    const resolve = vi.fn();
+    render(
+      <Form
+        values={{ country: 'au' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query, resolve } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+    // Give resolve a chance to be called if it's going to be
+    await new Promise((r) => setTimeout(r, 50));
+    expect(resolve).not.toHaveBeenCalled();
+  });
+
+  it('filters inline options client-side when not using a query datasource', async () => {
+    render(
+      <Form values={{ country: '' }} onChange={() => undefined}>
+        <Enforma.Autocomplete bind="country" label="Country">
+          <AutocompleteOption value="au" label="Australia" />
+          <AutocompleteOption value="nz" label="New Zealand" />
+        </Enforma.Autocomplete>
+      </Form>,
+    );
+    const combobox = screen.getByRole('combobox');
+    await userEvent.click(combobox);
+    await userEvent.type(combobox, 'xyz');
+    // MUI client-side filter → no options match 'xyz'
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+  });
+
+  it('does not filter query datasource options client-side', async () => {
+    const query = vi.fn().mockResolvedValue([
+      { value: 'au', label: 'Australia' },
+      { value: 'nz', label: 'New Zealand' },
+    ]);
+    render(
+      <Form
+        values={{ country: '' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    const combobox = await screen.findByRole('combobox');
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+
+    await userEvent.type(combobox, 'xyz');
+
+    // Wait for query with search:'xyz' to complete
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledWith(expect.objectContaining({ search: 'xyz' }));
+    });
+
+    // disableClientFilter → MUI passes all datasource results through
+    await vi.waitFor(() => {
+      expect(screen.queryAllByRole('option')).toHaveLength(2);
+    });
+  });
+
+  it('does not fire a query when inputValue is shorter than minSearchLength', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    render(
+      <Form values={{ item: '' }} onChange={() => undefined} dataSources={{ items: { query } }}>
+        <Enforma.Autocomplete bind="item" label="Item" dataSource="items" minSearchLength={2} />
+      </Form>,
+    );
+    // inputValue='' < minSearchLength=2 → no query on mount
+    await new Promise((r) => setTimeout(r, 50));
+    expect(query).not.toHaveBeenCalled();
+
+    // Type 1 character — still below threshold
+    const combobox = screen.getByRole('combobox');
+    await userEvent.type(combobox, 'a');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(query).not.toHaveBeenCalled();
+
+    // Type a 2nd character — now at threshold, query fires
+    await userEvent.type(combobox, 'b');
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledWith(expect.objectContaining({ search: 'ab' }));
+    });
+  });
+
   it('shows error message after blur with failed validation', async () => {
     render(
       <Form values={{ country: '' }} onChange={() => undefined}>

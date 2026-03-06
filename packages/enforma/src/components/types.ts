@@ -68,6 +68,7 @@ export type ResolvedRadioGroupOptionProps = {
 export type AutocompleteProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
   children?: ReactNode;
+  minSearchLength?: Reactive<number>;
 };
 
 export type ExclusiveToggleProps = CommonProps & {
@@ -83,6 +84,9 @@ export type ResolvedAutocompleteProps = ResolvedCommonProps & {
   displayValue: string;
   isLoading: boolean;
   dataSourceError: Error | null;
+  onInputChange: (value: string) => void;
+  disableClientFilter: boolean;
+  suppressDropdown: boolean;
 };
 
 export type ResolvedAutocompleteOptionProps = {

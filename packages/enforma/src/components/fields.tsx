@@ -35,7 +35,8 @@ import type {
   FieldResolved,
 } from './types';
 import { useFieldProps, useReactiveProp } from '../hooks/useField';
-import { useDataSource } from '../hooks/useDataSource';
+import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
+import { useDataSources } from '../context/DataSourceContext';
 import { Scope } from './Scope';
 
 function isEmptyRef(v: unknown): boolean {
@@ -256,31 +257,92 @@ function RadioGroupDispatch(props: RadioGroupProps) {
 }
 
 function AutocompleteDispatch(props: AutocompleteProps) {
+  const [inputValue, setInputValue] = React.useState('');
+  const [resolvedItem, setResolvedItem] = React.useState<{
+    value: unknown;
+    label: string;
+  } | null>(null);
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const registry = useDataSources();
+  const minSearchLength = useReactiveProp(props.minSearchLength) ?? 0;
+  const activeDataSource = inputValue.length >= minSearchLength ? props.dataSource : undefined;
   const {
     items,
     isLoading,
     error: dataSourceError,
-  } = useDataSource(props.dataSource, {
+  } = useDataSource(activeDataSource, {
     bind: props.bind,
+    search: inputValue,
   });
+
+  // Auto-detect: disable MUI client-side filtering when datasource owns search
+  const definition =
+    props.dataSource !== undefined ? resolveDefinition(props.dataSource, registry) : null;
+  const disableClientFilter =
+    definition !== null &&
+    definition !== 'reactive' &&
+    !Array.isArray(definition) &&
+    'query' in definition;
+
   const options = buildSelectOptions(items, props.children);
+  const currentValue = resolved.value;
+  const valueInOptions = options.some((opt) => opt.value === currentValue);
+
+  // Resolve pre-selected values that are not in the loaded options.
+  // Wait for the initial query to finish (isLoading=false) before deciding to call resolve,
+  // so we don't call it unnecessarily when the value will appear in query results.
+  // Uses a ref to avoid re-calling resolve for the same value.
+  const lastResolvedValueRef = React.useRef<unknown>(undefined);
+  React.useEffect(() => {
+    if (!currentValue || valueInOptions || isLoading) {
+      if (valueInOptions) {
+        lastResolvedValueRef.current = undefined;
+        setResolvedItem(null);
+      }
+      return;
+    }
+    if (lastResolvedValueRef.current === currentValue) return;
+    if (definition === null || definition === 'reactive' || Array.isArray(definition)) return;
+    if (!definition.resolve) return;
+
+    lastResolvedValueRef.current = currentValue;
+    let cancelled = false;
+    void Promise.resolve(definition.resolve(currentValue)).then((item) => {
+      if (cancelled) return;
+      const [mappedItem] = buildSelectOptions([item], props.children);
+      if (mappedItem !== undefined) setResolvedItem(mappedItem);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // definition, registry, props.children intentionally omitted —
+    // resolve re-triggers on value/options changes, not datasource identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentValue, valueInOptions, isLoading]);
+
+  // Merge resolved item into options so the combobox displays the correct label
+  const mergedOptions =
+    resolvedItem !== null && !valueInOptions ? [resolvedItem, ...options] : options;
+
   const AutocompleteOptionImpl = getComponent('AutocompleteOption');
   if (!AutocompleteOptionImpl) {
     throw new Error('Enforma: component "AutocompleteOption" is not registered.');
   }
-  const renderedOptions = options.map((opt) => (
+  const renderedOptions = mergedOptions.map((opt) => (
     <AutocompleteOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
-  const matched = options.find((opt) => opt.value === resolved.value);
-  const displayValue = matched?.label ?? (typeof resolved.value === 'string' ? resolved.value : '');
+  const matched = mergedOptions.find((opt) => opt.value === currentValue);
+  const displayValue = matched?.label ?? (typeof currentValue === 'string' ? currentValue : '');
   return dispatchComponent('Autocomplete', {
     ...resolved,
-    options,
+    options: mergedOptions,
     children: renderedOptions,
     displayValue,
     isLoading,
     dataSourceError: dataSourceError ?? null,
+    onInputChange: setInputValue,
+    disableClientFilter,
+    suppressDropdown: activeDataSource === undefined && minSearchLength > 0,
   } as ResolvedAutocompleteProps);
 }
 

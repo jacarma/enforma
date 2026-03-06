@@ -28,7 +28,10 @@ export type QueryResult<TItem> = TItem[] | { items: TItem[]; total: number };
 
 export type DataSourceDefinition<TItem> =
   | TItem[]
-  | { query: (params: DataSourceParams) => QueryResult<TItem> | Promise<QueryResult<TItem>> };
+  | {
+      query: (params: DataSourceParams) => QueryResult<TItem> | Promise<QueryResult<TItem>>;
+      resolve?: (value: unknown) => TItem | Promise<TItem>;
+    };
 
 export type DataSourceProp<TItem> =
   | string
