@@ -86,6 +86,7 @@ export type ResolvedAutocompleteProps = ResolvedCommonProps & {
   dataSourceError: Error | null;
   onInputChange: (value: string) => void;
   disableClientFilter: boolean;
+  suppressDropdown: boolean;
 };
 
 export type ResolvedAutocompleteOptionProps = {

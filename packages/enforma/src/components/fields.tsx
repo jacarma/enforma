@@ -342,6 +342,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     dataSourceError: dataSourceError ?? null,
     onInputChange: setInputValue,
     disableClientFilter,
+    suppressDropdown: activeDataSource === undefined && minSearchLength > 0,
   } as ResolvedAutocompleteProps);
 }
 

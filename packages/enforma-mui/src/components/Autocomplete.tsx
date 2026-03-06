@@ -54,6 +54,7 @@ export function Autocomplete({
   dataSourceError,
   onInputChange,
   disableClientFilter,
+  suppressDropdown,
 }: ResolvedAutocompleteProps) {
   const currentOption = options.find((opt) => opt.value === value) ?? null;
 
@@ -70,7 +71,11 @@ export function Autocomplete({
         // label as search text, which can change filtersKey and incorrectly auto-clear the field.
         if (reason !== 'reset') onInputChange(newValue);
       }}
-      {...(disableClientFilter && { filterOptions: (x) => x })}
+      {...(suppressDropdown
+        ? { filterOptions: () => [] }
+        : disableClientFilter
+          ? { filterOptions: (x) => x }
+          : {})}
       getOptionLabel={(opt) => opt.label}
       isOptionEqualToValue={(opt, val) => opt.value === val.value}
       disabled={disabled}
