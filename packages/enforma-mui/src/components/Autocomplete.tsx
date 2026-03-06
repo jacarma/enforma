@@ -64,8 +64,11 @@ export function Autocomplete({
       onChange={(_, selected) => {
         setValue(selected?.value ?? undefined);
       }}
-      onInputChange={(_, newValue) => {
-        onInputChange(newValue);
+      onInputChange={(_, newValue, reason) => {
+        // 'reset' fires after a selection — ignore it so inputValue only tracks user typing.
+        // If we let 'reset' through, selecting an option triggers a query with the option
+        // label as search text, which can change filtersKey and incorrectly auto-clear the field.
+        if (reason !== 'reset') onInputChange(newValue);
       }}
       {...(disableClientFilter && { filterOptions: (x) => x })}
       getOptionLabel={(opt) => opt.label}
