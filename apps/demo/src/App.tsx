@@ -388,7 +388,7 @@ export function App() {
         <a href="https://openlibrary.org" target="_blank" rel="noreferrer">
           Open Library
         </a>{' '}
-        server-side search — type 2+ chars to search, optional subject filter. Pre-selected book
+        server-side search — type 3+ chars to search, optional subject filter. Pre-selected book
         resolves its label on mount.
       </p>
 
@@ -422,12 +422,12 @@ export function App() {
         {/* Autocomplete — Open Library server-side search, minSearchLength=2, resolve for pre-selected */}
         <Enforma.Autocomplete
           bind="book"
-          label="Book (type 2+ chars to search)"
+          label="Book (type 3+ chars to search)"
           dataSource={{
             source: 'books',
             filters: (scope) => ({ subject: scope.subject as string }),
           }}
-          minSearchLength={2}
+          minSearchLength={3}
         >
           <Enforma.Autocomplete.Option label="label" value="key" />
         </Enforma.Autocomplete>
@@ -452,7 +452,7 @@ export function App() {
             source: 'books',
             filters: (scope) => ({ subject: scope.subject as string }),
           }}
-          minSearchLength={2}
+          minSearchLength={3}
         >
           <Enforma.Autocomplete.Option label="label" value="key" />
         </Enforma.Autocomplete>
