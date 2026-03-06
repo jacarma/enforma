@@ -35,7 +35,8 @@ import type {
   FieldResolved,
 } from './types';
 import { useFieldProps, useReactiveProp } from '../hooks/useField';
-import { useDataSource } from '../hooks/useDataSource';
+import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
+import { useDataSources } from '../context/DataSourceContext';
 import { Scope } from './Scope';
 
 function isEmptyRef(v: unknown): boolean {
@@ -258,6 +259,7 @@ function RadioGroupDispatch(props: RadioGroupProps) {
 function AutocompleteDispatch(props: AutocompleteProps) {
   const [inputValue, setInputValue] = React.useState('');
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const registry = useDataSources();
   const minSearchLength = useReactiveProp(props.minSearchLength) ?? 0;
   const activeDataSource = inputValue.length >= minSearchLength ? props.dataSource : undefined;
   const {
@@ -268,6 +270,16 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     bind: props.bind,
     search: inputValue,
   });
+
+  // Auto-detect: disable MUI client-side filtering when datasource owns search
+  const definition =
+    props.dataSource !== undefined ? resolveDefinition(props.dataSource, registry) : null;
+  const disableClientFilter =
+    definition !== null &&
+    definition !== 'reactive' &&
+    !Array.isArray(definition) &&
+    'query' in definition;
+
   const options = buildSelectOptions(items, props.children);
   const AutocompleteOptionImpl = getComponent('AutocompleteOption');
   if (!AutocompleteOptionImpl) {
@@ -286,7 +298,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     isLoading,
     dataSourceError: dataSourceError ?? null,
     onInputChange: setInputValue,
-    disableClientFilter: false, // placeholder — Task 3 will set this correctly
+    disableClientFilter,
   } as ResolvedAutocompleteProps);
 }
 

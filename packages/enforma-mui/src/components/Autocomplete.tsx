@@ -53,6 +53,7 @@ export function Autocomplete({
   isLoading,
   dataSourceError,
   onInputChange,
+  disableClientFilter,
 }: ResolvedAutocompleteProps) {
   const currentOption = options.find((opt) => opt.value === value) ?? null;
 
@@ -66,7 +67,7 @@ export function Autocomplete({
       onInputChange={(_, newValue) => {
         onInputChange(newValue);
       }}
-      filterOptions={(x) => x}
+      {...(disableClientFilter && { filterOptions: (x) => x })}
       getOptionLabel={(opt) => opt.label}
       isOptionEqualToValue={(opt, val) => opt.value === val.value}
       disabled={disabled}

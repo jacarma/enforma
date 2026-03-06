@@ -102,6 +102,54 @@ describe('MUI Autocomplete', () => {
     });
   });
 
+  it('filters inline options client-side when not using a query datasource', async () => {
+    render(
+      <Form values={{ country: '' }} onChange={() => undefined}>
+        <Enforma.Autocomplete bind="country" label="Country">
+          <AutocompleteOption value="au" label="Australia" />
+          <AutocompleteOption value="nz" label="New Zealand" />
+        </Enforma.Autocomplete>
+      </Form>,
+    );
+    const combobox = screen.getByRole('combobox');
+    await userEvent.click(combobox);
+    await userEvent.type(combobox, 'xyz');
+    // MUI client-side filter → no options match 'xyz'
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+  });
+
+  it('does not filter query datasource options client-side', async () => {
+    const query = vi.fn().mockResolvedValue([
+      { value: 'au', label: 'Australia' },
+      { value: 'nz', label: 'New Zealand' },
+    ]);
+    render(
+      <Form
+        values={{ country: '' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    const combobox = await screen.findByRole('combobox');
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledTimes(1);
+    });
+
+    await userEvent.type(combobox, 'xyz');
+
+    // Wait for query with search:'xyz' to complete
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledWith(expect.objectContaining({ search: 'xyz' }));
+    });
+
+    // disableClientFilter → MUI passes all datasource results through
+    await vi.waitFor(() => {
+      expect(screen.queryAllByRole('option')).toHaveLength(2);
+    });
+  });
+
   it('does not fire a query when inputValue is shorter than minSearchLength', async () => {
     const query = vi.fn().mockResolvedValue([]);
     render(
