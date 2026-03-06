@@ -60,7 +60,7 @@ function normalizeResult<TItem>(result: QueryResult<TItem>): {
   return { items: result.items, total: result.total };
 }
 
-function resolveDefinition<TItem>(
+export function resolveDefinition<TItem>(
   dataSource: DataSourceProp<TItem>,
   registry: Record<string, DataSourceDefinition<unknown>>,
 ): DataSourceDefinition<TItem> | 'reactive' | null {
