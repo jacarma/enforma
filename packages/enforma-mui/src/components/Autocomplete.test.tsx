@@ -102,6 +102,30 @@ describe('MUI Autocomplete', () => {
     });
   });
 
+  it('does not fire a query when inputValue is shorter than minSearchLength', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    render(
+      <Form values={{ item: '' }} onChange={() => undefined} dataSources={{ items: { query } }}>
+        <Enforma.Autocomplete bind="item" label="Item" dataSource="items" minSearchLength={2} />
+      </Form>,
+    );
+    // inputValue='' < minSearchLength=2 → no query on mount
+    await new Promise((r) => setTimeout(r, 50));
+    expect(query).not.toHaveBeenCalled();
+
+    // Type 1 character — still below threshold
+    const combobox = screen.getByRole('combobox');
+    await userEvent.type(combobox, 'a');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(query).not.toHaveBeenCalled();
+
+    // Type a 2nd character — now at threshold, query fires
+    await userEvent.type(combobox, 'b');
+    await vi.waitFor(() => {
+      expect(query).toHaveBeenCalledWith(expect.objectContaining({ search: 'ab' }));
+    });
+  });
+
   it('shows error message after blur with failed validation', async () => {
     render(
       <Form values={{ country: '' }} onChange={() => undefined}>

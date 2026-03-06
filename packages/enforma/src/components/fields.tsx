@@ -258,11 +258,13 @@ function RadioGroupDispatch(props: RadioGroupProps) {
 function AutocompleteDispatch(props: AutocompleteProps) {
   const [inputValue, setInputValue] = React.useState('');
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const minSearchLength = useReactiveProp(props.minSearchLength) ?? 0;
+  const activeDataSource = inputValue.length >= minSearchLength ? props.dataSource : undefined;
   const {
     items,
     isLoading,
     error: dataSourceError,
-  } = useDataSource(props.dataSource, {
+  } = useDataSource(activeDataSource, {
     bind: props.bind,
     search: inputValue,
   });
@@ -284,6 +286,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     isLoading,
     dataSourceError: dataSourceError ?? null,
     onInputChange: setInputValue,
+    disableClientFilter: false, // placeholder — Task 3 will set this correctly
   } as ResolvedAutocompleteProps);
 }
 
