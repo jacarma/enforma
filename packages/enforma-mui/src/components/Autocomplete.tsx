@@ -55,8 +55,17 @@ export function Autocomplete({
   onInputChange,
   disableClientFilter,
   suppressDropdown,
+  resolvedOption,
+  minSearchLength,
 }: ResolvedAutocompleteProps) {
-  const currentOption = options.find((opt) => opt.value === value) ?? null;
+  // Use resolvedOption as fallback so the input shows the correct label even when the
+  // resolved item is not included in the dropdown options list.
+  const currentOption = options.find((opt) => opt.value === value) ?? resolvedOption ?? null;
+
+  const plural = minSearchLength !== 1 ? 's' : '';
+  const noOptionsText = suppressDropdown
+    ? `Type at least ${String(minSearchLength)} character${plural}`
+    : 'No options';
 
   return (
     <MuiAutocomplete<OptionItem>
@@ -77,7 +86,9 @@ export function Autocomplete({
           ? { filterOptions: (x) => x }
           : {})}
       getOptionLabel={(opt) => opt.label}
+      getOptionKey={(opt) => String(opt.value)}
       isOptionEqualToValue={(opt, val) => opt.value === val.value}
+      noOptionsText={noOptionsText}
       disabled={disabled}
       onBlur={onBlur}
       fullWidth

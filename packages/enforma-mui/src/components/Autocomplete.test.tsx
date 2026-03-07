@@ -211,6 +211,42 @@ describe('MUI Autocomplete', () => {
     });
   });
 
+  it('shows "type at least N characters" when input is below minSearchLength', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    render(
+      <Form values={{ item: '' }} onChange={() => undefined} dataSources={{ items: { query } }}>
+        <Enforma.Autocomplete bind="item" label="Item" dataSource="items" minSearchLength={3} />
+      </Form>,
+    );
+    const combobox = screen.getByRole('combobox');
+    await userEvent.click(combobox);
+    await userEvent.type(combobox, 'ab');
+    // Below minSearchLength — should show helpful message, not "No options"
+    expect(await screen.findByText('Type at least 3 characters')).toBeInTheDocument();
+    expect(screen.queryByText('No options')).not.toBeInTheDocument();
+  });
+
+  it('does not show resolved pre-selected item as a dropdown option', async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const resolve = vi.fn().mockResolvedValue({ value: 'au', label: 'Australia' });
+    render(
+      <Form
+        values={{ country: 'au' }}
+        onChange={() => undefined}
+        dataSources={{ countries: { query, resolve } }}
+      >
+        <Enforma.Autocomplete bind="country" label="Country" dataSource="countries" />
+      </Form>,
+    );
+    // Wait for resolve to populate the input
+    await vi.waitFor(() => {
+      expect(screen.getByRole('combobox')).toHaveValue('Australia');
+    });
+    // Open the dropdown — the resolved item should NOT appear as a selectable option
+    await userEvent.click(screen.getByRole('combobox'));
+    expect(screen.queryAllByRole('option', { name: 'Australia' })).toHaveLength(0);
+  });
+
   it('shows error message after blur with failed validation', async () => {
     render(
       <Form values={{ country: '' }} onChange={() => undefined}>

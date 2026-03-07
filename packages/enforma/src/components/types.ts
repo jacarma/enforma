@@ -87,6 +87,8 @@ export type ResolvedAutocompleteProps = ResolvedCommonProps & {
   onInputChange: (value: string) => void;
   disableClientFilter: boolean;
   suppressDropdown: boolean;
+  resolvedOption: { value: unknown; label: string } | null;
+  minSearchLength: number;
 };
 
 export type ResolvedAutocompleteOptionProps = {

@@ -21,9 +21,9 @@
 
 ## Single selection
 
-- [ ] RadioList — radio button group bound to a single value
-- [ ] Autocomplete — combobox with type-ahead filter; single selection; supports datasource
-- [ ] ExclusiveToggle — segmented control / button group for single selection from a small fixed set
+- [x] RadioList — radio button group bound to a single value
+- [x] Autocomplete — combobox with type-ahead filter; single selection; supports datasource
+- [x] ExclusiveToggle — segmented control / button group for single selection from a small fixed set
 
 ## Multiple selection
 
@@ -67,3 +67,7 @@
 - [ ] **StarRating demo**: Checkbox is now implemented — update `docs/custom-components.md` and the demo to replace the placeholder `TextInput` with a Checkbox that controls the `disabled` reactive prop on the star rating field.
 
 - [ ] **Validator performance**: the `onChange(values, { valid })` architecture runs all validators (type + user) on every value change. Measure whether this is a bottleneck for forms with many fields or expensive validators. If so, consider debouncing validator execution (e.g. 100–200 ms) while keeping the last known `valid` state stable between runs.
+
+- [ ] **Mask Input and floating label**: After adding a value to a masked input or numeric input, if you change bwtween mui otline and mui classic, the label is rendered over the value and only stays on top after editing the value.
+
+- [ ] **List look and feel**: List component looks weird. It improves a lot if wrapped in a Card

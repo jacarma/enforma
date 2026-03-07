@@ -149,6 +149,7 @@ function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
 function buildSelectOptions(
   items: unknown[],
   children: React.ReactNode,
+  templateMode = false,
 ): { value: unknown; label: string }[] {
   const childOptions: { value: unknown; label: unknown }[] = [];
   React.Children.forEach(children, (child) => {
@@ -157,8 +158,9 @@ function buildSelectOptions(
     childOptions.push({ value: props.value, label: props.label });
   });
 
-  // Single SelectOption with string fields + datasource items → field-name mapping template
-  if (items.length > 0 && childOptions.length === 1) {
+  // Single SelectOption with both string fields + datasource → field-name mapping template.
+  // Always uses template mode: returns [] when items is empty so child is never shown as an option.
+  if (templateMode && childOptions.length === 1) {
     const template = childOptions[0];
     if (
       template !== undefined &&
@@ -208,7 +210,7 @@ function SelectDispatch(props: SelectProps) {
   } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
-  const options = buildSelectOptions(items, props.children);
+  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
   const SelectOptionImpl = getComponent('SelectOption');
   if (!SelectOptionImpl) {
     throw new Error('Enforma: component "SelectOption" is not registered.');
@@ -237,7 +239,7 @@ function RadioGroupDispatch(props: RadioGroupProps) {
   } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
-  const options = buildSelectOptions(items, props.children);
+  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
   const RadioGroupOptionImpl = getComponent('RadioGroupOption');
   if (!RadioGroupOptionImpl) {
     throw new Error('Enforma: component "RadioGroupOption" is not registered.');
@@ -284,7 +286,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     !Array.isArray(definition) &&
     'query' in definition;
 
-  const options = buildSelectOptions(items, props.children);
+  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
   const currentValue = resolved.value;
   const valueInOptions = options.some((opt) => opt.value === currentValue);
 
@@ -309,7 +311,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     let cancelled = false;
     void Promise.resolve(definition.resolve(currentValue)).then((item) => {
       if (cancelled) return;
-      const [mappedItem] = buildSelectOptions([item], props.children);
+      const [mappedItem] = buildSelectOptions([item], props.children, true);
       if (mappedItem !== undefined) setResolvedItem(mappedItem);
     });
     return () => {
@@ -320,29 +322,30 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentValue, valueInOptions, isLoading]);
 
-  // Merge resolved item into options so the combobox displays the correct label
-  const mergedOptions =
-    resolvedItem !== null && !valueInOptions ? [resolvedItem, ...options] : options;
-
   const AutocompleteOptionImpl = getComponent('AutocompleteOption');
   if (!AutocompleteOptionImpl) {
     throw new Error('Enforma: component "AutocompleteOption" is not registered.');
   }
-  const renderedOptions = mergedOptions.map((opt) => (
+  const renderedOptions = options.map((opt) => (
     <AutocompleteOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
-  const matched = mergedOptions.find((opt) => opt.value === currentValue);
-  const displayValue = matched?.label ?? (typeof currentValue === 'string' ? currentValue : '');
+  // resolvedItem is passed separately so adapters can show the selected label without
+  // including it as a selectable dropdown option.
+  const matched = options.find((opt) => opt.value === currentValue);
+  const displayValue =
+    matched?.label ?? resolvedItem?.label ?? (typeof currentValue === 'string' ? currentValue : '');
   return dispatchComponent('Autocomplete', {
     ...resolved,
-    options: mergedOptions,
+    options,
     children: renderedOptions,
     displayValue,
+    resolvedOption: resolvedItem,
     isLoading,
     dataSourceError: dataSourceError ?? null,
     onInputChange: setInputValue,
     disableClientFilter,
     suppressDropdown: activeDataSource === undefined && minSearchLength > 0,
+    minSearchLength,
   } as ResolvedAutocompleteProps);
 }
 
@@ -355,7 +358,7 @@ function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
   } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
-  const options = buildSelectOptions(items, props.children);
+  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
   const ExclusiveToggleOptionImpl = getComponent('ExclusiveToggleOption');
   if (!ExclusiveToggleOptionImpl) {
     throw new Error('Enforma: component "ExclusiveToggleOption" is not registered.');
