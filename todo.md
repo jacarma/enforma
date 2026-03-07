@@ -70,4 +70,4 @@
 
 - [ ] **Mask Input and floating label**: After adding a value to a masked input or numeric input, if you change bwtween mui otline and mui classic, the label is rendered over the value and only stays on top after editing the value.
 
-- [ ] **List look and feel**: List component looks weird. It improves a lot if wrapped in a Card
+- [ ] **List title**: List component should allow users to add a title or label

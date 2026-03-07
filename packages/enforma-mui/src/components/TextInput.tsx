@@ -23,12 +23,12 @@ const LazyMaskedTextInput = lazy(() =>
       const IMaskInput = rawIMaskInput as unknown as IMaskInputType;
 
       const MaskAdapter = forwardRef<HTMLInputElement, MaskAdapterProps>(
-        ({ onChange, inputRef, mask, value, ...other }) => (
+        ({ onChange, inputRef, mask, value, ...other }, ref) => (
           <IMaskInput
             {...other}
             value={typeof value === 'string' ? value : ''}
             mask={mask}
-            inputRef={inputRef}
+            inputRef={ref ?? inputRef}
             onAccept={(v) => {
               onChange?.({ target: { value: v } } as React.ChangeEvent<HTMLInputElement>);
             }}

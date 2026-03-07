@@ -2,6 +2,7 @@ import {
   forwardRef,
   lazy,
   Suspense,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -40,8 +41,6 @@ type MaskedNumberOptions = {
   min?: number;
   max?: number;
 };
-
-type MaskRef = { typedValue: number | null | undefined };
 
 type NumberMaskAdapterProps = React.InputHTMLAttributes<HTMLInputElement> & {
   inputRef: React.Ref<HTMLInputElement>;
@@ -99,35 +98,47 @@ function NumberInputSkeleton({
 
 // ── Lazy-loaded component that requires react-imask ───────────────────────────
 
-type IMaskInputType = React.ComponentType<{
-  value: string;
-  inputRef: React.Ref<HTMLInputElement>;
-  onAccept: (value: string, mask: MaskRef) => void;
-  [key: string]: unknown;
-}>;
-
 const LazyNumberInput = lazy(() =>
   import('react-imask')
-    .then(({ IMaskInput: rawIMaskInput }) => {
-      const IMaskInput = rawIMaskInput as unknown as IMaskInputType;
-
-      // forwardRef adapter — bridges MUI TextField's inputComponent slot to IMaskInput
+    .then(({ useIMask }) => {
+      // Uses useIMask hook so mask options never reach the DOM input element
       const NumberMaskAdapter = forwardRef<HTMLInputElement, NumberMaskAdapterProps>(
-        ({ onChange, onTypedValueChange, inputRef, maskOptions, value, ...other }) => (
-          <IMaskInput
-            {...other}
-            {...(maskOptions as Record<string, unknown>)}
-            value={typeof value === 'string' ? value : ''}
-            inputRef={inputRef}
-            onAccept={(maskedValue, mask) => {
-              onChange?.({
-                target: { value: maskedValue },
-              } as React.ChangeEvent<HTMLInputElement>);
-              const typed = mask.typedValue;
-              onTypedValueChange(typeof typed === 'number' && !isNaN(typed) ? typed : undefined);
-            }}
-          />
-        ),
+        function NumberMaskAdapter(
+          { onChange, onTypedValueChange, inputRef, maskOptions, value, ...other },
+          forwardedRef,
+        ) {
+          const { ref: imaskRef, setValue } = useIMask(
+            maskOptions as Parameters<typeof useIMask>[0],
+            {
+              onAccept(maskedValue: string, mask: { typedValue: unknown }) {
+                onChange?.({
+                  target: { value: maskedValue },
+                } as React.ChangeEvent<HTMLInputElement>);
+                const typed = mask.typedValue;
+                onTypedValueChange(typeof typed === 'number' && !isNaN(typed) ? typed : undefined);
+              },
+            },
+          );
+
+          const stringValue = typeof value === 'string' ? value : '';
+          useEffect(() => {
+            setValue(stringValue);
+          }, [stringValue, setValue]);
+
+          const mergedRef = useCallback(
+            (node: HTMLInputElement | null) => {
+              imaskRef.current = node as (typeof imaskRef)['current'];
+              if (typeof inputRef === 'function') inputRef(node);
+              else if (inputRef != null)
+                (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = node;
+              if (typeof forwardedRef === 'function') forwardedRef(node);
+              else if (forwardedRef != null) forwardedRef.current = node;
+            },
+            [imaskRef, inputRef, forwardedRef],
+          );
+
+          return <input {...other} ref={mergedRef} />;
+        },
       );
       NumberMaskAdapter.displayName = 'NumberMaskAdapter';
 

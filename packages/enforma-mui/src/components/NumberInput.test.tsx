@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,32 +6,38 @@ import Enforma, { Form, registerComponents, clearRegistry } from 'enforma';
 import { NumberInput } from './NumberInput';
 
 // ── Mock react-imask ──────────────────────────────────────────────────────────
-// Simulates IMask's Number mask: onChange fires onAccept(maskedValue, { typedValue })
+// Simulates IMask's Number mask via the useIMask hook interface.
 vi.mock('react-imask', () => ({
-  IMaskInput: forwardRef(
-    ({
-      onAccept,
-      inputRef,
-      value,
-      ...rest
-    }: {
-      onAccept: (v: string, mask: { typedValue: number | null }) => void;
-      inputRef: React.Ref<HTMLInputElement>;
-      value: string;
-    }) => (
-      <input
-        {...rest}
-        ref={inputRef}
-        value={value}
-        data-testid="imask-input"
-        onChange={(e) => {
-          const raw = e.target.value;
-          const parsed = parseFloat(raw);
-          onAccept(raw, { typedValue: isNaN(parsed) ? null : parsed });
-        }}
-      />
-    ),
-  ),
+  useIMask(
+    _maskOptions: unknown,
+    { onAccept }: { onAccept?: (v: string, mask: { typedValue: number | null }) => void } = {},
+  ) {
+    const ref = React.useRef<HTMLInputElement | null>(null);
+    const onAcceptRef = React.useRef(onAccept);
+    React.useEffect(() => {
+      onAcceptRef.current = onAccept;
+    }, [onAccept]);
+
+    const setValue = React.useCallback((v: string) => {
+      if (ref.current) ref.current.value = v;
+    }, []);
+
+    React.useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+      const handler = (e: Event) => {
+        const raw = (e.target as HTMLInputElement).value;
+        const parsed = parseFloat(raw);
+        onAcceptRef.current?.(raw, { typedValue: isNaN(parsed) ? null : parsed });
+      };
+      el.addEventListener('input', handler);
+      return () => {
+        el.removeEventListener('input', handler);
+      };
+    });
+
+    return { ref, setValue };
+  },
 }));
 
 beforeEach(() => {
@@ -46,7 +52,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" />
       </Form>,
     );
-    expect(await screen.findByTestId('imask-input')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Price')).toBeInTheDocument();
   });
 
   it('displays empty string when form value is undefined', async () => {
@@ -55,7 +61,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" />
       </Form>,
     );
-    expect(await screen.findByTestId('imask-input')).toHaveValue('');
+    expect(await screen.findByLabelText('Price')).toHaveValue('');
   });
 
   it('displays stringified value when form value is a number', async () => {
@@ -64,7 +70,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" />
       </Form>,
     );
-    expect(await screen.findByTestId('imask-input')).toHaveValue('42');
+    expect(await screen.findByLabelText('Price')).toHaveValue('42');
   });
 
   it('calls onChange with a number when user types', async () => {
@@ -74,7 +80,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" />
       </Form>,
     );
-    const input = await screen.findByTestId('imask-input');
+    const input = await screen.findByLabelText('Price');
     await userEvent.type(input, '9');
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ price: 9 }),
@@ -89,7 +95,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" />
       </Form>,
     );
-    const input = await screen.findByTestId('imask-input');
+    const input = await screen.findByLabelText('Price');
     await userEvent.clear(input);
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ price: undefined }),
@@ -103,7 +109,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" disabled />
       </Form>,
     );
-    expect(await screen.findByTestId('imask-input')).toBeDisabled();
+    expect(await screen.findByLabelText('Price')).toBeDisabled();
   });
 
   it('shows description when there is no error', async () => {
@@ -112,7 +118,7 @@ describe('MUI NumberInput', () => {
         <Enforma.NumberInput bind="price" label="Price" description="Enter amount in USD" />
       </Form>,
     );
-    await screen.findByTestId('imask-input');
+    await screen.findByLabelText('Price');
     expect(screen.getByText('Enter amount in USD')).toBeInTheDocument();
   });
 
@@ -126,7 +132,7 @@ describe('MUI NumberInput', () => {
         />
       </Form>,
     );
-    const input = await screen.findByTestId('imask-input');
+    const input = await screen.findByLabelText('Price');
     input.focus();
     await userEvent.tab();
     expect(await screen.findByText('Price is required')).toBeInTheDocument();
@@ -142,7 +148,7 @@ describe('MUI NumberInput', () => {
         />
       </Form>,
     );
-    await screen.findByTestId('imask-input');
+    await screen.findByLabelText('Price');
     expect(screen.queryByText('Price is required')).not.toBeInTheDocument();
   });
 
@@ -157,7 +163,7 @@ describe('MUI NumberInput', () => {
         <button type="submit">Submit</button>
       </Form>,
     );
-    await screen.findByTestId('imask-input');
+    await screen.findByLabelText('Price');
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
     expect(await screen.findByText('Price is required')).toBeInTheDocument();
   });
@@ -173,7 +179,7 @@ describe('MUI NumberInput', () => {
         />
       </Form>,
     );
-    await screen.findByTestId('imask-input');
+    await screen.findByLabelText('Price');
     expect(onChange).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ isValid: false }),
