@@ -6,7 +6,7 @@ import Enforma, { Form, registerComponents, clearRegistry } from 'enforma';
 import { DatePicker } from './DatePicker';
 
 vi.mock('@mui/x-date-pickers', () => ({
-  useLocalizationContext: () => ({ utils: { date: (v: string) => new Date(v) } }),
+  usePickerAdapter: () => ({ date: (v: string) => new Date(v) }),
   DatePicker: ({
     onChange,
     value,

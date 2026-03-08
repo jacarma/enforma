@@ -64,16 +64,13 @@ function TimePickerSkeleton({
   );
 }
 
-type UseLocalizationContext = () => { utils: { date: (v: string) => object } };
+type UsePickerAdapter = () => { date: (v: string) => object };
 
 const LazyTimePicker = lazy(() =>
   import('@mui/x-date-pickers')
     .then((mod) => {
       const { TimePicker: MuiTimePicker } = mod;
-      // useLocalizationContext is in the bundle at runtime but absent from types
-      const { useLocalizationContext } = mod as unknown as {
-        useLocalizationContext: UseLocalizationContext;
-      };
+      const { usePickerAdapter } = mod as unknown as { usePickerAdapter: UsePickerAdapter };
       function TimePickerImpl({
         value,
         setValue,
@@ -94,12 +91,12 @@ const LazyTimePicker = lazy(() =>
               '  pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
           );
         }
-        const { utils } = useLocalizationContext();
+        const adapter = usePickerAdapter();
         const rawInputRef = useRef('');
         const nativeTime =
           typeof value === 'string' && /^\d{2}:\d{2}$/.test(value) ? timeToDate(value) : null;
         // v8 requires the value in the adapter's native format (Dayjs, DateTime, Moment…)
-        const adapterValue = nativeTime !== null ? utils.date(nativeTime.toISOString()) : null;
+        const adapterValue = nativeTime !== null ? adapter.date(nativeTime.toISOString()) : null;
 
         return (
           <ComponentWrap error={showError} disabled={disabled}>
