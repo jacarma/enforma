@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import React from 'react';
 import { getComponent } from './registry';
 import { SelectOption } from './SelectOption';
@@ -8,6 +8,7 @@ import { AutocompleteOption } from './AutocompleteOption';
 import { ExclusiveToggleOption } from './ExclusiveToggleOption';
 import type {
   AutocompleteProps,
+  CalculatedProps,
   CheckboxProps,
   ComponentPropsMap,
   DatePickerProps,
@@ -17,6 +18,7 @@ import type {
   NumberInputProps,
   RadioGroupProps,
   ResolvedAutocompleteProps,
+  ResolvedCalculatedProps,
   ResolvedExclusiveToggleProps,
   ResolvedRadioGroupProps,
   SelectProps,
@@ -35,6 +37,7 @@ import type {
   FieldResolved,
 } from './types';
 import { useFieldProps, useReactiveProp } from '../hooks/useField';
+import { useScope, joinPath } from '../context/ScopeContext';
 import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
 import { useDataSources } from '../context/DataSourceContext';
 import { Scope } from './Scope';
@@ -374,6 +377,29 @@ function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
     dataSourceError: dataSourceError ?? null,
   } as ResolvedExclusiveToggleProps);
 }
+
+function CalculatedDispatch<T = unknown>({ bind, value, label, description, disabled }: CalculatedProps<T>) {
+  const resolvedValue = useReactiveProp(value);
+  const resolvedLabel = useReactiveProp(label);
+  const resolvedDescription = useReactiveProp(description);
+  const resolvedDisabled = useReactiveProp(disabled);
+  const { store, prefix } = useScope();
+
+  useEffect(() => {
+    if (bind == null) return;
+    const fullPath = joinPath(prefix, bind);
+    store.setField(fullPath, resolvedValue);
+  }, [resolvedValue, bind, store, prefix]);
+
+  return dispatchComponent('Calculated', {
+    value: resolvedValue,
+    label: resolvedLabel,
+    description: resolvedDescription,
+    disabled: resolvedDisabled,
+  } as ResolvedCalculatedProps);
+}
+
+export const Calculated = memo(CalculatedDispatch, stablePropsEqual) as typeof CalculatedDispatch;
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);
