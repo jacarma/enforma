@@ -187,6 +187,11 @@ export function App() {
     size: '',
     plan: '',
   });
+  const [openChoiceValues, setOpenChoiceValues] = useState<Record<string, unknown>>({
+    color: '',
+    size: '',
+    format: 'tangerine', // pre-loaded custom value to show auto-detection
+  });
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [calculatedValues, setCalculatedValues] = useState<FormValues>({ q1: 0, q2: 0 });
   const [dateValues, setDateValues] = useState<FormValues>({});
@@ -493,6 +498,38 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(toggleValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>openChoice</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Add <code>openChoice</code> to <code>Select</code>, <code>RadioGroup</code>, or{' '}
+        <code>ExclusiveToggle</code> to append an "Other" option that reveals a text input. The
+        typed value is stored directly as the field value. Pre-loaded values not in the options list
+        are auto-detected as "Other".
+      </p>
+      <Enforma.Form values={openChoiceValues} onChange={setOpenChoiceValues}>
+        <Enforma.Select bind="color" label="Color (openChoice)" openChoice>
+          <Enforma.Select.Option value="red" label="Red" />
+          <Enforma.Select.Option value="blue" label="Blue" />
+          <Enforma.Select.Option value="green" label="Green" />
+        </Enforma.Select>
+
+        <Enforma.RadioGroup bind="size" label="Size (openChoice)" openChoice>
+          <Enforma.RadioGroup.Option value="s" label="Small" />
+          <Enforma.RadioGroup.Option value="m" label="Medium" />
+          <Enforma.RadioGroup.Option value="l" label="Large" />
+        </Enforma.RadioGroup>
+
+        <Enforma.ExclusiveToggle bind="format" label="Format (openChoice, pre-loaded custom)" openChoice>
+          <Enforma.ExclusiveToggle.Option value="pdf" label="PDF" />
+          <Enforma.ExclusiveToggle.Option value="csv" label="CSV" />
+        </Enforma.ExclusiveToggle>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(openChoiceValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
