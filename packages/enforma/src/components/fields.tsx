@@ -378,7 +378,13 @@ function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
   } as ResolvedExclusiveToggleProps);
 }
 
-function CalculatedDispatch<T = unknown>({ bind, value, label, description, disabled }: CalculatedProps<T>) {
+function CalculatedDispatch<T = unknown>({
+  bind,
+  value,
+  label,
+  description,
+  disabled,
+}: CalculatedProps<T>) {
   const resolvedValue = useReactiveProp(value);
   const resolvedLabel = useReactiveProp(label);
   const resolvedDescription = useReactiveProp(description);
