@@ -262,7 +262,7 @@ function SelectDispatch(props: SelectProps) {
 
   const matchedInRaw = rawOptions.find((opt) => opt.value === storeValue);
   const displayValue = isOtherSelected
-    ? otherText || 'Other'
+    ? 'Other'
     : (matchedInRaw?.label ?? (typeof storeValue === 'string' ? storeValue : ''));
 
   const adapterValue = isOtherSelected ? OPEN_CHOICE_SENTINEL : storeValue;
