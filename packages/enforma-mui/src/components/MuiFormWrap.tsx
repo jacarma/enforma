@@ -36,8 +36,10 @@ function getLocalizationWrapper(key: AdapterKey): React.LazyExoticComponent<Wrap
 
   const wrapper = lazy(async () => {
     const [LocalizationProvider, Adapter] = await adapterLoaders[key]();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dateAdapter = Adapter as new (...args: any[]) => any;
     const Wrapper: WrapperComponent = ({ children }) => (
-      <LocalizationProvider dateAdapter={Adapter}>{children}</LocalizationProvider>
+      <LocalizationProvider dateAdapter={dateAdapter}>{children}</LocalizationProvider>
     );
     return { default: Wrapper };
   });

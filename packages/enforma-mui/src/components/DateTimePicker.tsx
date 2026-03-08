@@ -4,6 +4,7 @@ import { getRegistryOptions } from 'enforma';
 import type { ResolvedDateTimePickerProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
+import { toNativeDate } from '../utils/toNativeDate';
 
 function DateTimePickerSkeleton({
   label,
@@ -49,9 +50,16 @@ function DateTimePickerSkeleton({
   );
 }
 
+type UseLocalizationContext = () => { utils: { date: (v: string) => object } };
+
 const LazyDateTimePicker = lazy(() =>
   import('@mui/x-date-pickers')
-    .then(({ DateTimePicker: MuiDateTimePicker }) => {
+    .then((mod) => {
+      const { DateTimePicker: MuiDateTimePicker } = mod;
+      // useLocalizationContext is in the bundle at runtime but absent from types
+      const { useLocalizationContext } = mod as unknown as {
+        useLocalizationContext: UseLocalizationContext;
+      };
       function DateTimePickerImpl({
         value,
         setValue,
@@ -74,13 +82,16 @@ const LazyDateTimePicker = lazy(() =>
               '  pnpm add @mui/x-date-pickers dayjs|date-fns|luxon|moment',
           );
         }
+        const { utils } = useLocalizationContext();
         const rawInputRef = useRef('');
-        const dateValue = value instanceof Date ? value : null;
+        const nativeDate = value instanceof Date ? value : null;
+        // v8 requires the value in the adapter's native format (Dayjs, DateTime, Moment…)
+        const adapterValue = nativeDate !== null ? utils.date(nativeDate.toISOString()) : null;
 
         return (
           <ComponentWrap error={showError} disabled={disabled}>
             <MuiDateTimePicker
-              value={dateValue}
+              value={adapterValue}
               label={label}
               disabled={disabled}
               {...(minDate !== undefined && { minDate })}
@@ -89,8 +100,9 @@ const LazyDateTimePicker = lazy(() =>
               {...(disablePast !== undefined && { disablePast })}
               {...(ampm !== undefined && { ampm })}
               onChange={(date) => {
-                if (date instanceof Date && !isNaN(date.getTime())) {
-                  setValue(date);
+                const jsDate = toNativeDate(date);
+                if (jsDate !== null && !isNaN(jsDate.getTime())) {
+                  setValue(jsDate);
                 } else if (rawInputRef.current === '') {
                   setValue(undefined);
                 } else {
