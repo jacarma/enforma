@@ -522,7 +522,11 @@ export function App() {
           <Enforma.RadioGroup.Option value="l" label="Large" />
         </Enforma.RadioGroup>
 
-        <Enforma.ExclusiveToggle bind="format" label="Format (openChoice, pre-loaded custom)" openChoice>
+        <Enforma.ExclusiveToggle
+          bind="format"
+          label="Format (openChoice, pre-loaded custom)"
+          openChoice
+        >
           <Enforma.ExclusiveToggle.Option value="pdf" label="PDF" />
           <Enforma.ExclusiveToggle.Option value="csv" label="CSV" />
         </Enforma.ExclusiveToggle>
