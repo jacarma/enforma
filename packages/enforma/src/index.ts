@@ -79,4 +79,6 @@ export type {
   ExclusiveToggleProps,
   ResolvedExclusiveToggleProps,
   ResolvedExclusiveToggleOptionProps,
+  CalculatedProps,
+  ResolvedCalculatedProps,
 } from './components/types';
