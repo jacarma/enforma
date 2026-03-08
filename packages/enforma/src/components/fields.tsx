@@ -283,6 +283,7 @@ function SelectDispatch(props: SelectProps) {
 }
 
 function RadioGroupDispatch(props: RadioGroupProps) {
+  const [localOtherSelected, setLocalOtherSelected] = React.useState(false);
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
   const {
     items,
@@ -291,7 +292,39 @@ function RadioGroupDispatch(props: RadioGroupProps) {
   } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
-  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
+  const rawOptions = buildSelectOptions(items, props.children, props.dataSource !== undefined);
+  const openChoice = props.openChoice ?? false;
+  const options = openChoice
+    ? [...rawOptions, { value: OPEN_CHOICE_SENTINEL, label: 'Other' }]
+    : rawOptions;
+
+  const storeValue = resolved.value;
+  const valueInRawOptions = rawOptions.some((o) => o.value === storeValue);
+  const isOtherSelected =
+    openChoice &&
+    (localOtherSelected || (storeValue !== '' && storeValue != null && !valueInRawOptions));
+  const otherText = isOtherSelected && typeof storeValue === 'string' ? storeValue : '';
+
+  React.useEffect(() => {
+    if (storeValue == null) {
+      setLocalOtherSelected(false);
+    }
+  }, [storeValue]);
+
+  const originalSetValue = resolved.setValue;
+  const wrappedSetValue = (v: unknown) => {
+    if (v === OPEN_CHOICE_SENTINEL) {
+      setLocalOtherSelected(true);
+      originalSetValue('');
+    } else if (rawOptions.some((o) => o.value === v)) {
+      setLocalOtherSelected(false);
+      originalSetValue(v);
+    } else {
+      setLocalOtherSelected(true);
+      originalSetValue(v);
+    }
+  };
+
   const RadioGroupOptionImpl = getComponent('RadioGroupOption');
   if (!RadioGroupOptionImpl) {
     throw new Error('Enforma: component "RadioGroupOption" is not registered.');
@@ -300,13 +333,20 @@ function RadioGroupDispatch(props: RadioGroupProps) {
     <RadioGroupOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
   const row = useReactiveProp(props.row) ?? false;
+  const adapterValue = isOtherSelected ? OPEN_CHOICE_SENTINEL : storeValue;
+
   return dispatchComponent('RadioGroup', {
     ...resolved,
+    value: adapterValue,
+    setValue: wrappedSetValue,
     options,
     children: renderedOptions,
     row,
     isLoading,
     dataSourceError: dataSourceError ?? null,
+    openChoice,
+    isOtherSelected,
+    otherText,
   } as ResolvedRadioGroupProps);
 }
 

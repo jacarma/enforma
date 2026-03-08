@@ -125,3 +125,70 @@ describe('MUI RadioGroup', () => {
     expect(screen.getByRole('radio', { name: 'Small' })).toBeInTheDocument();
   });
 });
+
+describe('MUI RadioGroup — openChoice', () => {
+  it('renders an "Other" radio option when openChoice is true', () => {
+    render(
+      <Form values={{ size: '' }} onChange={() => undefined}>
+        <Enforma.RadioGroup bind="size" label="Size" openChoice>
+          <RadioGroupOption value="s" label="Small" />
+          <RadioGroupOption value="m" label="Medium" />
+        </Enforma.RadioGroup>
+      </Form>,
+    );
+    expect(screen.getByRole('radio', { name: 'Other' })).toBeInTheDocument();
+  });
+
+  it('shows the text input when "Other" radio is selected', async () => {
+    render(
+      <Form values={{ size: '' }} onChange={() => undefined}>
+        <Enforma.RadioGroup bind="size" label="Size" openChoice>
+          <RadioGroupOption value="s" label="Small" />
+        </Enforma.RadioGroup>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('radio', { name: 'Other' }));
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('pre-loaded value not in options shows "Other" checked with text input containing the value', () => {
+    render(
+      <Form values={{ size: 'custom' }} onChange={() => undefined}>
+        <Enforma.RadioGroup bind="size" label="Size" openChoice>
+          <RadioGroupOption value="s" label="Small" />
+        </Enforma.RadioGroup>
+      </Form>,
+    );
+    expect(screen.getByRole('radio', { name: 'Other' })).toBeChecked();
+    expect(screen.getByRole('textbox')).toHaveValue('custom');
+  });
+
+  it('pre-loaded value matching an option does not show the text input', () => {
+    render(
+      <Form values={{ size: 's' }} onChange={() => undefined}>
+        <Enforma.RadioGroup bind="size" label="Size" openChoice>
+          <RadioGroupOption value="s" label="Small" />
+        </Enforma.RadioGroup>
+      </Form>,
+    );
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('typing in the text input updates the form value', async () => {
+    const onChange = vi.fn();
+    render(
+      <Form values={{ size: 'custom' }} onChange={onChange}>
+        <Enforma.RadioGroup bind="size" label="Size" openChoice>
+          <RadioGroupOption value="s" label="Small" />
+        </Enforma.RadioGroup>
+      </Form>,
+    );
+    const textbox = screen.getByRole('textbox');
+    await userEvent.clear(textbox);
+    await userEvent.type(textbox, 'xl');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ size: 'xl' }),
+      expect.anything(),
+    );
+  });
+});
