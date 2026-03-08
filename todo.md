@@ -33,7 +33,7 @@
 
 ## Open-ended selection
 
-- [ ] OpenChoice — select/radio group where one option is "Other" and reveals a free-text input; value shape `{ code: string } | { other: string }`; supports datasource for the coded options
+- [ ] OpenChoice — `openChoice` boolean prop on Select, RadioGroup, and ExclusiveToggle; appends an "Other" option that reveals a text input below the component; typed value stored directly as the field value; if form loads with a value not in the options list, "Other" is auto-selected and text input shows the value
 
 ## Numeric
 
@@ -83,6 +83,10 @@ Built-in validators
 ---
 
 ## Notes / investigations
+
+- [ ] **messages prop**: `messages` is defined on all field components but currently unused. Implement support to allow overriding built-in UI strings (e.g., the "Other" label added by `openChoice`, future validation messages). Design before implementing.
+
+
 
 - [ ] **StarRating demo**: Checkbox is now implemented — update `docs/custom-components.md` and the demo to replace the placeholder `TextInput` with a Checkbox that controls the `disabled` reactive prop on the star rating field.
 
