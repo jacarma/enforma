@@ -167,6 +167,7 @@ export type ComponentPropsMap = {
   AutocompleteOption: ResolvedAutocompleteOptionProps;
   ExclusiveToggle: ResolvedExclusiveToggleProps;
   ExclusiveToggleOption: ResolvedExclusiveToggleOptionProps;
+  Calculated: ResolvedCalculatedProps;
 };
 
 export type ValidationState = {
@@ -295,4 +296,19 @@ export type ResolvedFormModalProps = {
 export type ResolvedAddButtonProps = {
   onClick: () => void;
   disabled: boolean;
+};
+
+export type CalculatedProps<T = unknown> = {
+  bind?: string;
+  value: Reactive<T>;
+  label?: Reactive<string>;
+  description?: Reactive<string>;
+  disabled?: Reactive<boolean>;
+};
+
+export type ResolvedCalculatedProps = {
+  value: unknown;
+  label: string | undefined;
+  description: string | undefined;
+  disabled: boolean | undefined;
 };
