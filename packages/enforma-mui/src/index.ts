@@ -1,4 +1,5 @@
 import type { EnformaComponentRegistry } from 'enforma';
+import { Calculated } from './components/Calculated';
 import { TextInput } from './components/TextInput';
 import { Checkbox } from './components/Checkbox';
 import { Switch } from './components/Switch';
@@ -22,6 +23,7 @@ import { FormModal } from './components/FormModal';
 import { MuiFormWrap } from './components/MuiFormWrap';
 
 const muiComponents = {
+  Calculated,
   TextInput,
   Checkbox,
   Switch,
@@ -48,6 +50,7 @@ const muiComponents = {
 export default muiComponents;
 
 export {
+  Calculated,
   TextInput,
   Checkbox,
   Switch,
