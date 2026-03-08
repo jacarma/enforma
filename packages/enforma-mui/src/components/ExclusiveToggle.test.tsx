@@ -114,3 +114,69 @@ describe('MUI ExclusiveToggle', () => {
     expect(screen.getByRole('button', { name: 'M' })).toBeDisabled();
   });
 });
+
+describe('MUI ExclusiveToggle — openChoice', () => {
+  it('renders an "Other" button when openChoice is true', () => {
+    render(
+      <Form values={{ size: '' }} onChange={() => undefined}>
+        <Enforma.ExclusiveToggle bind="size" label="Size" openChoice>
+          <ExclusiveToggleOption value="s" label="S" />
+          <ExclusiveToggleOption value="m" label="M" />
+        </Enforma.ExclusiveToggle>
+      </Form>,
+    );
+    expect(screen.getByRole('button', { name: 'Other' })).toBeInTheDocument();
+  });
+
+  it('shows the text input when "Other" button is clicked', async () => {
+    render(
+      <Form values={{ size: '' }} onChange={() => undefined}>
+        <Enforma.ExclusiveToggle bind="size" label="Size" openChoice>
+          <ExclusiveToggleOption value="s" label="S" />
+        </Enforma.ExclusiveToggle>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Other' }));
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('pre-loaded value not in options shows the text input with the value', () => {
+    render(
+      <Form values={{ size: 'custom' }} onChange={() => undefined}>
+        <Enforma.ExclusiveToggle bind="size" label="Size" openChoice>
+          <ExclusiveToggleOption value="s" label="S" />
+        </Enforma.ExclusiveToggle>
+      </Form>,
+    );
+    expect(screen.getByRole('textbox')).toHaveValue('custom');
+  });
+
+  it('pre-loaded value matching an option does not show the text input', () => {
+    render(
+      <Form values={{ size: 's' }} onChange={() => undefined}>
+        <Enforma.ExclusiveToggle bind="size" label="Size" openChoice>
+          <ExclusiveToggleOption value="s" label="S" />
+        </Enforma.ExclusiveToggle>
+      </Form>,
+    );
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('typing in the text input updates the form value', async () => {
+    const onChange = vi.fn();
+    render(
+      <Form values={{ size: 'custom' }} onChange={onChange}>
+        <Enforma.ExclusiveToggle bind="size" label="Size" openChoice>
+          <ExclusiveToggleOption value="s" label="S" />
+        </Enforma.ExclusiveToggle>
+      </Form>,
+    );
+    const textbox = screen.getByRole('textbox');
+    await userEvent.clear(textbox);
+    await userEvent.type(textbox, 'xl');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ size: 'xl' }),
+      expect.anything(),
+    );
+  });
+});
