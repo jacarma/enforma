@@ -190,6 +190,7 @@ export function App() {
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [calculatedValues, setCalculatedValues] = useState<FormValues>({ q1: 0, q2: 0 });
   const [dateValues, setDateValues] = useState<FormValues>({});
+  const [phq9Values, setPhq9Values] = useState<FormValues>({});
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
@@ -754,6 +755,130 @@ export function App() {
           <Enforma.Select.Option label="label" value="name" />
         </Enforma.Select>
       </Enforma.Form>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>PHQ-9 Questionnaire</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Patient Health Questionnaire — 9 Item. Each question is scored 0–3; the{' '}
+        <code>Calculated</code> field sums all answers to produce a total severity score.
+      </p>
+
+      <Enforma.Form values={phq9Values} onChange={setPhq9Values} aria-label="PHQ-9 form">
+        <p style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
+          Over the last two weeks, how often have you been bothered by any of the following
+          problems?
+        </p>
+
+        <Enforma.RadioGroup bind="q1" label="Little interest or pleasure in doing things?" row>
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup bind="q2" label="Feeling down, depressed, or hopeless?" row>
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup
+          bind="q3"
+          label="Trouble falling or staying asleep, or sleeping too much?"
+          row
+        >
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup bind="q4" label="Feeling tired or having little energy?" row>
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup bind="q5" label="Poor appetite or overeating?" row>
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup
+          bind="q6"
+          label="Feeling bad about yourself — or that you are a failure or have let yourself or your family down?"
+          row
+        >
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup
+          bind="q7"
+          label="Trouble concentrating on things, such as reading the newspaper or watching television?"
+          row
+        >
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup
+          bind="q8"
+          label="Moving or speaking so slowly that other people could have noticed? Or so fidgety or restless that you have been moving a lot more than usual?"
+          row
+        >
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.RadioGroup
+          bind="q9"
+          label="Thoughts that you would be better off dead, or thoughts of hurting yourself in some way?"
+          row
+        >
+          <Enforma.RadioGroup.Option value={0} label="Not at all" />
+          <Enforma.RadioGroup.Option value={1} label="Several days" />
+          <Enforma.RadioGroup.Option value={2} label="More than half the days" />
+          <Enforma.RadioGroup.Option value={3} label="Nearly every day" />
+        </Enforma.RadioGroup>
+
+        <Enforma.Calculated<number>
+          bind="total"
+          value={(v) =>
+            ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'].reduce(
+              (sum, k) => sum + (typeof v[k] === 'number' ? v[k] : 0),
+              0,
+            )
+          }
+          label="PHQ-9 Total Score"
+          description={(v) => {
+            const phqKeys = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'];
+            const anyAnswered = phqKeys.some((k) => v[k] !== undefined);
+            if (!anyAnswered) return 'Answer questions above to compute score';
+            const score = phqKeys.reduce((sum, k) => sum + ((v[k] as number | undefined) ?? 0), 0);
+            if (score <= 4) return `${String(score)} — None-minimal`;
+            if (score <= 9) return `${String(score)} — Mild`;
+            if (score <= 14) return `${String(score)} — Moderate`;
+            if (score <= 19) return `${String(score)} — Moderately severe`;
+            return `${String(score)} — Severe`;
+          }}
+        />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(phq9Values, null, 2)}
+      </pre>
     </div>
   );
 }

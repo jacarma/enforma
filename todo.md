@@ -31,6 +31,10 @@
 - [ ] CheckboxList — group of checkboxes that produces an array of selected values; supports datasource
 - [ ] TagsInput — free-form entry of multiple string values displayed as chips/tags
 
+## Open-ended selection
+
+- [ ] OpenChoice — select/radio group where one option is "Other" and reveals a free-text input; value shape `{ code: string } | { other: string }`; supports datasource for the coded options
+
 ## Numeric
 
 - [x] NumberInput — numeric-only text input with min/max/step; no spinner arrows
@@ -52,6 +56,10 @@
 
 - [ ] RichText — WYSIWYG / markdown editor for formatted content fields
 
+## Display / static content
+
+- [ ] Display — read-only inline element that renders a label and optional description with no bound value; used for instructions, section notes, or computed text shown via a reactive `value` prop
+
 ## Utility / misc
 
 - [ ] Hidden — renders nothing; stores a value in form state programmatically
@@ -59,6 +67,18 @@
 - [ ] ColorPicker — hex/rgb color selection
 - [ ] OtpInput — fixed-length code entry (PIN, verification code); alternative to masked TextInput
 - [ ] TransferList — move items between "available" and "selected" pools; produces an array
+
+---
+
+---
+
+## Validation helpers
+
+Built-in validators
+
+- [ ] **required** — fails if value is `null`, `undefined`, or empty string; works for all field types
+- [ ] **minLength / maxLength** — string length bounds; intended for TextInput and Textarea
+- [ ] **minItems / maxItems** — array length bounds; intended for List and multi-select fields; number min/max already exists on NumberInput at the field level
 
 ---
 
@@ -71,3 +91,5 @@
 - [ ] **Mask Input and floating label**: After adding a value to a masked input or numeric input, if you change bwtween mui otline and mui classic, the label is rendered over the value and only stays on top after editing the value.
 
 - [ ] **List title**: List component should allow users to add a title or label
+
+- [x] **Calculated expression**: docs/PHQ-9 vs Enforma — Gap Analysis.md

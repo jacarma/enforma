@@ -1,6 +1,6 @@
 export type RadioGroupOptionProps = {
   label: string | ((item: unknown) => string);
-  value: string | ((item: unknown) => unknown);
+  value: string | number | ((item: unknown) => unknown);
 };
 
 // Props are read externally by the adapter via React.Children — not used in the body.

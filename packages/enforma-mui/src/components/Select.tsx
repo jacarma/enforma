@@ -19,6 +19,7 @@ export function Select({
   showError,
   onBlur,
   children,
+  options,
   displayValue,
   isLoading,
   dataSourceError,
@@ -50,7 +51,8 @@ export function Select({
       <MuiSelect
         value={value ?? ''}
         onChange={(e) => {
-          setValue(e.target.value);
+          const matched = options.find((opt) => String(opt.value) === e.target.value);
+          setValue(matched !== undefined ? matched.value : e.target.value);
         }}
         onBlur={onBlur}
         fullWidth

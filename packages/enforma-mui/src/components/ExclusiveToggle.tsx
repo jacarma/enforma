@@ -1,12 +1,7 @@
 // packages/enforma-mui/src/components/ExclusiveToggle.tsx
-import {
-  CircularProgress,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  ToggleButtonGroup,
-} from '@mui/material';
+import { CircularProgress, FormHelperText, FormLabel, ToggleButtonGroup } from '@mui/material';
 import { type ResolvedExclusiveToggleProps } from 'enforma';
+import { ComponentWrap } from './ComponentWrap';
 
 export function ExclusiveToggle({
   value,
@@ -25,7 +20,7 @@ export function ExclusiveToggle({
   }
 
   return (
-    <FormControl disabled={disabled} error={showError} fullWidth>
+    <ComponentWrap disabled={disabled} error={showError}>
       {label !== undefined && <FormLabel>{label}</FormLabel>}
       <ToggleButtonGroup
         value={value ?? null}
@@ -41,6 +36,6 @@ export function ExclusiveToggle({
         {children}
       </ToggleButtonGroup>
       {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
-    </FormControl>
+    </ComponentWrap>
   );
 }

@@ -3,7 +3,7 @@ import type { FormValues } from '../store/FormStore';
 
 export type SelectOptionProps<TItem = FormValues> = {
   label: string | ((item: TItem) => string);
-  value: string | ((item: TItem) => unknown);
+  value: string | number | ((item: TItem) => unknown);
 };
 
 // Props are read externally by the adapter via React.Children — not used in the body.

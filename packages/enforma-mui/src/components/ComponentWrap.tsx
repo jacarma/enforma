@@ -5,7 +5,7 @@ export function ComponentWrap({
   error = false,
   children,
   component = 'div',
-  margin = 'dense',
+  margin = 'normal',
   disabled = false,
   variant,
 }: {

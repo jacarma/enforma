@@ -153,26 +153,24 @@ export function useDataSource<TItem>(
   // Auto-clear the bound field when the filtered items change after initial mount.
   // This handles the case where a dependent field's value is no longer valid
   // (e.g., city select should reset when country changes and filters city list).
-  const didMount = useRef(false);
+  // Uses previous-value tracking instead of a didMount ref so it works correctly
+  // under React Strict Mode (which runs effects twice on mount).
+  const prevStaticItems = useRef(staticItems);
   useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (!bind) return;
+    const prev = prevStaticItems.current;
+    prevStaticItems.current = staticItems;
+    if (prev === staticItems || !bind || dataSource === undefined) return;
     store.setField(joinPath(prefix, bind), '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [staticItems]);
 
   // Auto-clear the bound field when form-derived filters change for query-based datasources.
   // This mirrors the static-items auto-clear above, but fires on filtersKey instead of staticItems.
-  const didMountQueryClear = useRef(false);
+  const prevFiltersKey = useRef(filtersKey);
   useEffect(() => {
-    if (!didMountQueryClear.current) {
-      didMountQueryClear.current = true;
-      return;
-    }
-    if (!bind || dataSource === undefined) return;
+    const prev = prevFiltersKey.current;
+    prevFiltersKey.current = filtersKey;
+    if (prev === filtersKey || !bind || dataSource === undefined) return;
     const def = resolveDefinition(dataSource, registry);
     if (def === null || Array.isArray(def) || def === 'reactive') return;
     store.setField(joinPath(prefix, bind), '');

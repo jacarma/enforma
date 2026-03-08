@@ -1,11 +1,11 @@
 import {
   CircularProgress,
-  FormControl,
   FormHelperText,
   FormLabel,
   RadioGroup as MuiRadioGroup,
 } from '@mui/material';
 import { type ResolvedRadioGroupProps } from 'enforma';
+import { ComponentWrap } from './ComponentWrap';
 
 export function RadioGroup({
   value,
@@ -17,6 +17,7 @@ export function RadioGroup({
   onBlur,
   children,
   row,
+  options,
   isLoading,
   dataSourceError,
 }: ResolvedRadioGroupProps) {
@@ -25,12 +26,13 @@ export function RadioGroup({
   }
 
   return (
-    <FormControl disabled={disabled} error={showError} fullWidth>
+    <ComponentWrap disabled={disabled} error={showError}>
       {label !== undefined && <FormLabel>{label}</FormLabel>}
       <MuiRadioGroup
         value={value ?? ''}
         onChange={(e) => {
-          setValue(e.target.value);
+          const matched = options.find((opt) => String(opt.value) === e.target.value);
+          if (matched !== undefined) setValue(matched.value);
         }}
         onBlur={onBlur}
         row={row}
@@ -38,6 +40,6 @@ export function RadioGroup({
         {children}
       </MuiRadioGroup>
       {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
-    </FormControl>
+    </ComponentWrap>
   );
 }
