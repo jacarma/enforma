@@ -188,6 +188,7 @@ export function App() {
     plan: '',
   });
   const [numericValues, setNumericValues] = useState<FormValues>({});
+  const [calculatedValues, setCalculatedValues] = useState<FormValues>({ q1: 0, q2: 0 });
   const [dateValues, setDateValues] = useState<FormValues>({});
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -527,6 +528,38 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(numericValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Calculated Fields</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>Calculated</code> derives a value from form state. With <code>bind</code> the result
+        is synced back into the store; without, it is display-only.
+      </p>
+
+      <Enforma.Form
+        values={calculatedValues}
+        onChange={setCalculatedValues}
+        aria-label="calculated demo form"
+      >
+        <Enforma.NumberInput bind="q1" label="Q1 score" decimalScale={0} />
+        <Enforma.NumberInput bind="q2" label="Q2 score" decimalScale={0} />
+        <Enforma.Calculated<number>
+          bind="total"
+          value={(v) => (v.q1 as number) + (v.q2 as number)}
+          label="Computed Total (synced into store)"
+          description="Value is written back to form state via bind"
+        />
+        <Enforma.Calculated<number>
+          value={(v) => (v.q1 as number) + (v.q2 as number)}
+          label="Computed Total (display only)"
+          description="Value is not written back to form state"
+        />
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(calculatedValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
