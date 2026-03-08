@@ -42,6 +42,8 @@ import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
 import { useDataSources } from '../context/DataSourceContext';
 import { Scope } from './Scope';
 
+const OPEN_CHOICE_SENTINEL = '__enforma_other__';
+
 function isEmptyRef(v: unknown): boolean {
   if (Array.isArray(v)) return v.length === 0;
   if (v !== null && typeof v === 'object') return Object.keys(v).length === 0;
@@ -205,6 +207,7 @@ function buildSelectOptions(
 }
 
 function SelectDispatch(props: SelectProps) {
+  const [localOtherSelected, setLocalOtherSelected] = React.useState(false);
   const resolved = useFieldProps<FieldResolved<unknown>>(props);
   const {
     items,
@@ -213,7 +216,42 @@ function SelectDispatch(props: SelectProps) {
   } = useDataSource(props.dataSource, {
     bind: props.bind,
   });
-  const options = buildSelectOptions(items, props.children, props.dataSource !== undefined);
+  const rawOptions = buildSelectOptions(items, props.children, props.dataSource !== undefined);
+  const openChoice = props.openChoice ?? false;
+  const options = openChoice
+    ? [...rawOptions, { value: OPEN_CHOICE_SENTINEL, label: 'Other' }]
+    : rawOptions;
+
+  const storeValue = resolved.value;
+  const valueInRawOptions = rawOptions.some((o) => o.value === storeValue);
+  const isOtherSelected =
+    openChoice &&
+    (localOtherSelected || (storeValue !== '' && storeValue != null && !valueInRawOptions));
+  const otherText = isOtherSelected && typeof storeValue === 'string' ? storeValue : '';
+
+  // Reset localOtherSelected if the form value is cleared externally (null/undefined only)
+  React.useEffect(() => {
+    if (storeValue == null) {
+      setLocalOtherSelected(false);
+    }
+  }, [storeValue]);
+
+  const originalSetValue = resolved.setValue;
+  const wrappedSetValue = (v: unknown) => {
+    if (v === OPEN_CHOICE_SENTINEL) {
+      setLocalOtherSelected(true);
+      originalSetValue('');
+    } else if (rawOptions.some((o) => o.value === v)) {
+      // Real option selected from dropdown — exit other mode
+      setLocalOtherSelected(false);
+      originalSetValue(v);
+    } else {
+      // Text typed in the "Other" input — maintain other mode
+      setLocalOtherSelected(true);
+      originalSetValue(v);
+    }
+  };
+
   const SelectOptionImpl = getComponent('SelectOption');
   if (!SelectOptionImpl) {
     throw new Error('Enforma: component "SelectOption" is not registered.');
@@ -221,15 +259,26 @@ function SelectDispatch(props: SelectProps) {
   const renderedOptions = options.map((opt) => (
     <SelectOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
-  const matched = options.find((opt) => opt.value === resolved.value);
-  const displayValue = matched?.label ?? (typeof resolved.value === 'string' ? resolved.value : '');
+
+  const matchedInRaw = rawOptions.find((opt) => opt.value === storeValue);
+  const displayValue = isOtherSelected
+    ? otherText || 'Other'
+    : (matchedInRaw?.label ?? (typeof storeValue === 'string' ? storeValue : ''));
+
+  const adapterValue = isOtherSelected ? OPEN_CHOICE_SENTINEL : storeValue;
+
   return dispatchComponent('Select', {
     ...resolved,
+    value: adapterValue,
+    setValue: wrappedSetValue,
     options,
     children: renderedOptions,
     displayValue,
     isLoading,
     dataSourceError: dataSourceError ?? null,
+    openChoice,
+    isOtherSelected,
+    otherText,
   });
 }
 

@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import Enforma, { Form, registerComponents, clearRegistry, SelectOption } from 'enforma';
 import { Select } from './Select';
@@ -62,5 +63,61 @@ describe('MUI Select', () => {
       </Form>,
     );
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+});
+
+describe('MUI Select — openChoice', () => {
+  it('shows the text input when a pre-loaded value is not in the options list', () => {
+    render(
+      <Form values={{ color: 'tangerine' }} onChange={() => undefined}>
+        <Enforma.Select bind="color" label="Color" openChoice>
+          <SelectOption value="red" label="Red" />
+          <SelectOption value="blue" label="Blue" />
+        </Enforma.Select>
+      </Form>,
+    );
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveValue('tangerine');
+  });
+
+  it('does not show the text input when the value matches a real option', () => {
+    render(
+      <Form values={{ color: 'red' }} onChange={() => undefined}>
+        <Enforma.Select bind="color" label="Color" openChoice>
+          <SelectOption value="red" label="Red" />
+          <SelectOption value="blue" label="Blue" />
+        </Enforma.Select>
+      </Form>,
+    );
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('does not show the text input when value is empty', () => {
+    render(
+      <Form values={{ color: '' }} onChange={() => undefined}>
+        <Enforma.Select bind="color" label="Color" openChoice>
+          <SelectOption value="red" label="Red" />
+        </Enforma.Select>
+      </Form>,
+    );
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('typing in the text input updates the form value directly', async () => {
+    const onChange = vi.fn();
+    render(
+      <Form values={{ color: 'tangerine' }} onChange={onChange}>
+        <Enforma.Select bind="color" label="Color" openChoice>
+          <SelectOption value="red" label="Red" />
+        </Enforma.Select>
+      </Form>,
+    );
+    const textbox = screen.getByRole('textbox');
+    await userEvent.clear(textbox);
+    await userEvent.type(textbox, 'mauve');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ color: 'mauve' }),
+      expect.anything(),
+    );
   });
 });

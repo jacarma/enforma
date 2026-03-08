@@ -38,6 +38,7 @@ export type TextareaProps = CommonProps;
 export type SelectProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
   children?: ReactNode;
+  openChoice?: boolean;
 };
 export type CheckboxProps = CommonProps & {
   labelPlacement?: Reactive<'end' | 'start' | 'top' | 'bottom'>;
@@ -48,6 +49,7 @@ export type RadioGroupProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
   children?: ReactNode;
   row?: Reactive<boolean>;
+  openChoice?: boolean;
 };
 
 export type ResolvedRadioGroupProps = ResolvedCommonProps & {
@@ -58,6 +60,9 @@ export type ResolvedRadioGroupProps = ResolvedCommonProps & {
   row: boolean;
   isLoading: boolean;
   dataSourceError: Error | null;
+  openChoice: boolean;
+  isOtherSelected: boolean;
+  otherText: string;
 };
 
 export type ResolvedRadioGroupOptionProps = {
@@ -74,6 +79,7 @@ export type AutocompleteProps = CommonProps & {
 export type ExclusiveToggleProps = CommonProps & {
   dataSource?: DataSourceProp<unknown>;
   children?: ReactNode;
+  openChoice?: boolean;
 };
 
 export type ResolvedAutocompleteProps = ResolvedCommonProps & {
@@ -103,6 +109,9 @@ export type ResolvedExclusiveToggleProps = ResolvedCommonProps & {
   children: ReactNode;
   isLoading: boolean;
   dataSourceError: Error | null;
+  openChoice: boolean;
+  isOtherSelected: boolean;
+  otherText: string;
 };
 
 export type ResolvedExclusiveToggleOptionProps = {
@@ -251,6 +260,9 @@ export type ResolvedSelectProps = ResolvedCommonProps & {
   displayValue: string;
   isLoading: boolean;
   dataSourceError: Error | null;
+  openChoice: boolean;
+  isOtherSelected: boolean;
+  otherText: string;
 };
 
 export type ResolvedSelectOptionProps = {

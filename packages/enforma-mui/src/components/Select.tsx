@@ -5,6 +5,7 @@ import {
   InputLabel,
   FormHelperText,
   FormLabel,
+  TextField,
 } from '@mui/material';
 import { type ResolvedSelectProps } from 'enforma';
 import { ComponentWrap } from './ComponentWrap';
@@ -23,6 +24,9 @@ export function Select({
   displayValue,
   isLoading,
   dataSourceError,
+  openChoice,
+  isOtherSelected,
+  otherText,
 }: ResolvedSelectProps) {
   const variant = useContext(MuiVariantContext);
   const labelId = useId();
@@ -46,23 +50,35 @@ export function Select({
   const variantProps = isClassic ? { labelId, size: 'small' as const } : { labelId, label };
 
   return (
-    <ComponentWrap error={showError} disabled={disabled} variant={muiVariant}>
-      {labelEl}
-      <MuiSelect
-        value={value ?? ''}
-        onChange={(e) => {
-          const matched = options.find((opt) => String(opt.value) === e.target.value);
-          setValue(matched !== undefined ? matched.value : e.target.value);
-        }}
-        onBlur={onBlur}
-        fullWidth
-        renderValue={() => displayValue}
-        variant={muiVariant}
-        {...variantProps}
-      >
-        {children}
-      </MuiSelect>
-      {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
-    </ComponentWrap>
+    <>
+      <ComponentWrap error={showError} disabled={disabled} variant={muiVariant}>
+        {labelEl}
+        <MuiSelect
+          value={value ?? ''}
+          onChange={(e) => {
+            const matched = options.find((opt) => String(opt.value) === e.target.value);
+            setValue(matched !== undefined ? matched.value : e.target.value);
+          }}
+          onBlur={onBlur}
+          fullWidth
+          renderValue={() => displayValue}
+          variant={muiVariant}
+          {...variantProps}
+        >
+          {children}
+        </MuiSelect>
+        {showError && <FormHelperText>{dataSourceError?.message ?? error}</FormHelperText>}
+      </ComponentWrap>
+      {openChoice && isOtherSelected && (
+        <TextField
+          value={otherText}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          size="small"
+          fullWidth
+        />
+      )}
+    </>
   );
 }
