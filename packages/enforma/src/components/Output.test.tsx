@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import type { ElementType } from 'react';
 import Enforma, { Form, registerComponents, clearRegistry } from '../index';
 import { Output } from './fields';
 import type { ResolvedOutputProps, ResolvedTextInputProps } from './types';
-import type { FormValues } from '../store/FormStore';
 
 function MinimalOutput({ value, as: Tag }: ResolvedOutputProps) {
   const text =
@@ -13,7 +13,7 @@ function MinimalOutput({ value, as: Tag }: ResolvedOutputProps) {
     typeof value === 'bigint'
       ? String(value)
       : '';
-  const El = Tag as React.ElementType;
+  const El = Tag as ElementType;
   return <El data-testid="output">{text}</El>;
 }
 
@@ -47,7 +47,7 @@ describe('Output', () => {
   it('renders a reactive value from form state', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
-        <Output value={(v: FormValues) => v.name as string} />
+        <Output value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')} />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');
@@ -58,7 +58,7 @@ describe('Output', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" />
-        <Output value={(v: FormValues) => v.name as string} />
+        <Output value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')} />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');
