@@ -81,4 +81,6 @@ export type {
   ResolvedExclusiveToggleOptionProps,
   CalculatedProps,
   ResolvedCalculatedProps,
+  OutputProps,
+  ResolvedOutputProps,
 } from './components/types';
