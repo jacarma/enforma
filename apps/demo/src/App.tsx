@@ -194,6 +194,7 @@ export function App() {
   });
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [calculatedValues, setCalculatedValues] = useState<FormValues>({ q1: 0, q2: 0 });
+  const [outputValues, setOutputValues] = useState<FormValues>({ name: '' });
   const [dateValues, setDateValues] = useState<FormValues>({});
   const [phq9Values, setPhq9Values] = useState<FormValues>({});
 
@@ -603,6 +604,28 @@ export function App() {
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(calculatedValues, null, 2)}
       </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Output</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>Output</code> renders a read-only value inline. Pass a static value or a reactive
+        function. Use the <code>as</code> prop to control the rendered element.
+      </p>
+
+      <Enforma.Form values={outputValues} onChange={setOutputValues} aria-label="output demo form">
+        <h3>
+          {'  '}
+          <Enforma.Output
+            as="span"
+            value={({ name }: Record<string, unknown>) =>
+              typeof name === 'string' && name ? name : 'stranger'
+            }
+          />
+        </h3>
+        <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
+        <Enforma.Output value="This is a static instruction note." />
+      </Enforma.Form>
 
       <hr style={{ margin: '2rem 0' }} />
 
