@@ -2,9 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
-import { TextInput, Checkbox } from './fields';
+import { TextInput, Checkbox, NumberInput } from './fields';
 import { registerComponents } from './registry';
-import type { ResolvedTextInputProps, ResolvedCheckboxProps } from './types';
+import type {
+  ResolvedTextInputProps,
+  ResolvedCheckboxProps,
+  ResolvedNumberInputProps,
+} from './types';
 
 // Minimal adapter that renders the error and exposes required via aria
 function StubTextInput({
@@ -169,6 +173,37 @@ describe('required on Checkbox', () => {
     render(
       <Form values={{ accepted: true }} onChange={vi.fn()} showErrors>
         <Checkbox bind="accepted" label="Accept" required />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
+describe('required on NumberInput', () => {
+  beforeEach(() => {
+    registerComponents({
+      NumberInput: ({ error, showError, onBlur }: ResolvedNumberInputProps) => (
+        <div>
+          <button aria-label="field" onBlur={onBlur} />
+          {showError && <span role="alert">{error}</span>}
+        </div>
+      ),
+    });
+  });
+
+  it('shows error when value is undefined', () => {
+    render(
+      <Form values={{}} onChange={vi.fn()} showErrors>
+        <NumberInput bind="qty" required />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+
+  it('does not show error when value is 0', () => {
+    render(
+      <Form values={{ qty: 0 }} onChange={vi.fn()} showErrors>
+        <NumberInput bind="qty" required />
       </Form>,
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

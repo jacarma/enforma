@@ -183,11 +183,20 @@ function SwitchDispatch(props: SwitchProps) {
 }
 
 function NumberInputDispatch(props: NumberInputProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'NumberInput',
-    useFieldProps<ResolvedNumberInputProps>(props, {
+    useFieldProps<ResolvedNumberInputProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
         return null;
       },
@@ -196,11 +205,20 @@ function NumberInputDispatch(props: NumberInputProps) {
 }
 
 function DatePickerDispatch(props: DatePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'DatePicker',
-    useFieldProps<ResolvedDatePickerProps>(props, {
+    useFieldProps<ResolvedDatePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (v instanceof Date) return null;
         return 'invalidDate';
       },
@@ -209,11 +227,20 @@ function DatePickerDispatch(props: DatePickerProps) {
 }
 
 function TimePickerDispatch(props: TimePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'TimePicker',
-    useFieldProps<ResolvedTimePickerProps>(props, {
+    useFieldProps<ResolvedTimePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
         return 'invalidTime';
       },
@@ -222,11 +249,20 @@ function TimePickerDispatch(props: TimePickerProps) {
 }
 
 function DateTimePickerDispatch(props: DateTimePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'DateTimePicker',
-    useFieldProps<ResolvedDateTimePickerProps>(props, {
+    useFieldProps<ResolvedDateTimePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (v instanceof Date) return null;
         return 'invalidDateTime';
       },
