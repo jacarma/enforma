@@ -3,10 +3,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Enforma, { Form, registerComponents, clearRegistry } from '../index';
 import { Output } from './fields';
 import type { ResolvedOutputProps, ResolvedTextInputProps } from './types';
+import type { FormValues } from '../store/FormStore';
 
-function MinimalOutput({ value, as: Tag = 'span' }: ResolvedOutputProps) {
-  const text = value !== null && value !== undefined ? String(value) : '';
-  return <Tag data-testid="output">{text}</Tag>;
+function MinimalOutput({ value, as: Tag }: ResolvedOutputProps) {
+  const text =
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'bigint'
+      ? String(value)
+      : '';
+  const El = Tag as React.ElementType;
+  return <El data-testid="output">{text}</El>;
 }
 
 function MinimalInput({ value, setValue }: ResolvedTextInputProps) {
@@ -14,7 +22,9 @@ function MinimalInput({ value, setValue }: ResolvedTextInputProps) {
     <input
       data-testid="input"
       value={value ?? ''}
-      onChange={(e) => { setValue(e.target.value); }}
+      onChange={(e) => {
+        setValue(e.target.value);
+      }}
     />
   );
 }
@@ -37,7 +47,7 @@ describe('Output', () => {
   it('renders a reactive value from form state', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
-        <Output value={({ name }) => String(name)} />
+        <Output value={(v: FormValues) => v.name as string} />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');
@@ -48,7 +58,7 @@ describe('Output', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" />
-        <Output value={({ name }) => String(name)} />
+        <Output value={(v: FormValues) => v.name as string} />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');

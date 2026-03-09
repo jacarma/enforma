@@ -16,10 +16,12 @@ import type {
   ExclusiveToggleProps,
   FieldsetProps,
   NumberInputProps,
+  OutputProps,
   RadioGroupProps,
   ResolvedAutocompleteProps,
   ResolvedCalculatedProps,
   ResolvedExclusiveToggleProps,
+  ResolvedOutputProps,
   ResolvedRadioGroupProps,
   SelectProps,
   SwitchProps,
@@ -535,6 +537,13 @@ function CalculatedDispatch<T = unknown>({
 }
 
 export const Calculated = memo(CalculatedDispatch, stablePropsEqual) as typeof CalculatedDispatch;
+
+function OutputDispatch({ value, as = 'span' }: OutputProps) {
+  const resolvedValue = useReactiveProp(value);
+  return dispatchComponent('Output', { value: resolvedValue, as } as ResolvedOutputProps);
+}
+
+export const Output = memo(OutputDispatch, stablePropsEqual);
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);
