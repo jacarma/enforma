@@ -47,7 +47,9 @@ describe('Output', () => {
   it('renders a reactive value from form state', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
-        <Output value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')} />
+        <Output
+          value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')}
+        />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');
@@ -58,7 +60,9 @@ describe('Output', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" />
-        <Output value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')} />
+        <Output
+          value={({ name }: Record<string, unknown>) => (typeof name === 'string' ? name : '')}
+        />
       </Form>,
     );
     expect(screen.getByTestId('output')).toHaveTextContent('Alice');
