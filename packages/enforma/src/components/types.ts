@@ -177,6 +177,7 @@ export type ComponentPropsMap = {
   ExclusiveToggle: ResolvedExclusiveToggleProps;
   ExclusiveToggleOption: ResolvedExclusiveToggleOptionProps;
   Calculated: ResolvedCalculatedProps;
+  Output: ResolvedOutputProps;
 };
 
 export type ValidationState = {
@@ -318,9 +319,19 @@ export type CalculatedProps<T = unknown> = {
   disabled?: Reactive<boolean>;
 };
 
+export type OutputProps = {
+  value: Reactive<unknown>;
+  as?: string;
+};
+
 export type ResolvedCalculatedProps = {
   value: unknown;
   label: string | undefined;
   description: string | undefined;
   disabled: boolean | undefined;
+};
+
+export type ResolvedOutputProps = {
+  value: unknown;
+  as: string;
 };
