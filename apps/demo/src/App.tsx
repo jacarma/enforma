@@ -615,7 +615,7 @@ export function App() {
 
       <Enforma.Form values={outputValues} onChange={setOutputValues} aria-label="output demo form">
         <h3>
-          {'  '}
+          Hello,{' '}
           <Enforma.Output
             as="span"
             value={({ name }: Record<string, unknown>) =>
