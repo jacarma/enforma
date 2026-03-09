@@ -1,0 +1,176 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Form } from './Form';
+import { TextInput, Checkbox } from './fields';
+import { registerComponents } from './registry';
+import type { ResolvedTextInputProps, ResolvedCheckboxProps } from './types';
+
+// Minimal adapter that renders the error and exposes required via aria
+function StubTextInput({
+  value,
+  setValue,
+  label,
+  error,
+  showError,
+  onBlur,
+  required,
+}: ResolvedTextInputProps) {
+  return (
+    <div>
+      <label htmlFor="f">{label}</label>
+      <input
+        id="f"
+        aria-label={label ?? ''}
+        aria-required={required}
+        value={value ?? ''}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        onBlur={onBlur}
+      />
+      {showError && <span role="alert">{error}</span>}
+    </div>
+  );
+}
+
+function StubCheckbox({
+  value,
+  setValue,
+  label,
+  error,
+  showError,
+  onBlur,
+  required,
+}: ResolvedCheckboxProps) {
+  return (
+    <div>
+      <input
+        type="checkbox"
+        aria-label={label ?? ''}
+        aria-required={required}
+        checked={value ?? false}
+        onChange={(e) => {
+          setValue(e.target.checked);
+        }}
+        onBlur={onBlur}
+      />
+      {showError && <span role="alert">{error}</span>}
+    </div>
+  );
+}
+
+beforeEach(() => {
+  registerComponents({ TextInput: StubTextInput, Checkbox: StubCheckbox });
+});
+
+describe('required on TextInput', () => {
+  it('blocks submit and shows default message when value is empty string', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{ name: '' }} onChange={vi.fn()} onSubmit={onSubmit}>
+        <TextInput bind="name" label="Name" required />
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+
+  it('blocks submit when value is undefined', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{}} onChange={vi.fn()} onSubmit={onSubmit}>
+        <TextInput bind="name" label="Name" required />
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('does not show error when value is provided', () => {
+    render(
+      <Form values={{ name: 'Alice' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="name" label="Name" required />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('passes required to the adapter', () => {
+    render(
+      <Form values={{}} onChange={vi.fn()}>
+        <TextInput bind="name" label="Name" required />
+      </Form>,
+    );
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('message is customizable via messages prop', () => {
+    render(
+      <Form values={{ name: '' }} onChange={vi.fn()} showErrors>
+        <TextInput
+          bind="name"
+          label="Name"
+          required
+          messages={{ required: 'Name cannot be empty' }}
+        />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Name cannot be empty');
+  });
+
+  it('message is customizable via Form-level messages', () => {
+    render(
+      <Form
+        values={{ name: '' }}
+        onChange={vi.fn()}
+        showErrors
+        messages={{ required: 'Global required message' }}
+      >
+        <TextInput bind="name" label="Name" required />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Global required message');
+  });
+
+  it('field-level messages override Form-level messages', () => {
+    render(
+      <Form values={{ name: '' }} onChange={vi.fn()} showErrors messages={{ required: 'Global' }}>
+        <TextInput bind="name" label="Name" required messages={{ required: 'Local' }} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Local');
+  });
+});
+
+describe('required on Checkbox', () => {
+  it('shows error when value is false', () => {
+    render(
+      <Form values={{ accepted: false }} onChange={vi.fn()} showErrors>
+        <Checkbox bind="accepted" label="Accept" required />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+
+  it('shows error when value is undefined', () => {
+    render(
+      <Form values={{}} onChange={vi.fn()} showErrors>
+        <Checkbox bind="accepted" label="Accept" required />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+
+  it('does not show error when value is true', () => {
+    render(
+      <Form values={{ accepted: true }} onChange={vi.fn()} showErrors>
+        <Checkbox bind="accepted" label="Accept" required />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
