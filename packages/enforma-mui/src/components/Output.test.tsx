@@ -46,7 +46,7 @@ describe('MUI Output', () => {
         <Enforma.Output value={null} />
       </Form>,
     );
-    expect(container.querySelector('span')).toBeInTheDocument();
+    expect(container.querySelector('span')?.textContent).toBe('');
   });
 
   it('renders with default as="span"', () => {
