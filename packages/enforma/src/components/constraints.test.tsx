@@ -209,3 +209,96 @@ describe('required on NumberInput', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
+
+describe('minLength / maxLength on TextInput', () => {
+  it('shows tooShort when value is shorter than minLength', () => {
+    render(
+      <Form values={{ code: 'ab' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="code" label="Code" minLength={3} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Must be at least 3 characters');
+  });
+
+  it('does not show tooShort when value meets minLength', () => {
+    render(
+      <Form values={{ code: 'abc' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="code" label="Code" minLength={3} />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('does not show tooShort when value is undefined', () => {
+    render(
+      <Form values={{}} onChange={vi.fn()} showErrors>
+        <TextInput bind="code" label="Code" minLength={3} />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('shows tooLong when value exceeds maxLength', () => {
+    render(
+      <Form values={{ name: 'HelloWorld' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="name" label="Name" maxLength={5} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Must be 5 characters or fewer');
+  });
+
+  it('does not show tooLong when value is within maxLength', () => {
+    render(
+      <Form values={{ name: 'Hello' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="name" label="Name" maxLength={5} />
+      </Form>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('minLength message is customizable', () => {
+    render(
+      <Form values={{ code: 'a' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="code" label="Code" minLength={3} messages={{ tooShort: 'Too short!' }} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Too short!');
+  });
+
+  it('maxLength message is customizable', () => {
+    render(
+      <Form values={{ name: 'TooLongName' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="name" label="Name" maxLength={5} messages={{ tooLong: 'Too long!' }} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Too long!');
+  });
+
+  it('passes minLength and maxLength to the adapter', () => {
+    const received: { minLength?: number; maxLength?: number }[] = [];
+    registerComponents({
+      TextInput: (props: ResolvedTextInputProps) => {
+        received.push({
+          ...(props.minLength !== undefined ? { minLength: props.minLength } : {}),
+          ...(props.maxLength !== undefined ? { maxLength: props.maxLength } : {}),
+        });
+        return <input aria-label={props.label ?? ''} />;
+      },
+    });
+    render(
+      <Form values={{}} onChange={vi.fn()}>
+        <TextInput bind="code" label="Code" minLength={3} maxLength={10} />
+      </Form>,
+    );
+    expect(received[0]).toEqual({ minLength: 3, maxLength: 10 });
+  });
+
+  it('required and minLength together: required fires first on empty string', () => {
+    render(
+      <Form values={{ code: '' }} onChange={vi.fn()} showErrors>
+        <TextInput bind="code" label="Code" required minLength={3} />
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+});

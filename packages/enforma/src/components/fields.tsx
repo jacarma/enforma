@@ -80,12 +80,25 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
 
 function TextInputDispatch(props: TextInputProps) {
   const required = useReactiveProp(props.required);
+  const minLength = useReactiveProp(props.minLength);
+  const maxLength = useReactiveProp(props.maxLength);
   const { messages: formMessages } = useFormSettings();
-  const hasConstraints = required !== undefined;
+  const hasConstraints =
+    required !== undefined || minLength !== undefined || maxLength !== undefined;
   const mergedProps = hasConstraints
     ? {
         ...props,
-        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+        messages: {
+          required: 'This field is required',
+          ...(minLength !== undefined
+            ? { tooShort: `Must be at least ${String(minLength)} characters` }
+            : {}),
+          ...(maxLength !== undefined
+            ? { tooLong: `Must be ${String(maxLength)} characters or fewer` }
+            : {}),
+          ...formMessages,
+          ...props.messages,
+        },
       }
     : props;
   return dispatchComponent(
@@ -96,6 +109,10 @@ function TextInputDispatch(props: TextInputProps) {
         ? {
             typeValidator: (v): string | null => {
               if (required && (v === undefined || v === null || v === '')) return 'required';
+              if (typeof v === 'string') {
+                if (minLength !== undefined && v.length < minLength) return 'tooShort';
+                if (maxLength !== undefined && v.length > maxLength) return 'tooLong';
+              }
               return null;
             },
           }
