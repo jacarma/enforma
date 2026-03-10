@@ -197,6 +197,7 @@ export function App() {
   const [outputValues, setOutputValues] = useState<FormValues>({ name: '' });
   const [dateValues, setDateValues] = useState<FormValues>({});
   const [phq9Values, setPhq9Values] = useState<FormValues>({});
+  const [constraintValues, setConstraintValues] = useState<FormValues>({ tags: [] });
 
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
@@ -942,6 +943,41 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(phq9Values, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Validation Constraints</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Use <code>required</code>, <code>minLength</code>/<code>maxLength</code>, and{' '}
+        <code>minItems</code>/<code>maxItems</code> props to declare constraints without writing a
+        custom <code>validate</code> function. Click Submit to reveal all errors.
+      </p>
+
+      <Enforma.Form
+        values={constraintValues}
+        onChange={setConstraintValues}
+        aria-label="validation constraints demo form"
+      >
+        <Enforma.TextInput
+          bind="username"
+          label="Username"
+          required
+          minLength={3}
+          maxLength={20}
+          placeholder="3–20 characters"
+        />
+        <Enforma.Checkbox bind="terms" label="I accept the terms and conditions" required />
+        <Enforma.List bind="tags" defaultItem={{ tag: '' }} minItems={1} maxItems={3}>
+          <Enforma.List.Form showDeleteButton>
+            <Enforma.TextInput bind="tag" label="Tag" required />
+          </Enforma.List.Form>
+        </Enforma.List>
+        <button type="submit">Submit</button>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(constraintValues, null, 2)}
       </pre>
     </div>
   );
