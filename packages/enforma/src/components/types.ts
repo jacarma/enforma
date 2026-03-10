@@ -29,10 +29,13 @@ export type CommonProps = {
   description?: Reactive<string>;
   validate?: (value: unknown, scopeValues: FormValues, allValues: FormValues) => string | null;
   messages?: Partial<Record<string, string>>;
+  required?: Reactive<boolean>;
 };
 
 export type TextInputProps = CommonProps & {
   mask?: Reactive<string | RegExp>;
+  minLength?: Reactive<number>;
+  maxLength?: Reactive<number>;
 };
 export type TextareaProps = CommonProps;
 export type SelectProps = CommonProps & {
@@ -198,12 +201,15 @@ export type ResolvedCommonProps = {
   error: string | null;
   showError: boolean;
   onBlur: () => void;
+  required: boolean | undefined;
 };
 
 export type ResolvedTextInputProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
   value: string | undefined;
   setValue: (value: string) => void;
   mask?: string | RegExp;
+  minLength?: number;
+  maxLength?: number;
 };
 
 export type ResolvedTextareaProps = ResolvedTextInputProps;
@@ -282,6 +288,8 @@ export type ResolvedListProps = {
   modal: ReactNode;
   isEmpty: boolean;
   disabled: boolean;
+  error: string | null;
+  showError: boolean;
 };
 
 export type ResolvedListItemProps = {

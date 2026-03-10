@@ -11,6 +11,7 @@ export function Checkbox({
   error,
   showError,
   onBlur,
+  required,
   labelPlacement = 'end',
 }: ResolvedCheckboxProps) {
   return (
@@ -19,6 +20,7 @@ export function Checkbox({
         label={label ?? ''}
         labelPlacement={labelPlacement}
         disabled={disabled}
+        required={required ?? false}
         control={
           <MuiCheckbox
             checked={value ?? false}

@@ -40,6 +40,7 @@ import type {
 } from './types';
 import { useFieldProps, useReactiveProp } from '../hooks/useField';
 import { useScope, joinPath } from '../context/ScopeContext';
+import { useFormSettings } from '../context/FormSettingsContext';
 import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
 import { useDataSources } from '../context/DataSourceContext';
 import { Scope } from './Scope';
@@ -78,27 +79,141 @@ function dispatchComponent<K extends keyof ComponentPropsMap>(
 }
 
 function TextInputDispatch(props: TextInputProps) {
-  return dispatchComponent('TextInput', useFieldProps<ResolvedTextInputProps>(props));
+  const required = useReactiveProp(props.required);
+  const minLength = useReactiveProp(props.minLength);
+  const maxLength = useReactiveProp(props.maxLength);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints =
+    required !== undefined || minLength !== undefined || maxLength !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: {
+          required: 'This field is required',
+          ...(minLength !== undefined
+            ? { tooShort: `Must be at least ${String(minLength)} characters` }
+            : {}),
+          ...(maxLength !== undefined
+            ? { tooLong: `Must be ${String(maxLength)} characters or fewer` }
+            : {}),
+          ...formMessages,
+          ...props.messages,
+        },
+      }
+    : props;
+  return dispatchComponent(
+    'TextInput',
+    useFieldProps<ResolvedTextInputProps>(
+      mergedProps,
+      hasConstraints
+        ? {
+            typeValidator: (v): string | null => {
+              if (required && (v === undefined || v === null || v === '')) return 'required';
+              if (typeof v === 'string') {
+                if (minLength !== undefined && v.length < minLength) return 'tooShort';
+                if (maxLength !== undefined && v.length > maxLength) return 'tooLong';
+              }
+              return null;
+            },
+          }
+        : undefined,
+    ),
+  );
 }
 
 function TextareaDispatch(props: TextareaProps) {
-  return dispatchComponent('Textarea', useFieldProps<ResolvedTextareaProps>(props));
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  return dispatchComponent(
+    'Textarea',
+    useFieldProps<ResolvedTextareaProps>(
+      mergedProps,
+      hasConstraints
+        ? {
+            typeValidator: (v): string | null => {
+              if (required && (v === undefined || v === null || v === '')) return 'required';
+              return null;
+            },
+          }
+        : undefined,
+    ),
+  );
 }
 
 function CheckboxDispatch(props: CheckboxProps) {
-  return dispatchComponent('Checkbox', useFieldProps<ResolvedCheckboxProps>(props));
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  return dispatchComponent(
+    'Checkbox',
+    useFieldProps<ResolvedCheckboxProps>(
+      mergedProps,
+      hasConstraints
+        ? {
+            typeValidator: (v): string | null => {
+              if (required && v !== true) return 'required';
+              return null;
+            },
+          }
+        : undefined,
+    ),
+  );
 }
 
 function SwitchDispatch(props: SwitchProps) {
-  return dispatchComponent('Switch', useFieldProps<ResolvedSwitchProps>(props));
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  return dispatchComponent(
+    'Switch',
+    useFieldProps<ResolvedSwitchProps>(
+      mergedProps,
+      hasConstraints
+        ? {
+            typeValidator: (v): string | null => {
+              if (required && v !== true) return 'required';
+              return null;
+            },
+          }
+        : undefined,
+    ),
+  );
 }
 
 function NumberInputDispatch(props: NumberInputProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'NumberInput',
-    useFieldProps<ResolvedNumberInputProps>(props, {
+    useFieldProps<ResolvedNumberInputProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
         return null;
       },
@@ -107,11 +222,20 @@ function NumberInputDispatch(props: NumberInputProps) {
 }
 
 function DatePickerDispatch(props: DatePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'DatePicker',
-    useFieldProps<ResolvedDatePickerProps>(props, {
+    useFieldProps<ResolvedDatePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (v instanceof Date) return null;
         return 'invalidDate';
       },
@@ -120,11 +244,20 @@ function DatePickerDispatch(props: DatePickerProps) {
 }
 
 function TimePickerDispatch(props: TimePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'TimePicker',
-    useFieldProps<ResolvedTimePickerProps>(props, {
+    useFieldProps<ResolvedTimePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
         return 'invalidTime';
       },
@@ -133,11 +266,20 @@ function TimePickerDispatch(props: TimePickerProps) {
 }
 
 function DateTimePickerDispatch(props: DateTimePickerProps) {
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
   return dispatchComponent(
     'DateTimePicker',
-    useFieldProps<ResolvedDateTimePickerProps>(props, {
+    useFieldProps<ResolvedDateTimePickerProps>(mergedProps, {
       typeValidator: (v): string | null => {
-        if (v === undefined) return null;
+        if (v === undefined) return required ? 'required' : null;
         if (v instanceof Date) return null;
         return 'invalidDateTime';
       },
@@ -210,7 +352,26 @@ function buildSelectOptions(
 
 function SelectDispatch(props: SelectProps) {
   const [localOtherSelected, setLocalOtherSelected] = React.useState(false);
-  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  const resolved = useFieldProps<FieldResolved<unknown>>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null)) return 'required';
+            return null;
+          },
+        }
+      : undefined,
+  );
   const {
     items,
     isLoading,
@@ -286,7 +447,26 @@ function SelectDispatch(props: SelectProps) {
 
 function RadioGroupDispatch(props: RadioGroupProps) {
   const [localOtherSelected, setLocalOtherSelected] = React.useState(false);
-  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  const resolved = useFieldProps<FieldResolved<unknown>>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null)) return 'required';
+            return null;
+          },
+        }
+      : undefined,
+  );
   const {
     items,
     isLoading,
@@ -358,7 +538,26 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     value: unknown;
     label: string;
   } | null>(null);
-  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  const resolved = useFieldProps<FieldResolved<unknown>>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null)) return 'required';
+            return null;
+          },
+        }
+      : undefined,
+  );
   const registry = useDataSources();
   const minSearchLength = useReactiveProp(props.minSearchLength) ?? 0;
   const activeDataSource = inputValue.length >= minSearchLength ? props.dataSource : undefined;
@@ -445,7 +644,26 @@ function AutocompleteDispatch(props: AutocompleteProps) {
 
 function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
   const [localOtherSelected, setLocalOtherSelected] = React.useState(false);
-  const resolved = useFieldProps<FieldResolved<unknown>>(props);
+  const required = useReactiveProp(props.required);
+  const { messages: formMessages } = useFormSettings();
+  const hasConstraints = required !== undefined;
+  const mergedProps = hasConstraints
+    ? {
+        ...props,
+        messages: { required: 'This field is required', ...formMessages, ...props.messages },
+      }
+    : props;
+  const resolved = useFieldProps<FieldResolved<unknown>>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null)) return 'required';
+            return null;
+          },
+        }
+      : undefined,
+  );
   const {
     items,
     isLoading,

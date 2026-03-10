@@ -237,6 +237,7 @@ describe('MUI DatePicker', () => {
           disabled={false}
           placeholder={undefined}
           description={undefined}
+          required={undefined}
           error={null}
           showError={false}
           onBlur={() => undefined}
