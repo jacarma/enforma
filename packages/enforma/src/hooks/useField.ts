@@ -118,6 +118,7 @@ export function useFieldValidation(
   localMessages: Partial<Record<string, string>> | undefined,
   implicitValidator?: () => string | null,
   typeValidator?: (value: unknown) => string | null,
+  skip?: boolean,
 ): { error: string | null; showError: boolean; onBlur: () => void } {
   const { store, prefix } = useScope();
   const { showErrors: formShowErrors, messages: formMessages } = useFormSettings();
@@ -140,6 +141,7 @@ export function useFieldValidation(
   typeValidatorRef.current = typeValidator;
 
   useEffect(() => {
+    if (skip) return;
     if (
       validateRef.current === undefined &&
       implicitValidatorRef.current === undefined &&
@@ -182,7 +184,7 @@ export function useFieldValidation(
     };
 
     return store.registerValidator(fullPath, combinedValidator);
-  }, [store, fullPath, prefix]);
+  }, [store, fullPath, prefix, skip]);
 
   const error = useSyncExternalStore(
     (cb) => store.subscribe(cb),
