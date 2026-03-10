@@ -219,6 +219,7 @@ describe('MUI TextInput with mask', () => {
           disabled={false}
           placeholder={undefined}
           description={undefined}
+          required={undefined}
           error={null}
           showError={false}
           onBlur={() => undefined}

@@ -1,7 +1,7 @@
-import { Card, CardActions, CardContent, List as MuiList } from '@mui/material';
+import { Card, CardActions, CardContent, FormHelperText, List as MuiList } from '@mui/material';
 import { type ResolvedListProps } from 'enforma';
 
-export function List({ items, addButton, modal }: ResolvedListProps) {
+export function List({ items, addButton, modal, error, showError }: ResolvedListProps) {
   return (
     <>
       <Card variant="outlined">
@@ -10,6 +10,7 @@ export function List({ items, addButton, modal }: ResolvedListProps) {
         </CardContent>
         <CardActions>{addButton}</CardActions>
       </Card>
+      {showError && <FormHelperText error>{error}</FormHelperText>}
       {modal}
     </>
   );

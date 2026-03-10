@@ -1,5 +1,5 @@
 // packages/enforma/src/components/List.tsx
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
 import React from 'react';
 import { Form } from './Form';
 import type { FormValues } from '../store/FormStore';
@@ -7,6 +7,8 @@ import { useListState } from '../hooks/useListState';
 import { ListItemSlot, type ListItemSlotProps } from './ListItemSlot';
 import { ListFormSlot, type ListFormSlotProps, type ListFormSlotMode } from './ListFormSlot';
 import { getComponent } from './registry';
+import { useScope, joinPath } from '../context/ScopeContext';
+import { useFormSettings } from '../context/FormSettingsContext';
 import type { ResolvedListItemProps } from './types';
 
 type ListProps = {
@@ -14,6 +16,9 @@ type ListProps = {
   defaultItem: Record<string, unknown>;
   disabled?: boolean;
   children: ReactNode;
+  required?: boolean;
+  minItems?: number;
+  maxItems?: number;
 };
 
 type ModalState = { open: false } | { open: true; index: number; mode: ListFormSlotMode };
@@ -34,10 +39,72 @@ function evalProp(prop: string | ((item: FormValues) => string), item: unknown):
   return String(value);
 }
 
-function ListMain({ bind, defaultItem, disabled = false, children }: ListProps) {
+function ListMain({
+  bind,
+  defaultItem,
+  disabled = false,
+  children,
+  required,
+  minItems,
+  maxItems,
+}: ListProps) {
   const { arr, keys, append, remove, update } = useListState(bind, defaultItem);
   const [modal, setModal] = useState<ModalState>({ open: false });
   const [draftValues, setDraftValues] = useState<FormValues>({});
+  const { store, prefix } = useScope();
+  const fullPath = joinPath(prefix, bind);
+  const { showErrors: formShowErrors, messages: formMessages } = useFormSettings();
+
+  // Always-current refs for the registered validator closure
+  const formMessagesRef = useRef(formMessages);
+  formMessagesRef.current = formMessages;
+
+  const constraintRef = useRef({ required, minItems, maxItems });
+  constraintRef.current = { required, minItems, maxItems };
+
+  const constraintMessages: Partial<Record<string, string>> = {
+    required: 'This field is required',
+    ...(minItems !== undefined
+      ? { tooFewItems: `Must have at least ${String(minItems)} item(s)` }
+      : {}),
+    ...(maxItems !== undefined
+      ? { tooManyItems: `Must have ${String(maxItems)} item(s) or fewer` }
+      : {}),
+  };
+  const constraintMessagesRef = useRef<Partial<Record<string, string>>>(constraintMessages);
+  constraintMessagesRef.current = constraintMessages;
+
+  useEffect(() => {
+    if (required === undefined && minItems === undefined && maxItems === undefined) return;
+
+    const validator = (): string | null => {
+      const val = store.getField(fullPath);
+      const count = Array.isArray(val) ? val.length : 0;
+      const { required: req, minItems: min, maxItems: max } = constraintRef.current;
+
+      let key: string | null = null;
+      if (req && count === 0) key = 'required';
+      else if (min !== undefined && count < min) key = 'tooFewItems';
+      else if (max !== undefined && count > max) key = 'tooManyItems';
+
+      if (key === null) return null;
+      return formMessagesRef.current[key] ?? constraintMessagesRef.current[key] ?? key;
+    };
+
+    return store.registerValidator(fullPath, validator);
+  }, [store, fullPath, required, minItems, maxItems]);
+
+  const error = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.getError(fullPath),
+  );
+
+  const isSubmitted = useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.isSubmitted(),
+  );
+
+  const showError = (isSubmitted || formShowErrors) && error !== null;
 
   // Parse slot children
   let itemSlot: ListItemSlotProps | undefined;
@@ -166,6 +233,8 @@ function ListMain({ bind, defaultItem, disabled = false, children }: ListProps) 
       modal={modalNode}
       isEmpty={arr.length === 0}
       disabled={disabled}
+      error={error}
+      showError={showError}
     />
   );
 }

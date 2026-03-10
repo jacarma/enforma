@@ -3,11 +3,18 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form } from './Form';
 import { TextInput, Checkbox, NumberInput } from './fields';
+import { List } from './List';
+import { ListItemSlot } from './ListItemSlot';
+import { ListFormSlot } from './ListFormSlot';
 import { registerComponents } from './registry';
 import type {
   ResolvedTextInputProps,
   ResolvedCheckboxProps,
   ResolvedNumberInputProps,
+  ResolvedListProps,
+  ResolvedListItemProps,
+  ResolvedAddButtonProps,
+  ResolvedFormModalProps,
 } from './types';
 
 // Minimal adapter that renders the error and exposes required via aria
@@ -300,5 +307,136 @@ describe('minLength / maxLength on TextInput', () => {
       </Form>,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+});
+
+function StubList({ items, addButton, error, showError }: ResolvedListProps) {
+  return (
+    <div>
+      <div data-testid="list-rows">{items}</div>
+      {addButton}
+      {showError && <span role="alert">{error}</span>}
+    </div>
+  );
+}
+
+function StubListItem({ title }: ResolvedListItemProps) {
+  return <div>{title}</div>;
+}
+
+function StubAddButton({ onClick, disabled }: ResolvedAddButtonProps) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled}>
+      Add
+    </button>
+  );
+}
+
+function StubFormModal({ open, children, onConfirm, onCancel }: ResolvedFormModalProps) {
+  if (!open) return null;
+  return (
+    <div>
+      {children}
+      <button onClick={onConfirm}>Confirm</button>
+      <button onClick={onCancel}>Cancel</button>
+    </div>
+  );
+}
+
+describe('List constraints', () => {
+  beforeEach(() => {
+    registerComponents({
+      List: StubList,
+      ListItem: StubListItem,
+      AddButton: StubAddButton,
+      FormModal: StubFormModal,
+    });
+  });
+
+  it('required blocks submit when list is empty', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{ items: [] }} onChange={vi.fn()} onSubmit={onSubmit}>
+        <List bind="items" defaultItem={{ name: '' }} required>
+          <ListItemSlot title="name" />
+          <ListFormSlot>
+            <TextInput bind="name" label="Name" />
+          </ListFormSlot>
+        </List>
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+  });
+
+  it('required does not show error when list has items', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{ items: [{ name: 'Alice' }] }} onChange={vi.fn()} onSubmit={onSubmit}>
+        <List bind="items" defaultItem={{ name: '' }} required>
+          <ListItemSlot title="name" />
+          <ListFormSlot>
+            <TextInput bind="name" label="Name" />
+          </ListFormSlot>
+        </List>
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('minItems shows error when below minimum', () => {
+    render(
+      <Form values={{ items: [] }} onChange={vi.fn()} showErrors>
+        <List bind="items" defaultItem={{ name: '' }} minItems={2}>
+          <ListItemSlot title="name" />
+          <ListFormSlot>
+            <TextInput bind="name" label="Name" />
+          </ListFormSlot>
+        </List>
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Must have at least 2 item(s)');
+  });
+
+  it('maxItems shows error when above maximum', () => {
+    render(
+      <Form
+        values={{ items: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] }}
+        onChange={vi.fn()}
+        showErrors
+      >
+        <List bind="items" defaultItem={{ name: '' }} maxItems={2}>
+          <ListItemSlot title="name" />
+          <ListFormSlot>
+            <TextInput bind="name" label="Name" />
+          </ListFormSlot>
+        </List>
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Must have 2 item(s) or fewer');
+  });
+
+  it('minItems message is customizable via Form messages', () => {
+    render(
+      <Form
+        values={{ items: [] }}
+        onChange={vi.fn()}
+        showErrors
+        messages={{ tooFewItems: 'Add more!' }}
+      >
+        <List bind="items" defaultItem={{ name: '' }} minItems={1}>
+          <ListItemSlot title="name" />
+          <ListFormSlot>
+            <TextInput bind="name" label="Name" />
+          </ListFormSlot>
+        </List>
+      </Form>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Add more!');
   });
 });
