@@ -39,6 +39,25 @@ function setByPath(obj: FormValues, path: string, value: unknown): FormValues {
   return { ...obj, [key]: setByPath(nested, rest, value) };
 }
 
+function deleteByPath(obj: FormValues, path: string): { changed: boolean; result: FormValues } {
+  const dotIndex = path.indexOf('.');
+  if (dotIndex === -1) {
+    if (!(path in obj)) return { changed: false, result: obj };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [path]: _, ...rest } = obj;
+    return { changed: true, result: rest as FormValues };
+  }
+  const key = path.slice(0, dotIndex);
+  const rest = path.slice(dotIndex + 1);
+  const existing = obj[key];
+  if (existing === null || typeof existing !== 'object' || Array.isArray(existing)) {
+    return { changed: false, result: obj };
+  }
+  const nested = deleteByPath(existing as FormValues, rest);
+  if (!nested.changed) return { changed: false, result: obj };
+  return { changed: true, result: { ...obj, [key]: nested.result } };
+}
+
 export class FormStore {
   private _values: FormValues;
   private readonly _subscribers = new Set<Subscriber>();
@@ -111,6 +130,13 @@ export class FormStore {
 
   getErrors(): Record<string, string | null> {
     return Object.fromEntries(this._errors);
+  }
+
+  deleteField(path: string): void {
+    const { changed, result } = deleteByPath(this._values, path);
+    if (!changed) return;
+    this._values = result;
+    this.notifySubscribers();
   }
 
   isTouched(path: string): boolean {

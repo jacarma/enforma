@@ -189,4 +189,61 @@ describe('FormStore', () => {
       expect(store.getError('name')).toBeNull();
     });
   });
+
+  describe('deleteField', () => {
+    it('deletes a top-level key', () => {
+      const store = new FormStore({ name: 'Alice', email: 'a@b.com' });
+      store.deleteField('name');
+      expect(store.getField('name')).toBeUndefined();
+      expect(store.getField('email')).toBe('a@b.com');
+    });
+
+    it('deletes a nested key via dot-path', () => {
+      const store = new FormStore({ address: { city: 'NY', zip: '10001' } });
+      store.deleteField('address.city');
+      expect(store.getField('address.city')).toBeUndefined();
+      expect(store.getField('address.zip')).toBe('10001');
+    });
+
+    it('deletes a deeply nested object key', () => {
+      const store = new FormStore({ a: { b: { c: 'deep' } } });
+      store.deleteField('a.b');
+      expect(store.getField('a.b')).toBeUndefined();
+      expect(store.getField('a')).toEqual({});
+    });
+
+    it('is a no-op when the path does not exist', () => {
+      const store = new FormStore({ name: 'Alice' });
+      expect(() => {
+        store.deleteField('missing');
+      }).not.toThrow();
+      expect(() => {
+        store.deleteField('a.b.c');
+      }).not.toThrow();
+      expect(store.getField('name')).toBe('Alice');
+    });
+
+    it('notifies subscribers after deletion', () => {
+      const store = new FormStore({ name: 'Alice' });
+      const cb = vi.fn();
+      store.subscribe(cb);
+      store.deleteField('name');
+      expect(cb).toHaveBeenCalledOnce();
+    });
+
+    it('does not notify subscribers when path does not exist (no-op)', () => {
+      const store = new FormStore({ name: 'Alice' });
+      const cb = vi.fn();
+      store.subscribe(cb);
+      store.deleteField('missing');
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it('removes the entire nested key, including all children', () => {
+      const store = new FormStore({ address: { city: 'NY', zip: '10001' } });
+      store.deleteField('address');
+      expect(store.getField('address')).toBeUndefined();
+      expect(store.getSnapshot()).toEqual({});
+    });
+  });
 });
