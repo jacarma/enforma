@@ -969,6 +969,7 @@ export function App() {
         />
         <Enforma.Checkbox bind="terms" label="I accept the terms and conditions" required />
         <Enforma.List bind="tags" defaultItem={{ tag: '' }} minItems={1} maxItems={3}>
+          <Enforma.List.Item title="tag" showDeleteButton />
           <Enforma.List.Form showDeleteButton>
             <Enforma.TextInput bind="tag" label="Tag" required />
           </Enforma.List.Form>
