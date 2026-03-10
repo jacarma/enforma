@@ -11,6 +11,7 @@ export function Switch({
   error,
   showError,
   onBlur,
+  required,
   labelPlacement = 'end',
 }: ResolvedSwitchProps) {
   return (
@@ -19,6 +20,7 @@ export function Switch({
         label={label ?? ''}
         labelPlacement={labelPlacement}
         disabled={disabled}
+        required={required ?? false}
         control={
           <MuiSwitch
             checked={value ?? false}

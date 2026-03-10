@@ -64,7 +64,10 @@ export function UnmaskedTextInput({
   error,
   showError,
   onBlur,
+  required,
   mask,
+  minLength,
+  maxLength,
   inputComponent,
 }: ResolvedTextInputProps & { inputComponent?: React.ComponentType<object> }) {
   const variant = useContext(MuiVariantContext);
@@ -83,6 +86,8 @@ export function UnmaskedTextInput({
     error: showError,
     helperText: showError ? error : description,
     color: showError ? ('error' as const) : ('primary' as const),
+    required: required ?? false,
+    inputProps: { minLength, maxLength },
   };
 
   const maskSlotProps =
