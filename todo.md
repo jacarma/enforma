@@ -33,7 +33,7 @@
 
 ## Open-ended selection
 
-- [ ] OpenChoice — `openChoice` boolean prop on Select, RadioGroup, and ExclusiveToggle; appends an "Other" option that reveals a text input below the component; typed value stored directly as the field value; if form loads with a value not in the options list, "Other" is auto-selected and text input shows the value
+- [x] OpenChoice — `openChoice` boolean prop on Select, RadioGroup, and ExclusiveToggle; appends an "Other" option that reveals a text input below the component; typed value stored directly as the field value; if form loads with a value not in the options list, "Other" is auto-selected and text input shows the value
 
 ## Numeric
 
@@ -58,7 +58,7 @@
 
 ## Display / static content
 
-- [ ] Display — read-only inline element that renders a label and optional description with no bound value; used for instructions, section notes, or computed text shown via a reactive `value` prop
+- [x] Output — read-only inline element that renders a text no bound value; used for instructions, section notes, or computed text shown via a reactive `value` prop - <h3>Hello, <Output as="span" value={({name})=>name}/></h3> "as" is optional and defaults to span
 
 ## Utility / misc
 
@@ -76,17 +76,15 @@
 
 Built-in validators
 
-- [ ] **required** — fails if value is `null`, `undefined`, or empty string; works for all field types
-- [ ] **minLength / maxLength** — string length bounds; intended for TextInput and Textarea
-- [ ] **minItems / maxItems** — array length bounds; intended for List and multi-select fields; number min/max already exists on NumberInput at the field level
+- [x] **required** — fails if value is `null`, `undefined`, or empty string; works for all field types
+- [x] **minLength / maxLength** — string length bounds; intended for TextInput and Textarea
+- [x] **minItems / maxItems** — array length bounds; intended for List and multi-select fields; number min/max already exists on NumberInput at the field level
 
 ---
 
 ## Notes / investigations
 
 - [ ] **messages prop**: `messages` is defined on all field components but currently unused. Implement support to allow overriding built-in UI strings (e.g., the "Other" label added by `openChoice`, future validation messages). Design before implementing.
-
-
 
 - [ ] **StarRating demo**: Checkbox is now implemented — update `docs/custom-components.md` and the demo to replace the placeholder `TextInput` with a Checkbox that controls the `disabled` reactive prop on the star rating field.
 
