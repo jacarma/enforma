@@ -192,6 +192,10 @@ export function App() {
     size: '',
     format: 'tangerine', // pre-loaded custom value to show auto-detection
   });
+  const [visibilityValues, setVisibilityValues] = useState<FormValues>({
+    showSpouse: false,
+    showBilling: false,
+  });
   const [numericValues, setNumericValues] = useState<FormValues>({});
   const [calculatedValues, setCalculatedValues] = useState<FormValues>({ q1: 0, q2: 0 });
   const [outputValues, setOutputValues] = useState<FormValues>({ name: '' });
@@ -312,6 +316,56 @@ export function App() {
 
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(reactiveValues, null, 2)}
+      </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Hidden &amp; Removed</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>hidden</code> visually removes a field but keeps its value in the store (like{' '}
+        <code>v-show</code>). <code>removed</code> removes the field <em>and</em> deletes its value
+        from the store (like <code>v-if</code>). Both props accept a static boolean or a reactive
+        function. Validators on hidden/removed fields are automatically skipped.
+      </p>
+
+      <Enforma.Form
+        values={visibilityValues}
+        onChange={setVisibilityValues}
+        aria-label="hidden and removed demo form"
+      >
+        {/* hidden — value preserved */}
+        <Enforma.Checkbox
+          bind="showSpouse"
+          label="Include spouse details (hidden when unchecked — value stays)"
+        />
+        <Enforma.TextInput
+          bind="spouseName"
+          label="Spouse name"
+          placeholder="Spouse name"
+          hidden={({ showSpouse }) => !showSpouse}
+        />
+        <Enforma.TextInput
+          bind="spouseEmail"
+          label="Spouse email"
+          placeholder="spouse@example.com"
+          hidden={({ showSpouse }) => !showSpouse}
+        />
+
+        <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid #ddd' }} />
+
+        {/* removed — value deleted */}
+        <Enforma.Checkbox
+          bind="showBilling"
+          label="Add separate billing address (removed when unchecked — value deleted)"
+        />
+        <Enforma.Fieldset bind="billing" removed={({ showBilling }) => !showBilling}>
+          <Enforma.TextInput bind="street" label="Billing street" placeholder="123 Main St" />
+          <Enforma.TextInput bind="city" label="Billing city" placeholder="City" />
+        </Enforma.Fieldset>
+      </Enforma.Form>
+
+      <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+        {JSON.stringify(visibilityValues, null, 2)}
       </pre>
 
       <hr style={{ margin: '2rem 0' }} />
