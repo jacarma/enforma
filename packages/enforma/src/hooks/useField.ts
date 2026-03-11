@@ -96,12 +96,13 @@ export function useFieldProps<R extends { value: unknown; setValue: (v: never) =
   // `bind` goes to useFormValue and useFieldValidation.
   // Everything else is a potentially-reactive prop that the loop will resolve.
   // `id` is excluded from the loop below — it's CommonProps-only and not in ResolvedCommonProps.
-  const { bind, validate, messages, ...reactiveProps } = props;
+  const { bind, validate, messages, hidden, removed, ...reactiveProps } = props;
 
   const { store, prefix } = useScope();
 
   type ValueType = NonNullable<R['value']>;
   const [value, setValue] = useFormValue<ValueType>(bind);
+  const { isHidden, isRemoved } = useVisibility(bind, hidden, removed);
 
   // Always-current ref — the subscribe/snapshot closures read this
   // instead of closing over `reactiveProps` directly, avoiding stale values.
@@ -152,7 +153,16 @@ export function useFieldProps<R extends { value: unknown; setValue: (v: never) =
     value,
     setValue,
     ...resolvedExtras,
-    ...useFieldValidation(bind, validate, messages, undefined, options?.typeValidator),
+    ...useFieldValidation(
+      bind,
+      validate,
+      messages,
+      undefined,
+      options?.typeValidator,
+      isHidden || isRemoved,
+    ),
+    hidden: isHidden,
+    removed: isRemoved,
   } as unknown as R;
 }
 

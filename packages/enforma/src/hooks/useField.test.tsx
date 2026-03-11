@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, renderHook, act } from '@testing-library/react';
+import { render, renderHook, screen, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { Form } from '../components/Form';
+import { TextInput } from '../components/fields';
 import { useFieldProps, useVisibility } from './useField';
 import type { FieldResolved, ToComponentProps } from '../components/types';
 import { FormContext } from '../context/FormContext';
@@ -136,5 +138,32 @@ describe('useVisibility', () => {
       renderHook(() => useVisibility(undefined, undefined, true), { wrapper: makeWrapper(store) });
     }).not.toThrow();
     expect(store.getField('name')).toBe('Alice');
+  });
+});
+
+describe('useFieldValidation skip (via useFieldProps)', () => {
+  it('does not register validator when field is hidden', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{ name: '' }} onChange={vi.fn()} onSubmit={onSubmit} showErrors>
+        <TextInput bind="name" label="Name" hidden validate={() => 'always-error'} />
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).toHaveBeenCalled();
+  });
+
+  it('does not register validator when field is removed', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form values={{ name: '' }} onChange={vi.fn()} onSubmit={onSubmit} showErrors>
+        <TextInput bind="name" label="Name" removed validate={() => 'always-error'} />
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await act(() => Promise.resolve());
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).toHaveBeenCalled();
   });
 });
