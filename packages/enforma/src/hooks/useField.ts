@@ -41,6 +41,52 @@ export function useReactiveProp<T>(prop: Reactive<T> | undefined): T | undefined
   );
 }
 
+export function useVisibility(
+  bind: string | undefined,
+  hidden: Reactive<boolean> | undefined,
+  removed: Reactive<boolean> | undefined,
+): { isHidden: boolean; isRemoved: boolean } {
+  const { store, prefix } = useScope();
+  const fullPath = bind !== undefined ? joinPath(prefix, bind) : undefined;
+
+  const isRemoved = useReactiveProp(removed) ?? false;
+  const isHiddenRaw = useReactiveProp(hidden) ?? false;
+  // removed takes precedence: if removed, isHidden is false (removed handles cleanup)
+  const isHidden = isHiddenRaw && !isRemoved;
+
+  // Keep a ref to the latest removed prop so the cleanup effect can re-evaluate it
+  // from the current store snapshot without a stale closure.
+  const removedRef = useRef(removed);
+  removedRef.current = removed;
+
+  // Active deletion: when removed transitions to true, delete the value.
+  useEffect(() => {
+    if (isRemoved && fullPath !== undefined) {
+      store.deleteField(fullPath);
+    }
+  }, [isRemoved, fullPath, store]);
+
+  // Unmount cleanup: re-evaluate removed from the current store snapshot.
+  // Handles the race condition where a parent component returns null before
+  // this child can re-render with its own removed=true.
+  useEffect(() => {
+    return () => {
+      if (fullPath === undefined) return;
+      const removedProp = removedRef.current;
+      if (removedProp === undefined) return;
+      const allValues = store.getSnapshot();
+      const raw = store.getField(prefix);
+      const scopeValues: FormValues =
+        prefix === '' || raw === null || typeof raw !== 'object' ? allValues : (raw as FormValues);
+      const currentRemoved =
+        typeof removedProp === 'function' ? removedProp(scopeValues, allValues) : removedProp;
+      if (currentRemoved) store.deleteField(fullPath);
+    };
+  }, [store, fullPath, prefix]);
+
+  return { isHidden, isRemoved };
+}
+
 export function useFieldProps<R extends { value: unknown; setValue: (v: never) => void }>(
   props: ToComponentProps<R>,
   options?: { typeValidator?: (value: unknown) => string | null },
