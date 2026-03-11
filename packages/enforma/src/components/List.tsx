@@ -4,12 +4,13 @@ import React from 'react';
 import { Form } from './Form';
 import type { FormValues } from '../store/FormStore';
 import { useListState } from '../hooks/useListState';
+import { useVisibility } from '../hooks/useField';
 import { ListItemSlot, type ListItemSlotProps } from './ListItemSlot';
 import { ListFormSlot, type ListFormSlotProps, type ListFormSlotMode } from './ListFormSlot';
 import { getComponent } from './registry';
 import { useScope, joinPath } from '../context/ScopeContext';
 import { useFormSettings } from '../context/FormSettingsContext';
-import type { ResolvedListItemProps } from './types';
+import type { ResolvedListItemProps, Reactive } from './types';
 
 type ListProps = {
   bind: string;
@@ -19,6 +20,8 @@ type ListProps = {
   required?: boolean;
   minItems?: number;
   maxItems?: number;
+  hidden?: Reactive<boolean>;
+  removed?: Reactive<boolean>;
 };
 
 type ModalState = { open: false } | { open: true; index: number; mode: ListFormSlotMode };
@@ -47,7 +50,10 @@ function ListMain({
   required,
   minItems,
   maxItems,
+  hidden,
+  removed,
 }: ListProps) {
+  const { isHidden, isRemoved } = useVisibility(bind, hidden, removed);
   const { arr, keys, append, remove, update } = useListState(bind, defaultItem);
   const [modal, setModal] = useState<ModalState>({ open: false });
   const [draftValues, setDraftValues] = useState<FormValues>({});
@@ -219,6 +225,8 @@ function ListMain({
       )}
     </FormModalImpl>
   ) : null;
+
+  if (isHidden || isRemoved) return null;
 
   // Dispatch to registered List
   const ListImpl = getComponent('List');
