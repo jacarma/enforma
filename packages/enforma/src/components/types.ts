@@ -30,6 +30,8 @@ export type CommonProps = {
   validate?: (value: unknown, scopeValues: FormValues, allValues: FormValues) => string | null;
   messages?: Partial<Record<string, string>>;
   required?: Reactive<boolean>;
+  hidden?: Reactive<boolean>;
+  removed?: Reactive<boolean>;
 };
 
 export type TextInputProps = CommonProps & {
@@ -150,6 +152,8 @@ export type FieldsetProps = {
   bind?: string;
   children: ReactNode;
   title?: string;
+  hidden?: Reactive<boolean>;
+  removed?: Reactive<boolean>;
 };
 
 export type FormWrapProps = {
@@ -202,6 +206,8 @@ export type ResolvedCommonProps = {
   showError: boolean;
   onBlur: () => void;
   required: boolean | undefined;
+  hidden: boolean;
+  removed: boolean;
 };
 
 export type ResolvedTextInputProps = Omit<ResolvedCommonProps, 'value' | 'setValue'> & {
@@ -325,11 +331,15 @@ export type CalculatedProps<T = unknown> = {
   label?: Reactive<string>;
   description?: Reactive<string>;
   disabled?: Reactive<boolean>;
+  hidden?: Reactive<boolean>;
+  removed?: Reactive<boolean>;
 };
 
 export type OutputProps = {
   value: Reactive<unknown>;
   as?: string;
+  hidden?: Reactive<boolean>;
+  removed?: Reactive<boolean>;
 };
 
 export type ResolvedCalculatedProps = {
