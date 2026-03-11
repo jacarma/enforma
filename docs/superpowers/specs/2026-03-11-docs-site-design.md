@@ -236,6 +236,20 @@ jobs:
 
 ---
 
+## Colors & Branding
+
+Logo files: `docs/enforma-logo.svg` and `docs/enforma-logo.png` → copied to `apps/docs/public/`.
+
+**Brand palette derived from the logo:**
+- Gradient: `hsl(340, 96%, 57%)` (hot pink) → `hsl(306, 100%, 34%)` (deep magenta-purple)
+- Accent: `#890079` (deep magenta — the "forma" text color in the logo)
+
+**Starlight theming**: Set `--sl-color-accent` to `#890079` in a custom CSS file. Starlight derives light/dark variants automatically from the accent.
+
+**Homepage**: Use the full gradient freely on the hero and CTA buttons since `index.astro` is fully custom.
+
+---
+
 ## Out of Scope (for now)
 
 - Auto-generated prop tables from TypeScript types (tracked in todo.md)
