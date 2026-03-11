@@ -38,7 +38,7 @@ import type {
   ResolvedTimePickerProps,
   FieldResolved,
 } from './types';
-import { useFieldProps, useReactiveProp } from '../hooks/useField';
+import { useFieldProps, useReactiveProp, useVisibility } from '../hooks/useField';
 import { useScope, joinPath } from '../context/ScopeContext';
 import { useFormSettings } from '../context/FormSettingsContext';
 import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
@@ -101,24 +101,23 @@ function TextInputDispatch(props: TextInputProps) {
         },
       }
     : props;
-  return dispatchComponent(
-    'TextInput',
-    useFieldProps<ResolvedTextInputProps>(
-      mergedProps,
-      hasConstraints
-        ? {
-            typeValidator: (v): string | null => {
-              if (required && (v === undefined || v === null || v === '')) return 'required';
-              if (typeof v === 'string') {
-                if (minLength !== undefined && v.length < minLength) return 'tooShort';
-                if (maxLength !== undefined && v.length > maxLength) return 'tooLong';
-              }
-              return null;
-            },
-          }
-        : undefined,
-    ),
+  const resolved = useFieldProps<ResolvedTextInputProps>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null || v === '')) return 'required';
+            if (typeof v === 'string') {
+              if (minLength !== undefined && v.length < minLength) return 'tooShort';
+              if (maxLength !== undefined && v.length > maxLength) return 'tooLong';
+            }
+            return null;
+          },
+        }
+      : undefined,
   );
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('TextInput', resolved);
 }
 
 function TextareaDispatch(props: TextareaProps) {
@@ -131,20 +130,19 @@ function TextareaDispatch(props: TextareaProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'Textarea',
-    useFieldProps<ResolvedTextareaProps>(
-      mergedProps,
-      hasConstraints
-        ? {
-            typeValidator: (v): string | null => {
-              if (required && (v === undefined || v === null || v === '')) return 'required';
-              return null;
-            },
-          }
-        : undefined,
-    ),
+  const resolved = useFieldProps<ResolvedTextareaProps>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && (v === undefined || v === null || v === '')) return 'required';
+            return null;
+          },
+        }
+      : undefined,
   );
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('Textarea', resolved);
 }
 
 function CheckboxDispatch(props: CheckboxProps) {
@@ -157,20 +155,19 @@ function CheckboxDispatch(props: CheckboxProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'Checkbox',
-    useFieldProps<ResolvedCheckboxProps>(
-      mergedProps,
-      hasConstraints
-        ? {
-            typeValidator: (v): string | null => {
-              if (required && v !== true) return 'required';
-              return null;
-            },
-          }
-        : undefined,
-    ),
+  const resolved = useFieldProps<ResolvedCheckboxProps>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && v !== true) return 'required';
+            return null;
+          },
+        }
+      : undefined,
   );
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('Checkbox', resolved);
 }
 
 function SwitchDispatch(props: SwitchProps) {
@@ -183,20 +180,19 @@ function SwitchDispatch(props: SwitchProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'Switch',
-    useFieldProps<ResolvedSwitchProps>(
-      mergedProps,
-      hasConstraints
-        ? {
-            typeValidator: (v): string | null => {
-              if (required && v !== true) return 'required';
-              return null;
-            },
-          }
-        : undefined,
-    ),
+  const resolved = useFieldProps<ResolvedSwitchProps>(
+    mergedProps,
+    hasConstraints
+      ? {
+          typeValidator: (v): string | null => {
+            if (required && v !== true) return 'required';
+            return null;
+          },
+        }
+      : undefined,
   );
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('Switch', resolved);
 }
 
 function NumberInputDispatch(props: NumberInputProps) {
@@ -209,16 +205,15 @@ function NumberInputDispatch(props: NumberInputProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'NumberInput',
-    useFieldProps<ResolvedNumberInputProps>(mergedProps, {
-      typeValidator: (v): string | null => {
-        if (v === undefined) return required ? 'required' : null;
-        if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
-        return null;
-      },
-    }),
-  );
+  const resolved = useFieldProps<ResolvedNumberInputProps>(mergedProps, {
+    typeValidator: (v): string | null => {
+      if (v === undefined) return required ? 'required' : null;
+      if (typeof v !== 'number' || isNaN(v)) return 'invalidNumber';
+      return null;
+    },
+  });
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('NumberInput', resolved);
 }
 
 function DatePickerDispatch(props: DatePickerProps) {
@@ -231,16 +226,15 @@ function DatePickerDispatch(props: DatePickerProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'DatePicker',
-    useFieldProps<ResolvedDatePickerProps>(mergedProps, {
-      typeValidator: (v): string | null => {
-        if (v === undefined) return required ? 'required' : null;
-        if (v instanceof Date) return null;
-        return 'invalidDate';
-      },
-    }),
-  );
+  const resolved = useFieldProps<ResolvedDatePickerProps>(mergedProps, {
+    typeValidator: (v): string | null => {
+      if (v === undefined) return required ? 'required' : null;
+      if (v instanceof Date) return null;
+      return 'invalidDate';
+    },
+  });
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('DatePicker', resolved);
 }
 
 function TimePickerDispatch(props: TimePickerProps) {
@@ -253,16 +247,15 @@ function TimePickerDispatch(props: TimePickerProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'TimePicker',
-    useFieldProps<ResolvedTimePickerProps>(mergedProps, {
-      typeValidator: (v): string | null => {
-        if (v === undefined) return required ? 'required' : null;
-        if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
-        return 'invalidTime';
-      },
-    }),
-  );
+  const resolved = useFieldProps<ResolvedTimePickerProps>(mergedProps, {
+    typeValidator: (v): string | null => {
+      if (v === undefined) return required ? 'required' : null;
+      if (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v)) return null;
+      return 'invalidTime';
+    },
+  });
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('TimePicker', resolved);
 }
 
 function DateTimePickerDispatch(props: DateTimePickerProps) {
@@ -275,19 +268,20 @@ function DateTimePickerDispatch(props: DateTimePickerProps) {
         messages: { required: 'This field is required', ...formMessages, ...props.messages },
       }
     : props;
-  return dispatchComponent(
-    'DateTimePicker',
-    useFieldProps<ResolvedDateTimePickerProps>(mergedProps, {
-      typeValidator: (v): string | null => {
-        if (v === undefined) return required ? 'required' : null;
-        if (v instanceof Date) return null;
-        return 'invalidDateTime';
-      },
-    }),
-  );
+  const resolved = useFieldProps<ResolvedDateTimePickerProps>(mergedProps, {
+    typeValidator: (v): string | null => {
+      if (v === undefined) return required ? 'required' : null;
+      if (v instanceof Date) return null;
+      return 'invalidDateTime';
+    },
+  });
+  if (resolved.hidden || resolved.removed) return null;
+  return dispatchComponent('DateTimePicker', resolved);
 }
 
-function FieldsetDispatch({ bind, children, title }: FieldsetProps) {
+function FieldsetDispatch({ bind, children, title, hidden, removed }: FieldsetProps) {
+  const { isHidden, isRemoved } = useVisibility(bind, hidden, removed);
+  if (isHidden || isRemoved) return null;
   const content = bind !== undefined ? <Scope bind={bind}>{children}</Scope> : children;
   return dispatchComponent('Fieldset', {
     children: content,
@@ -415,6 +409,7 @@ function SelectDispatch(props: SelectProps) {
     }
   };
 
+  if (resolved.hidden || resolved.removed) return null;
   const SelectOptionImpl = getComponent('SelectOption');
   if (!SelectOptionImpl) {
     throw new Error('Enforma: component "SelectOption" is not registered.');
@@ -507,6 +502,8 @@ function RadioGroupDispatch(props: RadioGroupProps) {
     }
   };
 
+  const row = useReactiveProp(props.row) ?? false;
+  if (resolved.hidden || resolved.removed) return null;
   const RadioGroupOptionImpl = getComponent('RadioGroupOption');
   if (!RadioGroupOptionImpl) {
     throw new Error('Enforma: component "RadioGroupOption" is not registered.');
@@ -514,7 +511,6 @@ function RadioGroupDispatch(props: RadioGroupProps) {
   const renderedOptions = options.map((opt) => (
     <RadioGroupOptionImpl key={String(opt.value)} value={opt.value} label={opt.label} />
   ));
-  const row = useReactiveProp(props.row) ?? false;
   const adapterValue = isOtherSelected ? OPEN_CHOICE_SENTINEL : storeValue;
 
   return dispatchComponent('RadioGroup', {
@@ -615,6 +611,7 @@ function AutocompleteDispatch(props: AutocompleteProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentValue, valueInOptions, isLoading]);
 
+  if (resolved.hidden || resolved.removed) return null;
   const AutocompleteOptionImpl = getComponent('AutocompleteOption');
   if (!AutocompleteOptionImpl) {
     throw new Error('Enforma: component "AutocompleteOption" is not registered.');
@@ -704,6 +701,7 @@ function ExclusiveToggleDispatch(props: ExclusiveToggleProps) {
     }
   };
 
+  if (resolved.hidden || resolved.removed) return null;
   const ExclusiveToggleOptionImpl = getComponent('ExclusiveToggleOption');
   if (!ExclusiveToggleOptionImpl) {
     throw new Error('Enforma: component "ExclusiveToggleOption" is not registered.');
@@ -733,19 +731,23 @@ function CalculatedDispatch<T = unknown>({
   label,
   description,
   disabled,
+  hidden,
+  removed,
 }: CalculatedProps<T>) {
   const resolvedValue = useReactiveProp(value);
   const resolvedLabel = useReactiveProp(label);
   const resolvedDescription = useReactiveProp(description);
   const resolvedDisabled = useReactiveProp(disabled);
+  const { isHidden, isRemoved } = useVisibility(bind, hidden, removed);
   const { store, prefix } = useScope();
 
   useEffect(() => {
-    if (bind == null) return;
+    if (bind == null || isRemoved) return;
     const fullPath = joinPath(prefix, bind);
     store.setField(fullPath, resolvedValue);
-  }, [resolvedValue, bind, store, prefix]);
+  }, [resolvedValue, bind, store, prefix, isRemoved]);
 
+  if (isHidden || isRemoved) return null;
   return dispatchComponent('Calculated', {
     value: resolvedValue,
     label: resolvedLabel,
@@ -756,8 +758,10 @@ function CalculatedDispatch<T = unknown>({
 
 export const Calculated = memo(CalculatedDispatch, stablePropsEqual) as typeof CalculatedDispatch;
 
-function OutputDispatch({ value, as = 'span' }: OutputProps) {
+function OutputDispatch({ value, as = 'span', hidden, removed }: OutputProps) {
   const resolvedValue = useReactiveProp(value);
+  const { isHidden, isRemoved } = useVisibility(undefined, hidden, removed);
+  if (isHidden || isRemoved) return null;
   return dispatchComponent('Output', { value: resolvedValue, as } as ResolvedOutputProps);
 }
 
