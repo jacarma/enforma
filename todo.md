@@ -82,6 +82,12 @@ Built-in validators
 
 ---
 
+## Docs site
+
+- [ ] **Auto-generated prop tables**: Investigate replacing hand-written MDX prop tables with auto-generation from TypeScript types (e.g. via `typedoc` or `ts-morph`). Requires adding JSDoc comments to exported types first.
+
+---
+
 ## Notes / investigations
 
 - [ ] **messages prop**: `messages` is defined on all field components but currently unused. Implement support to allow overriding built-in UI strings (e.g., the "Other" label added by `openChoice`, future validation messages). Design before implementing.
@@ -95,3 +101,5 @@ Built-in validators
 - [ ] **List title**: List component should allow users to add a title or label
 
 - [x] **Calculated expression**: docs/PHQ-9 vs Enforma — Gap Analysis.md
+
+- [ ] **List form enter**: when I click in add a new item and I press enter in the modal the parent form tries to submit
