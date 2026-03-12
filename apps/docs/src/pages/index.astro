@@ -1,0 +1,228 @@
+---
+// apps/docs/src/pages/index.astro
+import { HeroDemo } from '../components/HeroDemo';
+import { Code } from '@astrojs/starlight/components';
+
+// This string is intentionally hardcoded and kept in sync with HeroDemo.tsx manually.
+// The demo is small and stable — update this if HeroDemo changes.
+const heroCode = `
+<Enforma.Form values={values} onChange={setValues}>
+  <Enforma.TextInput
+    bind="name"
+    label="Name"
+    placeholder="Your name"
+  />
+  <Enforma.TextInput
+    bind="email"
+    label="Email"
+    placeholder="your@email.com"
+    disabled={({ name }) => !name}
+  />
+  <button type="submit">Submit</button>
+</Enforma.Form>
+`.trim();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enforma — Healthy forms for React</title>
+    <link rel="icon" type="image/svg+xml" href="/enforma/enforma-logo.svg" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f9f9fb;
+        color: #111;
+      }
+
+      /* ── Header ── */
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        background: #fff;
+        border-bottom: 1px solid #e8e8e8;
+      }
+      .site-header img { height: 2rem; }
+      .site-header nav a {
+        margin-left: 1.5rem;
+        text-decoration: none;
+        color: #555;
+        font-size: 0.9rem;
+      }
+      .site-header nav a:hover { color: #890079; }
+
+      /* ── Hero ── */
+      .hero {
+        max-width: 1100px;
+        margin: 4rem auto;
+        padding: 0 2rem;
+      }
+      .hero-headline {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+      .hero-headline h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        background: linear-gradient(135deg, hsl(340,96%,57%), hsl(306,100%,34%));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-headline p {
+        font-size: 1.15rem;
+        color: #555;
+        margin: 0;
+      }
+
+      .hero-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      }
+      @media (max-width: 700px) {
+        .hero-card { grid-template-columns: 1fr; }
+      }
+      .hero-left {
+        background: #fff;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .hero-right {
+        background: #1a1a2e;
+        padding: 2.5rem;
+        overflow: auto;
+      }
+      .hero-right pre { margin: 0; font-size: 0.85rem; line-height: 1.6; }
+
+      .hero-ctas {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.65rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: opacity 0.15s;
+      }
+      .btn:hover { opacity: 0.85; }
+      .btn-primary {
+        background: linear-gradient(135deg, hsl(340,96%,57%), hsl(306,100%,34%));
+        color: #fff;
+      }
+      .btn-outline {
+        border: 2px solid #890079;
+        color: #890079;
+      }
+
+      /* ── Features ── */
+      .features {
+        max-width: 1100px;
+        margin: 4rem auto;
+        padding: 0 2rem;
+      }
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+      .feature-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      }
+      .feature-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+      .feature-card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+      .feature-card p { margin: 0; color: #666; font-size: 0.9rem; line-height: 1.5; }
+
+      /* ── Footer ── */
+      footer {
+        text-align: center;
+        padding: 2rem;
+        color: #888;
+        font-size: 0.85rem;
+        border-top: 1px solid #e8e8e8;
+        margin-top: 4rem;
+      }
+      footer a { color: #890079; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <img src="/enforma/enforma-logo.svg" alt="Enforma" />
+      <nav>
+        <a href="/enforma/docs/installation">Docs</a>
+        <a href="https://github.com/jacarma/enforma" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-headline">
+        <h1>Healthy forms for React</h1>
+        <p>Write only your business logic — Enforma handles the rest.</p>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-left">
+          <!-- client:only skips SSR to avoid useSyncExternalStore server snapshot error -->
+          <HeroDemo client:only="react" />
+        </div>
+        <div class="hero-right">
+          <Code code={heroCode} lang="tsx" theme="github-dark" />
+        </div>
+      </div>
+
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="/enforma/docs/installation">Get started</a>
+        <a class="btn btn-outline" href="https://github.com/jacarma/enforma" target="_blank" rel="noreferrer">View on GitHub</a>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">✍️</div>
+          <h3>Only write what's yours</h3>
+          <p>No state management, no touched/error tracking, no blur handlers. Declare your fields and logic — Enforma handles the plumbing.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>UI library agnostic</h3>
+          <p>Swap MUI for shadcn or build your own components — your form logic is untouched.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Reactive attributes</h3>
+          <p><code>disabled</code>, <code>label</code>, <code>placeholder</code> accept functions that respond to live form state.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>High performance</h3>
+          <p>Each field re-renders only when its own value changes, powered by <code>useSyncExternalStore</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>MIT License · <a href="https://github.com/jacarma/enforma" target="_blank" rel="noreferrer">GitHub</a></p>
+    </footer>
+  </body>
+</html>
