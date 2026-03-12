@@ -1,6 +1,73 @@
 ---
 title: Date & Time
-description: Calendar and clock pickers for date, time, and combined values.
+description: Calendar and clock pickers for date, time, and combined date-time values.
 ---
 
-Coming soon.
+## Overview
+
+Three components cover date and time input:
+
+- **`DatePicker`** — stores a `Date` when valid, a partial string during entry
+- **`TimePicker`** — stores a `"HH:mm"` string
+- **`DateTimePicker`** — combined picker, stores a `Date`
+
+All three require `@mui/x-date-pickers` and a date adapter registered at startup:
+
+```tsx
+registerComponents(muiComponents, { variant: 'outlined', dateAdapter: 'dayjs' });
+```
+
+Supported adapters: `'dayjs'`, `'date-fns'`, `'luxon'`, `'moment'`.
+
+## Usage
+
+```tsx
+<Enforma.DatePicker bind="birthday" label="Birthday" />
+<Enforma.TimePicker bind="meetingTime" label="Meeting time" ampm={false} />
+<Enforma.DateTimePicker bind="deadline" label="Deadline" />
+```
+
+{/* StackBlitz: TODO */}
+
+## DatePicker props
+
+See [CommonProps](/enforma/docs/reference/common-props) for shared props.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `minDate` | `Reactive<Date>` | `undefined` | Earliest selectable date. |
+| `maxDate` | `Reactive<Date>` | `undefined` | Latest selectable date. |
+| `disableFuture` | `Reactive<boolean>` | `false` | Disables all dates after today. |
+| `disablePast` | `Reactive<boolean>` | `false` | Disables all dates before today. |
+
+## TimePicker props
+
+See [CommonProps](/enforma/docs/reference/common-props) for shared props.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `minTime` | `Reactive<Date>` | `undefined` | Earliest selectable time. |
+| `maxTime` | `Reactive<Date>` | `undefined` | Latest selectable time. |
+| `ampm` | `Reactive<boolean>` | locale default | When `false`, forces 24-hour clock. |
+
+## DateTimePicker props
+
+Combines all `DatePicker` props plus `ampm` from `TimePicker`.
+
+## Examples
+
+### Past-only date picker
+
+```tsx
+<Enforma.DatePicker bind="birthday" label="Birthday" disableFuture />
+```
+
+{/* StackBlitz: TODO */}
+
+### 24-hour time picker
+
+```tsx
+<Enforma.TimePicker bind="startTime" label="Start time" ampm={false} />
+```
+
+{/* StackBlitz: TODO */}

@@ -1,6 +1,59 @@
 ---
 title: Autocomplete
-description: Searchable combobox with type-ahead filtering.
+description: Searchable combobox with type-ahead filtering, inline options, or server-side search.
 ---
 
-Coming soon.
+## Overview
+
+`Autocomplete` is a combobox that filters options as the user types. Options can be inline (client-side filtered by the UI library) or loaded from an async data source (server-side search). Supports pre-loading a value by key (via the `resolve` function on the data source).
+
+## Usage
+
+```tsx
+<Enforma.Autocomplete bind="country" label="Country">
+  <Enforma.Autocomplete.Option value="us" label="United States" />
+  <Enforma.Autocomplete.Option value="gb" label="United Kingdom" />
+</Enforma.Autocomplete>
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | `Autocomplete.Option` elements. |
+| `dataSource` | `string \| TItem[] \| ((scopeValues, allValues) => TItem[]) \| { source: string \| TItem[]; filters: (scopeValues, allValues) => Record<string, string \| number \| boolean \| null \| Date \| FilterPredicate> }` | `undefined` | Options source: a registered data source name, an inline array, a reactive function, or a filtered object. |
+| `minSearchLength` | `Reactive<number>` | `0` | Minimum number of characters before triggering a search query (useful for async sources). |
+
+### Autocomplete.Option props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `value` | `unknown \| string` | The stored value, or a datasource key in template mode. |
+| `label` | `string` | The display label, or a datasource key in template mode. |
+
+## Examples
+
+### With async data source and pre-loaded value
+
+```tsx
+// dataSources={{ books: { query: async ({ search }) => [...], resolve: async (id) => {...} } }}
+
+<Enforma.Autocomplete
+  bind="book"
+  label="Book"
+  dataSource={{ source: 'books', filters: (scope) => ({ subject: scope.subject as string }) }}
+  minSearchLength={3}
+>
+  <Enforma.Autocomplete.Option label="label" value="key" />
+</Enforma.Autocomplete>
+```
+
+{/* StackBlitz: TODO */}
+
+## Notes
+
+When using an async `dataSource`, define a `resolve` function to support pre-selected values — Enforma calls it on mount to retrieve the display label for an already-stored key.

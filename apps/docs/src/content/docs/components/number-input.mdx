@@ -1,6 +1,47 @@
 ---
 title: NumberInput
-description: Numeric field with locale-aware formatting.
+description: Numeric field with locale-aware formatting, min/max bounds, and decimal scale control.
 ---
 
-Coming soon.
+## Overview
+
+`NumberInput` stores a `number | undefined` and formats the display value using IMask's Number mask. Separators default to the browser locale via `Intl.NumberFormat`. It has no spinner arrows — use a plain number input, not a stepper.
+
+## Usage
+
+```tsx
+<Enforma.NumberInput bind="price" label="Price" />
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `decimalScale` | `Reactive<number>` | locale default | Number of decimal places to allow. Pass `0` for integers. |
+| `decimalSeparator` | `Reactive<'intl' \| string>` | `'intl'` | Decimal separator character. `'intl'` uses browser locale. |
+| `thousandSeparator` | `Reactive<false \| 'intl' \| string>` | `'intl'` | Thousand separator. Pass `false` to disable. |
+| `allowNegative` | `Reactive<boolean>` | `true` | When `false`, negative values are rejected. |
+| `min` | `Reactive<number>` | `undefined` | Minimum allowed value (validation). |
+| `max` | `Reactive<number>` | `undefined` | Maximum allowed value (validation). |
+
+## Examples
+
+### Integer with no separator
+
+```tsx
+<Enforma.NumberInput bind="quantity" label="Quantity" decimalScale={0} thousandSeparator={false} allowNegative={false} />
+```
+
+{/* StackBlitz: TODO */}
+
+### Percentage with bounds
+
+```tsx
+<Enforma.NumberInput bind="rate" label="Rate (0–100%)" decimalScale={2} min={0} max={100} allowNegative={false} />
+```
+
+{/* StackBlitz: TODO */}

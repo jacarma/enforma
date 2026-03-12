@@ -1,6 +1,62 @@
 ---
 title: RadioGroup
-description: Radio button group for single selection.
+description: Radio button group for single selection from a list of options.
 ---
 
-Coming soon.
+## Overview
+
+`RadioGroup` renders a group of radio buttons for selecting one value. Options can be declared inline or loaded from a data source. Supports horizontal layout and the `openChoice` "Other" option.
+
+## Usage
+
+```tsx
+<Enforma.RadioGroup bind="size" label="Size">
+  <Enforma.RadioGroup.Option value="s" label="Small" />
+  <Enforma.RadioGroup.Option value="m" label="Medium" />
+  <Enforma.RadioGroup.Option value="l" label="Large" />
+</Enforma.RadioGroup>
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | `RadioGroup.Option` elements. |
+| `dataSource` | `string \| TItem[] \| ((scopeValues, allValues) => TItem[]) \| { source: string \| TItem[]; filters: (scopeValues, allValues) => Record<string, string \| number \| boolean \| null \| Date \| FilterPredicate> }` | `undefined` | Options source: a registered data source name, an inline array, a reactive function, or a filtered object. |
+| `row` | `Reactive<boolean>` | `false` | When `true`, options are laid out horizontally instead of vertically. |
+| `openChoice` | `boolean` | `false` | Appends an "Other" option that reveals a text input. |
+
+### RadioGroup.Option props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `value` | `unknown \| string` | The stored value, or a datasource key in template mode. |
+| `label` | `string` | The display label, or a datasource key in template mode. |
+
+## Examples
+
+### Horizontal layout with data source
+
+```tsx
+<Enforma.RadioGroup bind="country" label="Country" dataSource="countries" row>
+  <Enforma.RadioGroup.Option label="name" value="code" />
+</Enforma.RadioGroup>
+```
+
+{/* StackBlitz: TODO */}
+
+### openChoice
+
+```tsx
+<Enforma.RadioGroup bind="size" label="Size" openChoice>
+  <Enforma.RadioGroup.Option value="s" label="Small" />
+  <Enforma.RadioGroup.Option value="m" label="Medium" />
+  <Enforma.RadioGroup.Option value="l" label="Large" />
+</Enforma.RadioGroup>
+```
+
+{/* StackBlitz: TODO */}

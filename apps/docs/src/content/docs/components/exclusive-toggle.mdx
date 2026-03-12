@@ -1,6 +1,55 @@
 ---
 title: ExclusiveToggle
-description: Segmented button group for single selection from a small set.
+description: Segmented button group for single selection from a small fixed set.
 ---
 
-Coming soon.
+## Overview
+
+`ExclusiveToggle` renders a row of toggle buttons where only one can be active at a time — similar to a segmented control. Best for 2–5 options. For larger sets, use `Select` or `RadioGroup`.
+
+## Usage
+
+```tsx
+<Enforma.ExclusiveToggle bind="size" label="Size">
+  <Enforma.ExclusiveToggle.Option value="s" label="S" />
+  <Enforma.ExclusiveToggle.Option value="m" label="M" />
+  <Enforma.ExclusiveToggle.Option value="l" label="L" />
+</Enforma.ExclusiveToggle>
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | `ExclusiveToggle.Option` elements. |
+| `dataSource` | `string \| TItem[] \| ((scopeValues, allValues) => TItem[]) \| { source: string \| TItem[]; filters: (scopeValues, allValues) => Record<string, string \| number \| boolean \| null \| Date \| FilterPredicate> }` | `undefined` | Options source: a registered data source name, an inline array, a reactive function, or a filtered object. |
+| `openChoice` | `boolean` | `false` | Appends an "Other" option that reveals a text input. |
+
+### ExclusiveToggle.Option props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `value` | `unknown \| string` | The stored value, or a datasource key in template mode. |
+| `label` | `string` | The display label, or a datasource key in template mode. |
+
+## Examples
+
+### openChoice with pre-loaded custom value
+
+If the form loads with a value not in the option list, "Other" is auto-selected and the text input shows the value:
+
+```tsx
+// values = { format: 'epub' }  — not in the options below
+
+<Enforma.ExclusiveToggle bind="format" label="Format" openChoice>
+  <Enforma.ExclusiveToggle.Option value="pdf" label="PDF" />
+  <Enforma.ExclusiveToggle.Option value="csv" label="CSV" />
+</Enforma.ExclusiveToggle>
+// Renders with "Other" selected and "epub" in the text input
+```
+
+{/* StackBlitz: TODO */}
