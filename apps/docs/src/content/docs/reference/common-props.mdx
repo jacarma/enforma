@@ -1,6 +1,78 @@
 ---
 title: CommonProps
-description: Props shared by all field components.
+description: Props shared by all field components in Enforma.
 ---
 
-Coming soon.
+All field components (`TextInput`, `Select`, `Checkbox`, etc.) accept these props in addition to their own component-specific props.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `bind` | `string` | — | **Required.** The key in the form state this field reads from and writes to. Supports dot notation for nested keys (e.g. `"address.city"`) when inside a `Fieldset`. |
+| `label` | `Reactive<string>` | `undefined` | Label text displayed above the field. Accepts a static string or a reactive function. |
+| `placeholder` | `Reactive<string>` | `undefined` | Hint text shown when the field is empty. |
+| `disabled` | `Reactive<boolean>` | `undefined` | When `true`, the field is non-interactive. Validators are still run. |
+| `hidden` | `Reactive<boolean>` | `undefined` | When `true`, the field is visually hidden but its value is preserved in the store. Validators are skipped. Equivalent to CSS `display: none`. |
+| `removed` | `Reactive<boolean>` | `undefined` | When `true`, the field is hidden **and** its value is deleted from the store. Validators are skipped. Equivalent to a conditional `v-if`. |
+| `required` | `Reactive<boolean>` | `undefined` | Adds a built-in validator that fails if the value is `null`, `undefined`, or empty string. |
+| `description` | `Reactive<string>` | `undefined` | Helper text displayed below the field. |
+| `validate` | `(value: unknown, scopeValues: FormValues, allValues: FormValues) => string \| null` | `undefined` | Custom validator. Return a non-empty string to show as an error, or `null` to pass. |
+| `id` | `string` | auto-generated | HTML `id` attribute for the field's input element. |
+| `messages` | `Partial<Record<string, string>>` | `undefined` | Overrides built-in UI strings (e.g. the "Other" label added by `openChoice`). Currently reserved for future use. |
+
+## Reactive props
+
+Any prop typed as `Reactive<T>` accepts either a plain value or a function:
+
+```tsx
+// Static
+<Enforma.TextInput bind="email" label="Email" disabled={false} />
+
+// Reactive — re-evaluates whenever form values change
+<Enforma.TextInput
+  bind="email"
+  label={({ name }) => `Email for ${String(name)}`}
+  disabled={({ name }) => !name}
+/>
+```
+
+The function receives `(scopeValues, allValues)`. `scopeValues` is the values of the nearest enclosing scope (e.g. inside a `Fieldset` or `List.Form`). `allValues` is the complete root form state.
+
+## Validation
+
+Errors are shown after the field is blurred. Submitting the form while invalid reveals all errors and prevents `onSubmit` from firing.
+
+```tsx
+<Enforma.TextInput
+  bind="email"
+  label="Email"
+  validate={(value) => {
+    if (!value) return 'Email is required';
+    if (!String(value).includes('@')) return 'Enter a valid email';
+    return null;
+  }}
+/>
+```
+
+Cross-field validation — access other field values via `scopeValues`:
+
+```tsx
+<Enforma.TextInput
+  bind="confirmPassword"
+  label="Confirm password"
+  validate={(value, { password }) =>
+    value !== password ? 'Passwords do not match' : null
+  }
+/>
+```
+
+## hidden vs removed
+
+| | Value in store | Validator runs |
+|--|--|--|
+| `hidden={true}` | Preserved | No |
+| `removed={true}` | Deleted | No |
+| neither | Preserved | Yes |
+
+Use `hidden` when you need the value to survive a conditional toggle (e.g. accordion). Use `removed` when the field and its value should not exist when invisible (e.g. a billing address that is only relevant when "different from shipping" is checked).

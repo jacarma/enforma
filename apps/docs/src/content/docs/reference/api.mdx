@@ -1,6 +1,91 @@
 ---
 title: API
-description: Public hooks exported from enforma.
+description: Public hooks exported from the enforma package.
 ---
 
-Coming soon.
+All hooks are exported from `enforma`:
+
+```tsx
+import { useFieldProps, useFormValue, useReactiveProp, useVisibility, useFieldValidation, useListState, useDataSource } from 'enforma';
+```
+
+## useFieldProps
+
+The primary hook for building custom field components. Resolves all reactive props and connects the component to the form store.
+
+```tsx
+import { useFieldProps, type TextInputProps, type FieldResolved } from 'enforma';
+
+function MyInput(props: TextInputProps) {
+  const { value, setValue, label, error, showError, disabled } =
+    useFieldProps<FieldResolved<string>>(props);
+  return (
+    <div>
+      {label && <label>{label}</label>}
+      <input
+        value={value ?? ''}
+        onChange={(e) => { setValue(e.target.value); }}
+        disabled={disabled ?? false}
+      />
+      {showError && error && <span>{error}</span>}
+    </div>
+  );
+}
+```
+
+**Returns:** `ResolvedCommonProps` plus the component-specific resolved fields. See [Custom components](/enforma/docs/guides/custom-components) for full usage.
+
+## useFormValue
+
+Reads a single field's current value from the nearest form store. Re-renders only when that value changes. Returns a `[value, setValue]` tuple.
+
+```tsx
+const [name, setName] = useFormValue<string>('name');
+```
+
+## useReactiveProp
+
+Resolves a `Reactive<T>` prop against current scope values.
+
+```tsx
+const isDisabled = useReactiveProp(props.disabled);
+```
+
+## useVisibility
+
+Resolves `hidden` and `removed` props and handles removing the field's value from the store when `removed` is true.
+
+```tsx
+const { isHidden, isRemoved } = useVisibility(props.bind, props.hidden, props.removed);
+if (isRemoved) return null;
+```
+
+## useFieldValidation
+
+Runs the field's validators and returns the current error state.
+
+```tsx
+const { error, showError, onBlur } = useFieldValidation(
+  props.bind,
+  props.validate,
+  props.messages,
+);
+```
+
+Spread `onBlur` onto the input so errors appear after the field loses focus. Pass optional `implicitValidator` for built-in constraints (e.g. `required`) and `typeValidator` for type-specific checks.
+
+## useListState
+
+Manages the state for a repeating list of items. Used internally by `List` and available for custom list implementations.
+
+```tsx
+const { items, addItem, updateItem, deleteItem } = useListState(bind, defaultItem);
+```
+
+## useDataSource
+
+Fetches options from a `DataSourceDefinition` (static or async) and returns loading/error state.
+
+```tsx
+const { options, isLoading, error } = useDataSource(props.dataSource, scopeValues);
+```
