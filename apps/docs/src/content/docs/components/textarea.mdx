@@ -1,6 +1,59 @@
 ---
 title: Textarea
-description: Multi-line text field.
+description: Multi-line text field for longer string values.
 ---
 
-Coming soon.
+## Overview
+
+`Textarea` works like `TextInput` but renders a multi-line input. It accepts all CommonProps and has no additional props.
+
+## Usage
+
+```tsx
+<Enforma.Textarea bind="bio" label="Bio" placeholder="Tell us about yourself..." />
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+`Textarea` has no component-specific props. See [CommonProps](/enforma/docs/reference/common-props) for all available props (`bind`, `label`, `placeholder`, `disabled`, `validate`, `required`, etc.).
+
+## Examples
+
+### With validation and reactive disabled
+
+```tsx
+<Enforma.Checkbox bind="hasComment" label="Add a comment" />
+<Enforma.Textarea
+  bind="comment"
+  label="Comment"
+  placeholder="Your comment..."
+  disabled={({ hasComment }) => !hasComment}
+  validate={(v, { hasComment }) => hasComment && !v ? 'Comment is required' : null}
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+### Conditionally visible with hidden
+
+```tsx
+<Enforma.Select bind="feedbackType" label="Feedback type">
+  <Enforma.Select.Option value="general" label="General" />
+  <Enforma.Select.Option value="bug" label="Bug report" />
+</Enforma.Select>
+<Enforma.Textarea
+  bind="bugDetails"
+  label="Bug details"
+  placeholder="Describe the bug..."
+  hidden={({ feedbackType }) => feedbackType !== 'bug'}
+  required={({ feedbackType }) => feedbackType === 'bug'}
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+## Notes
+
+Textarea renders a multi-line `<textarea>` element. Row count and resize behaviour are controlled by the registered UI component — pass adapter-specific props via `registerComponents` or a custom adapter if you need to configure them.

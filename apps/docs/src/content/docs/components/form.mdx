@@ -1,6 +1,91 @@
 ---
 title: Form
-description: The root component that owns form state.
+description: The root component that owns form state and provides context to all fields.
 ---
 
-Coming soon.
+## Overview
+
+`Form` is the root of every Enforma form. It owns the values object, wires up validation, provides the data source registry, and handles submit. Every field component must be a descendant of `Form`.
+
+## Usage
+
+```tsx
+import { useState } from 'react';
+import Enforma, { type FormValues } from 'enforma';
+
+function MyForm() {
+  const [values, setValues] = useState<FormValues>({});
+
+  return (
+    <Enforma.Form values={values} onChange={setValues}>
+      <Enforma.TextInput bind="name" label="Name" />
+      <button type="submit">Submit</button>
+    </Enforma.Form>
+  );
+}
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `values` | `FormValues` | — | **Required.** The current form state object. |
+| `onChange` | `(values: FormValues, meta: { valid: boolean }) => void` | — | **Required.** Called on every value change. |
+| `onSubmit` | `(values: FormValues) => void` | `undefined` | Called when the form is submitted and all validators pass. |
+| `dataSources` | `Record<string, DataSourceDefinition \| unknown[]>` | `undefined` | Data sources available to fields via their `dataSource` prop. |
+| `children` | `ReactNode` | — | **Required.** Field components and other React content. |
+| (HTML form attrs) | — | — | All standard HTML `<form>` attributes (e.g. `aria-label`, `noValidate`) are forwarded. |
+
+## Examples
+
+### With submit handler
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={setValues}
+  onSubmit={(values) => fetch('/api/submit', { method: 'POST', body: JSON.stringify(values) })}
+>
+  <Enforma.TextInput bind="name" label="Name" required />
+  <button type="submit">Submit</button>
+</Enforma.Form>
+```
+
+{/* StackBlitz: TODO */}
+
+### With data sources
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={setValues}
+  dataSources={{
+    countries: [
+      { code: 'us', name: 'United States' },
+      { code: 'gb', name: 'United Kingdom' },
+    ],
+  }}
+>
+  <Enforma.Select bind="country" label="Country" dataSource="countries">
+    <Enforma.Select.Option label="name" value="code" />
+  </Enforma.Select>
+</Enforma.Form>
+```
+
+{/* StackBlitz: TODO */}
+
+### Reading validity in onChange
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={(newValues, { valid }) => {
+    setValues(newValues);
+    setIsValid(valid);
+  }}
+>
+```
+
+{/* StackBlitz: TODO */}

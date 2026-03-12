@@ -3,4 +3,56 @@ title: Checkbox & Switch
 description: Boolean fields bound to a true/false value.
 ---
 
-Coming soon.
+## Overview
+
+`Checkbox` and `Switch` both bind a boolean value. They are visually different but functionally identical — use whichever fits your UI. Both accept a `labelPlacement` prop to control where the label appears relative to the control.
+
+## Usage
+
+```tsx
+<Enforma.Checkbox bind="agree" label="I agree to the terms" />
+<Enforma.Switch bind="darkMode" label="Dark mode" />
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `labelPlacement` | `Reactive<'end' \| 'start' \| 'top' \| 'bottom'>` | adapter-dependent | Position of the label relative to the control. MUI default is `'end'`. |
+
+Both `Checkbox` and `Switch` accept the same props.
+
+## Examples
+
+### Reactive disabled based on another checkbox
+
+```tsx
+<Enforma.Checkbox bind="agree" label="I agree to the terms" />
+<Enforma.Checkbox
+  bind="newsletter"
+  label="Subscribe to newsletter"
+  disabled={({ agree }) => !agree}
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+### Switch with label on the left
+
+```tsx
+<Enforma.Switch bind="notifications" label="Email notifications" labelPlacement="start" />
+```
+
+{/* StackBlitz: TODO */}
+
+### Required checkbox
+
+```tsx
+<Enforma.Checkbox bind="terms" label="I accept the terms and conditions" required />
+```
+
+{/* StackBlitz: TODO */}

@@ -1,6 +1,71 @@
 ---
 title: TextInput
-description: Single-line text field with optional mask support.
+description: Single-line text field with optional mask and length constraints.
 ---
 
-Coming soon.
+## Overview
+
+`TextInput` is the most common field. It binds a string value, supports input masking via IMask, and accepts all CommonProps for validation, reactive labels, and conditional visibility.
+
+## Usage
+
+```tsx
+<Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `placeholder`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `mask` | `Reactive<string \| RegExp>` | `undefined` | IMask pattern string (e.g. `"(000) 000-0000"`) or RegExp. Loads `react-imask` lazily. |
+| `minLength` | `Reactive<number>` | `undefined` | Fails validation if string length is less than N. |
+| `maxLength` | `Reactive<number>` | `undefined` | Fails validation if string length is more than N. |
+
+## Examples
+
+### With validation
+
+```tsx
+<Enforma.TextInput
+  bind="email"
+  label="Email"
+  placeholder="you@example.com"
+  validate={(v) => (!v ? 'Required' : !String(v).includes('@') ? 'Invalid email' : null)}
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+### Reactive label and disabled
+
+```tsx
+<Enforma.TextInput bind="name" label="Name" placeholder="Enter your name first" />
+<Enforma.TextInput
+  bind="email"
+  label={({ name }) => `Email for ${String(name) || 'you'}`}
+  disabled={({ name }) => !name}
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+### With mask
+
+```tsx
+<Enforma.TextInput bind="phone" label="Phone" mask="(000) 000-0000" placeholder="(555) 000-0000" />
+<Enforma.TextInput bind="dob" label="Date of birth" mask="00/00/0000" placeholder="MM/DD/YYYY" />
+```
+
+{/* StackBlitz: TODO */}
+
+### Length constraints
+
+```tsx
+<Enforma.TextInput bind="username" label="Username" required minLength={3} maxLength={20} />
+```
+
+{/* StackBlitz: TODO */}

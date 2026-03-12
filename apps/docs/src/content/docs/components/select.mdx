@@ -1,6 +1,80 @@
 ---
 title: Select
-description: Dropdown field for single selection.
+description: Dropdown field for single selection with inline options or a data source.
 ---
 
-Coming soon.
+## Overview
+
+`Select` renders a dropdown for picking one value from a list. Options can be declared inline as children or loaded from a named data source defined on the parent `Form`.
+
+## Usage
+
+```tsx
+<Enforma.Select bind="country" label="Country">
+  <Enforma.Select.Option value="us" label="United States" />
+  <Enforma.Select.Option value="gb" label="United Kingdom" />
+</Enforma.Select>
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `disabled`, `hidden`, `removed`, `validate`, `required`, `description`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | `Select.Option` elements defining the available options. |
+| `dataSource` | `string \| TItem[] \| ((scopeValues, allValues) => TItem[]) \| { source: string \| TItem[]; filters: (scopeValues, allValues) => Record<string, string \| number \| boolean \| null \| Date \| FilterPredicate> }` | `undefined` | Options source: a registered data source name, an inline array, a reactive function, or a filtered object. |
+| `openChoice` | `boolean` | `false` | Appends an "Other" option that reveals a text input. The typed value is stored directly. |
+
+### Select.Option props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `value` | `unknown \| string` | The stored value, or the key name in a datasource object (template mode). |
+| `label` | `string` | The display label, or the key name in a datasource object (template mode). |
+
+## Examples
+
+### With data source
+
+```tsx
+// On Form:
+// dataSources={{ countries: [{ code: 'us', name: 'United States' }, ...] }}
+
+<Enforma.Select bind="country" label="Country" dataSource="countries">
+  <Enforma.Select.Option label="name" value="code" />
+</Enforma.Select>
+```
+
+{/* StackBlitz: TODO */}
+
+### Filtered (cascading) data source
+
+```tsx
+<Enforma.Select bind="country" label="Country" dataSource="countries">
+  <Enforma.Select.Option label="name" value="code" />
+</Enforma.Select>
+
+<Enforma.Select
+  bind="city"
+  label="City"
+  dataSource={{ source: 'cities', filters: (scope) => ({ country: scope.country as string }) }}
+>
+  <Enforma.Select.Option label="name" value="code" />
+</Enforma.Select>
+```
+
+{/* StackBlitz: TODO */}
+
+### openChoice
+
+```tsx
+<Enforma.Select bind="color" label="Favourite colour" openChoice>
+  <Enforma.Select.Option value="red" label="Red" />
+  <Enforma.Select.Option value="blue" label="Blue" />
+</Enforma.Select>
+```
+
+{/* StackBlitz: TODO */}
