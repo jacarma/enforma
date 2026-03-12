@@ -1,9 +1,13 @@
 // apps/docs/src/components/HeroDemo.tsx
 import { useState } from 'react';
-import Enforma, { type FormValues, registerComponents } from 'enforma';
+import Enforma, {
+  type FormValues,
+  type EnformaComponentRegistry,
+  registerComponents,
+} from 'enforma';
 import muiComponents from 'enforma-mui';
 
-registerComponents(muiComponents, { variant: 'outlined' });
+registerComponents(muiComponents as Partial<EnformaComponentRegistry>, { variant: 'outlined' });
 
 export function HeroDemo() {
   const [values, setValues] = useState<FormValues>({});
