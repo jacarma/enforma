@@ -7,7 +7,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint src",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "typecheck": "astro check"
   },
   "engines": {
