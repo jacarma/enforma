@@ -86,6 +86,8 @@ Built-in validators
 
 - [ ] **Auto-generated prop tables**: Investigate replacing hand-written MDX prop tables with auto-generation from TypeScript types (e.g. via `typedoc` or `ts-morph`). Requires adding JSDoc comments to exported types first.
 
+- [ ] **Local docs build fails (date-fns/x-date-pickers)**: `pnpm --filter docs build` fails locally with `[commonjs--resolver] Missing "./_lib/format/longFormatters" specifier in "date-fns" package`. Root cause: `HeroDemo.tsx` imports all of `enforma-mui`, which eagerly references `@mui/x-date-pickers` (even though the date pickers are dynamically imported at runtime). Vite's client bundle resolves `@mui/x-date-pickers` via `packages/enforma-mui/node_modules/` (where it's installed as a devDependency), and that package internally imports a date-fns v2 internal path (`_lib/format/longFormatters`) that doesn't exist in the date-fns v3 package installed in the docs app. CI passes because pnpm's strict isolation prevents the docs app's Vite context from seeing `@mui/x-date-pickers` (it's not listed in `apps/docs/package.json`). Fix options: (a) add `@mui/x-date-pickers` + a date adapter to `apps/docs/package.json` so the version is explicitly controlled, (b) make `HeroDemo.tsx` import only the non-date-picker subset of `enforma-mui`, or (c) add a Vite `optimizeDeps.exclude` or `resolve.alias` for the missing path.
+
 ---
 
 ## Notes / investigations
