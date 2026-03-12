@@ -1,6 +1,141 @@
 ---
 title: Adapters
-description: Connecting Enforma to a UI component library.
+description: How to connect Enforma to a UI component library by implementing the component registry.
 ---
 
-Coming soon.
+This guide is for component library authors who want to publish an Enforma adapter — a package that lets users drop in your UI components with a single `registerComponents` call.
+
+An adapter maps Enforma's component types to your library's implementations. Users register it once and their forms render with your components, with no changes to their form logic if they ever switch libraries.
+
+## Overview
+
+Your adapter exports an object mapping Enforma's component type keys to your implementations. Each component receives resolved props from the form store and is responsible only for rendering — Enforma handles state, validation, and reactivity.
+
+```tsx
+import { registerComponents } from "enforma";
+
+registerComponents({
+  TextInput: MyTextInput,
+  Select: MySelect,
+  Checkbox: MyCheckbox,
+  // ... other components
+});
+```
+
+## Implementing `TextInput`
+
+The most common starting point. Use `useFieldProps` to read all resolved props from the store.
+
+```tsx
+import { useFieldProps } from "enforma";
+import type { TextInputProps } from "enforma";
+
+export function MyTextInput(props: TextInputProps) {
+  const { value, setValue, label, error, showError, disabled, placeholder, onBlur } =
+    useFieldProps<string>(props);
+
+  return (
+    <div>
+      {label && <label>{label}</label>}
+      <input
+        value={value ?? ""}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={onBlur}
+        disabled={disabled ?? false}
+        placeholder={placeholder}
+      />
+      {showError && error && <span>{error}</span>}
+    </div>
+  );
+}
+```
+
+**Never read reactive props directly from `props`.** Props like `label`, `disabled`, and `placeholder` may be functions `(scopeValues, allValues) => T`. `useFieldProps` evaluates them reactively — reading them directly gives stale values.
+
+## Component types
+
+| Key | Props type | Purpose |
+|-----|-----------|---------|
+| `TextInput` | `TextInputProps` | Single-line text, supports optional `mask` |
+| `Textarea` | `TextareaProps` | Multi-line text |
+| `Select` | `SelectProps` | Dropdown, receives `children` (SelectOption nodes) |
+| `SelectOption` | `SelectOptionProps` | Option inside a Select |
+| `Checkbox` | `CheckboxProps` | Boolean toggle |
+| `Fieldset` | `FieldsetProps` | Groups related fields, receives `title` and `children` |
+| `FormWrap` | `FormWrapProps` | Wraps the entire form, useful for providers/themes |
+| `List` | `ListProps` | Renders array fields, receives pre-built `items`, `addButton`, `modal` |
+| `ListItem` | `ListItemProps` | Single row in a list |
+| `AddButton` | `AddButtonProps` | Button to append a new list item |
+| `FormModal` | `FormModalProps` | Dialog for creating/editing list items |
+
+You don't need to implement every type — only register what your forms use.
+
+## Supporting masked input
+
+If your adapter supports the `mask` prop on `TextInput`, use it to conditionally apply an input mask:
+
+```tsx
+import type { TextInputProps } from "enforma";
+
+export function MyTextInput(props: TextInputProps) {
+  const fieldProps = useFieldProps<string>(props);
+
+  if (props.mask) {
+    return <MaskedInput {...fieldProps} mask={props.mask} />;
+  }
+
+  return <PlainInput {...fieldProps} />;
+}
+```
+
+`mask` can be a string pattern (e.g. `"+1 (000) 000-0000"`) or a `RegExp`.
+
+## Providing theme context
+
+Use `FormWrap` to inject a theme provider or context that your components need:
+
+```tsx
+import { ThemeProvider } from "my-ui-lib";
+
+registerComponents({
+  FormWrap: function MyFormWrap({ children }) {
+    return <ThemeProvider theme={myTheme}>{children}</ThemeProvider>;
+  },
+  TextInput: MyTextInput,
+  // ...
+});
+```
+
+## Publishing an adapter
+
+An adapter is just an npm package that calls `registerComponents` with its components. Declare `enforma` as a peer dependency:
+
+```bash
+{
+  "peerDependencies": {
+    "enforma": "*",
+    "react": ">=18"
+  }
+}
+```
+
+Export the components object so users can spread it, register it selectively, or override individual components:
+
+```tsx
+// my-ui-adapter/src/index.ts
+export const myAdapter = {
+  TextInput: MyTextInput,
+  Select: MySelect,
+  // ...
+};
+
+// User code
+import { registerComponents } from "enforma";
+import { myAdapter } from "my-ui-adapter";
+import { MyCustomInput } from "./MyCustomInput";
+
+registerComponents({
+  ...myAdapter,
+  TextInput: MyCustomInput, // override one component
+});
+```
