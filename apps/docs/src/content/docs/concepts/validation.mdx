@@ -1,6 +1,77 @@
 ---
 title: Validation
-description: Declaring and running field validators.
+description: Declaring field validators and built-in constraint props.
 ---
 
-Coming soon.
+## validate prop
+
+Pass a `validate` function to any field. Return a string for an error, or `null` to pass:
+
+```tsx
+<Enforma.TextInput
+  bind="email"
+  label="Email"
+  validate={(value) => {
+    if (!value) return 'Email is required';
+    if (!String(value).includes('@')) return 'Enter a valid email';
+    return null;
+  }}
+/>
+```
+
+Validators receive `(value, scopeValues, allValues)`. Use `scopeValues` for cross-field logic:
+
+```tsx
+<Enforma.TextInput
+  bind="confirmPassword"
+  label="Confirm password"
+  validate={(value, { password }) =>
+    value !== password ? 'Passwords do not match' : null
+  }
+/>
+```
+
+## Built-in constraint props
+
+For common constraints, use declarative props instead of a custom `validate`:
+
+| Prop | Applies to | Fails when |
+|------|-----------|-----------|
+| `required` | All fields | Value is `null`, `undefined`, or `""` |
+| `minLength` | `TextInput`, `Textarea` | String length < N |
+| `maxLength` | `TextInput`, `Textarea` | String length > N |
+| `minItems` | `List` | Array length < N |
+| `maxItems` | `List` | Array length > N |
+
+```tsx
+<Enforma.TextInput
+  bind="username"
+  label="Username"
+  required
+  minLength={3}
+  maxLength={20}
+/>
+```
+
+## When errors appear
+
+- **On blur:** error shows after the user leaves the field
+- **On submit:** all remaining errors are revealed; `onSubmit` is not called
+
+## Validators on hidden/removed fields
+
+Validators on `hidden` or `removed` fields are automatically skipped — you do not need to guard them manually.
+
+## Form-level validity
+
+`onChange` receives a second argument `{ valid: boolean }`:
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={(values, { valid }) => {
+    setValues(values);
+    setCanSubmit(valid);
+  }}
+>
+```

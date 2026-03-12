@@ -1,6 +1,48 @@
 ---
 title: Installation
-description: How to install Enforma in your project.
+description: How to install Enforma in your React project.
 ---
 
-Coming soon.
+## Requirements
+
+- React 18+
+- Node 20+
+
+## Core package
+
+```bash
+npm install enforma
+# or
+pnpm add enforma
+```
+
+The core package is UI-agnostic. It exports the form logic, field components (as empty shells), and public hooks, but renders nothing without a registered component set.
+
+## With Material UI
+
+```bash
+npm install enforma-mui @mui/material @emotion/react @emotion/styled
+```
+
+Then register the MUI components once at app startup:
+
+```tsx
+import { registerComponents } from 'enforma';
+import muiComponents from 'enforma-mui';
+
+registerComponents(muiComponents, { variant: 'outlined' });
+```
+
+`variant` accepts `'classic'`, `'outlined'`, or `'standard'` (matches MUI's TextField variants). For date/time fields, also install a date adapter:
+
+```bash
+# dayjs (recommended)
+npm install dayjs
+
+# then pass dateAdapter to registerComponents:
+registerComponents(muiComponents, { variant: 'outlined', dateAdapter: 'dayjs' });
+```
+
+## Custom component library
+
+If you use a different UI library, see [Adapters](/enforma/docs/guides/adapters) for how to build your own component set.

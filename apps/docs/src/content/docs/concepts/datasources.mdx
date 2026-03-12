@@ -3,4 +3,89 @@ title: Data sources
 description: Loading select options from static data or async APIs.
 ---
 
-Coming soon.
+Data sources provide options to `Select`, `RadioGroup`, `Autocomplete`, and `ExclusiveToggle`. They are defined once on `Form` and referenced by name on individual fields, keeping fetch logic out of the component tree.
+
+## Defining data sources
+
+Pass a `dataSources` map to `Form`:
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={setValues}
+  dataSources={{
+    countries: [
+      { code: 'us', name: 'United States' },
+      { code: 'gb', name: 'United Kingdom' },
+    ],
+  }}
+>
+```
+
+## Static data source
+
+An array of objects. Reference by name with `dataSource`:
+
+```tsx
+<Enforma.Select bind="country" label="Country" dataSource="countries">
+  <Enforma.Select.Option label="name" value="code" />
+</Enforma.Select>
+```
+
+`label="name"` and `value="code"` are template mappings — they tell Enforma which object key to use for the display label and stored value.
+
+## Filtered data source
+
+Pass an object with `source` and `filters`. The filter function is reactive — it re-evaluates as form state changes:
+
+```tsx
+<Enforma.Select
+  bind="city"
+  label="City"
+  dataSource={{
+    source: 'cities',
+    filters: (scope) => ({ country: scope.country as string }),
+  }}
+>
+  <Enforma.Select.Option label="name" value="code" />
+</Enforma.Select>
+```
+
+When the filter changes, the field value is cleared automatically.
+
+## Async data source
+
+Define a `query` function that returns a promise. Used for server-side search:
+
+```tsx
+const dataSources = {
+  books: {
+    query: async ({ search, filters }) => {
+      const res = await fetch(`/api/books?q=${search}`);
+      const data = await res.json();
+      return data.map((b) => ({ id: b.id, title: b.title }));
+    },
+    // Optional: resolve a pre-existing value back to its display label
+    resolve: async (value) => {
+      const res = await fetch(`/api/books/${String(value)}`);
+      return res.json();
+    },
+  },
+};
+```
+
+## DataSourceDefinition type
+
+```tsx
+type DataSourceDefinition<TItem> =
+  | TItem[]
+  | {
+      query: (params: {
+        search: string;
+        filters: Record<string, string | number | boolean | null | Date | FilterPredicate>;
+        sort: { field: string; direction: 'asc' | 'desc' } | null;
+        pagination: { page: number; pageSize: number };
+      }) => TItem[] | { items: TItem[]; total: number } | Promise<TItem[] | { items: TItem[]; total: number }>;
+      resolve?: (value: unknown) => TItem | Promise<TItem>;
+    };
+```

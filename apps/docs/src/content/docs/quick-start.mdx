@@ -1,6 +1,64 @@
 ---
 title: Quick start
-description: Build your first form in minutes.
+description: Build your first Enforma form in minutes.
 ---
 
-Coming soon.
+## 1. Register components
+
+Call `registerComponents` once before rendering any forms (e.g. in your app entry point):
+
+```tsx
+import { registerComponents } from 'enforma';
+import muiComponents from 'enforma-mui';
+
+registerComponents(muiComponents, { variant: 'outlined' });
+```
+
+## 2. Build a form
+
+```tsx
+import { useState } from 'react';
+import Enforma, { type FormValues } from 'enforma';
+
+export function ContactForm() {
+  const [values, setValues] = useState<FormValues>({});
+
+  return (
+    <Enforma.Form values={values} onChange={setValues}>
+      <Enforma.TextInput bind="name" label="Name" required />
+      <Enforma.TextInput
+        bind="email"
+        label="Email"
+        validate={(v) => (!v ? 'Required' : null)}
+      />
+      <Enforma.Select bind="topic" label="Topic">
+        <Enforma.Select.Option value="support" label="Support" />
+        <Enforma.Select.Option value="sales" label="Sales" />
+      </Enforma.Select>
+      <button type="submit">Send</button>
+    </Enforma.Form>
+  );
+}
+```
+
+## 3. Handle submission
+
+Pass `onSubmit` to `Form`. It fires only when all validators pass:
+
+```tsx
+<Enforma.Form
+  values={values}
+  onChange={setValues}
+  onSubmit={(values) => {
+    console.log('Submitted:', values);
+  }}
+>
+  ...
+</Enforma.Form>
+```
+
+## Key concepts
+
+- **`bind`** — connects a field to a key in the form's `values` object
+- **Reactive props** — `disabled`, `label`, etc. can be functions `(scopeValues) => value` that re-evaluate live as the form changes. See [Reactive props](/enforma/docs/concepts/reactive-props).
+- **Validation** — errors show on blur; all errors show on submit. See [Validation](/enforma/docs/concepts/validation).

@@ -1,6 +1,80 @@
 ---
 title: Reactive props
-description: How props can be functions that respond to form state.
+description: How any prop can be a function that responds to live form state.
 ---
 
-Coming soon.
+Most props on Enforma field components accept either a static value or a **reactive function**:
+
+```tsx
+type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) => T)
+```
+
+When you pass a function, Enforma re-evaluates it whenever the form state changes and updates the field accordingly — no `useEffect`, no manual wiring.
+
+## How it works
+
+The function receives two arguments:
+- `scopeValues` — the values of the nearest enclosing scope (the current `Fieldset`, `List.Form`, or the root form)
+- `allValues` — the complete root form state (useful for cross-scope logic)
+
+For most cases `scopeValues` is sufficient and you can ignore `allValues`.
+
+## Examples
+
+### Reactive disabled
+
+```tsx
+<Enforma.TextInput bind="name" label="Name" />
+<Enforma.TextInput
+  bind="email"
+  label="Email"
+  disabled={({ name }) => !name}
+/>
+```
+
+The email field is disabled until `name` has a value.
+
+### Reactive label
+
+```tsx
+<Enforma.TextInput bind="contactType" label="Contact type" />
+<Enforma.TextInput
+  bind="contact"
+  label={({ contactType }) =>
+    contactType === 'work' ? 'Work email' : 'Personal email'
+  }
+/>
+```
+
+### Reactive placeholder
+
+```tsx
+<Enforma.TextInput
+  bind="handle"
+  placeholder={({ platform }) =>
+    platform === 'twitter' ? '@username' : 'username'
+  }
+/>
+```
+
+### Reactive validation
+
+```tsx
+<Enforma.TextInput
+  bind="address"
+  label="Delivery address"
+  validate={(value, { deliveryMethod }) =>
+    deliveryMethod === 'delivery' && !value
+      ? 'Address is required for delivery'
+      : null
+  }
+/>
+```
+
+## Which props are reactive?
+
+Any prop typed as `Reactive<T>` in the component's props. This includes `label`, `placeholder`, `disabled`, `hidden`, `removed`, `required`, `description`, and most component-specific props. See [CommonProps](/enforma/docs/reference/common-props) for the full list.
+
+## Performance
+
+Reactive prop functions are evaluated with `useSyncExternalStore` — the field only re-renders when its own value or a value it reads changes. Sibling fields that don't share dependencies are unaffected.
