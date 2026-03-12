@@ -101,7 +101,7 @@ const heroCode = `
         justify-content: center;
       }
       .hero-right {
-        background: #1a1a2e;
+        background: #24292e;
         padding: 2.5rem;
         overflow: auto;
       }
@@ -167,7 +167,7 @@ const heroCode = `
   </head>
   <body>
     <header class="site-header">
-      <img src="/enforma/enforma-logo.svg" alt="Enforma" />
+      <a href="/enforma/"><img src="/enforma/enforma-logo.svg" alt="Enforma" /></a>
       <nav>
         <a href="/enforma/docs/installation">Docs</a>
         <a href="https://github.com/jacarma/enforma" target="_blank" rel="noreferrer">GitHub</a>
@@ -199,22 +199,22 @@ const heroCode = `
     <section class="features">
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">✍️</div>
+          <div class="feature-icon" aria-hidden="true">✍️</div>
           <h3>Only write what's yours</h3>
           <p>No state management, no touched/error tracking, no blur handlers. Declare your fields and logic — Enforma handles the plumbing.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🎨</div>
+          <div class="feature-icon" aria-hidden="true">🎨</div>
           <h3>UI library agnostic</h3>
           <p>Swap MUI for shadcn or build your own components — your form logic is untouched.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon" aria-hidden="true">⚡</div>
           <h3>Reactive attributes</h3>
           <p><code>disabled</code>, <code>label</code>, <code>placeholder</code> accept functions that respond to live form state.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🚀</div>
+          <div class="feature-icon" aria-hidden="true">🚀</div>
           <h3>High performance</h3>
           <p>Each field re-renders only when its own value changes, powered by <code>useSyncExternalStore</code>.</p>
         </div>
