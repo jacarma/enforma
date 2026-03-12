@@ -1,6 +1,36 @@
 ---
 title: Output
-description: Read-only inline element that renders a value or static text.
+description: Read-only inline element that renders a reactive value or static text.
 ---
 
-Coming soon.
+## Overview
+
+`Output` renders a value without connecting to the form store as a field. Use it for inline text that reacts to form state — instructions, computed labels, or interpolated values inside headings.
+
+## Usage
+
+```tsx
+<h2>Hello, <Enforma.Output as="span" value={({ name }) => String(name) || 'stranger'} /></h2>
+<Enforma.TextInput bind="name" label="Name" />
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `Reactive<unknown>` | — | **Required.** The value to render. Accepts a static value or a reactive function. |
+| `as` | `string` | `'span'` | HTML element to render (e.g. `'span'`, `'p'`, `'strong'`). |
+| `hidden` | `Reactive<boolean>` | `false` | When `true`, renders nothing. |
+| `removed` | `Reactive<boolean>` | `false` | Same as `hidden` for `Output` (no store value to delete). |
+
+## Examples
+
+### Static instruction note
+
+```tsx
+<Enforma.Output value="All fields marked with * are required." />
+```
+
+{/* StackBlitz: TODO */}

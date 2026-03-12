@@ -3,4 +3,57 @@ title: Fieldset
 description: Groups fields under a nested key in the form state.
 ---
 
-Coming soon.
+## Overview
+
+`Fieldset` creates a nested scope in the form's values object. Fields inside a `Fieldset` with `bind="address"` write to `values.address.city` instead of `values.city`. Fieldsets can be nested.
+
+## Usage
+
+```tsx
+<Enforma.Fieldset bind="address" title="Address">
+  <Enforma.TextInput bind="city" label="City" />
+  <Enforma.TextInput bind="zip" label="ZIP code" />
+</Enforma.Fieldset>
+```
+
+Result: `values = { address: { city: '...', zip: '...' } }`
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `bind` | `string` | `undefined` | Key under which the nested values are stored. Optional — omit to create an unnamed grouping without nesting. |
+| `children` | `ReactNode` | — | **Required.** Field components. |
+| `title` | `string` | `undefined` | Optional heading displayed above the fieldset. |
+| `hidden` | `Reactive<boolean>` | `false` | Hides all children; values are preserved. |
+| `removed` | `Reactive<boolean>` | `false` | Hides all children and deletes the nested values from the store. |
+
+## Examples
+
+### Nested fieldsets
+
+```tsx
+<Enforma.Fieldset bind="address" title="Address">
+  <Enforma.TextInput bind="city" label="City" />
+  <Enforma.Fieldset bind="street">
+    <Enforma.TextInput bind="line1" label="Street line 1" />
+    <Enforma.TextInput bind="line2" label="Street line 2" />
+  </Enforma.Fieldset>
+</Enforma.Fieldset>
+```
+
+{/* StackBlitz: TODO */}
+
+### Conditional fieldset with removed
+
+```tsx
+<Enforma.Checkbox bind="hasBilling" label="Use a different billing address" />
+<Enforma.Fieldset bind="billing" removed={({ hasBilling }) => !hasBilling}>
+  <Enforma.TextInput bind="street" label="Billing street" />
+  <Enforma.TextInput bind="city" label="Billing city" />
+</Enforma.Fieldset>
+```
+
+{/* StackBlitz: TODO */}

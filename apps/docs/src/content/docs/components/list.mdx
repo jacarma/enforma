@@ -1,6 +1,71 @@
 ---
 title: List
-description: Repeating sections driven by an array value.
+description: Repeating sections driven by an array value — add, edit, and delete items via a modal.
 ---
 
-Coming soon.
+## Overview
+
+`List` renders a repeating set of items backed by an array in the form state. Users add items via an "Add" button, edit them in a modal form, and delete them from the list. The modal form is a nested Enforma form scoped to the item's values.
+
+## Usage
+
+```tsx
+<Enforma.List bind="members" defaultItem={{ name: '' }}>
+  <Enforma.List.Item title="name" showDeleteButton />
+  <Enforma.List.Form showDeleteButton>
+    <Enforma.TextInput bind="name" label="Name" />
+  </Enforma.List.Form>
+</Enforma.List>
+```
+
+{/* StackBlitz: TODO */}
+
+## List props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `bind` | `string` | — | **Required.** Key in the form state whose value is the array. |
+| `defaultItem` | `Record<string, unknown>` | — | **Required.** Template for new items added via the "Add" button. |
+| `children` | `ReactNode` | — | **Required.** `List.Item` and `List.Form` slots. |
+| `disabled` | `boolean` | `false` | Disables adding and deleting items. |
+| `required` | `boolean` | `false` | Fails validation if the array is empty. |
+| `minItems` | `number` | `undefined` | Fails validation if array length < N. |
+| `maxItems` | `number` | `undefined` | Fails validation if array length > N. Hides the "Add" button when the limit is reached. |
+| `hidden` | `Reactive<boolean>` | `false` | Hides the list; values are preserved. |
+| `removed` | `Reactive<boolean>` | `false` | Hides the list and deletes its value from the store. |
+
+## List.Item props
+
+Defines how each row in the list is displayed.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string \| ((item) => string)` | — | **Required.** Key in the item object to use as the row title, or a function. |
+| `subtitle` | `string \| ((item) => string)` | `undefined` | Secondary text. |
+| `avatar` | `string \| ((item) => string)` | `undefined` | Key or function returning an image URL to display as an avatar on each row. |
+| `showDeleteButton` | `boolean` | `false` | Shows a delete icon on each row. |
+
+## List.Form props
+
+Defines the modal form for creating and editing items.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | **Required.** Field components scoped to the item. |
+| `showDeleteButton` | `boolean` | `false` | Shows a delete button inside the modal. |
+| `mode` | `'CREATE' \| 'UPDATE' \| 'DISPLAY'` | `undefined` | When omitted, this form is used for all modes. Specify to use different forms per mode. |
+
+## Examples
+
+### With min/max constraints
+
+```tsx
+<Enforma.List bind="tags" defaultItem={{ tag: '' }} minItems={1} maxItems={3}>
+  <Enforma.List.Item title="tag" showDeleteButton />
+  <Enforma.List.Form showDeleteButton>
+    <Enforma.TextInput bind="tag" label="Tag" required />
+  </Enforma.List.Form>
+</Enforma.List>
+```
+
+{/* StackBlitz: TODO */}

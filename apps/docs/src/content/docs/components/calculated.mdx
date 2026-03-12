@@ -1,6 +1,59 @@
 ---
 title: Calculated
-description: A field whose value is derived from other form values.
+description: A read-only field whose value is derived from other form values.
 ---
 
-Coming soon.
+## Overview
+
+`Calculated` computes a value from form state via a reactive `value` function. With `bind`, the result is written back into the store (useful for downstream validation or submission). Without `bind`, it is display-only and does not affect the stored values.
+
+## Usage
+
+```tsx
+// Display-only
+<Enforma.Calculated<number>
+  value={(v) => (v.q1 as number) + (v.q2 as number)}
+  label="Total"
+/>
+
+// Synced to store
+<Enforma.Calculated<number>
+  bind="total"
+  value={(v) => (v.q1 as number) + (v.q2 as number)}
+  label="Total (stored)"
+/>
+```
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `Reactive<T>` | — | **Required.** Function that derives the computed value from form state. |
+| `bind` | `string` | `undefined` | When provided, writes the computed value back to the store under this key. |
+| `label` | `Reactive<string>` | `undefined` | Label displayed above the computed value. |
+| `description` | `Reactive<string>` | `undefined` | Helper text, can itself be reactive and show the computed value. |
+| `disabled` | `Reactive<boolean>` | `undefined` | Passed through to the UI component. |
+| `hidden` | `Reactive<boolean>` | `false` | Hides the field; if `bind` is set, the computed value is still synced. |
+| `removed` | `Reactive<boolean>` | `false` | Hides and stops syncing. |
+
+## Examples
+
+### Reactive description showing severity
+
+```tsx
+<Enforma.Calculated<number>
+  bind="score"
+  value={(v) => ['q1','q2','q3'].reduce((sum, k) => sum + ((v[k] as number) ?? 0), 0)}
+  label="Total score"
+  description={(v) => {
+    const score = v.score as number ?? 0;
+    if (score <= 4) return 'Minimal';
+    if (score <= 9) return 'Mild';
+    return 'Severe';
+  }}
+/>
+```
+
+{/* StackBlitz: TODO */}

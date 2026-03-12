@@ -1,6 +1,50 @@
 ---
 title: Scope
-description: Restricts field bindings to a nested scope without writing to the store.
+description: Restricts field bindings to a nested path without writing a nested object to the store.
 ---
 
-Coming soon.
+## Overview
+
+`Scope` changes the path prefix for `bind` props of its children — similar to `Fieldset` — but it does **not** affect the stored values structure. Fields inside `<Scope bind="address">` still read from and write to `values.address.city`. The difference from `Fieldset` is that `Scope` has no visual output and does not add a title or grouping element.
+
+Use `Scope` when you want the logical scoping of `Fieldset` without any visual wrapper.
+
+## Usage
+
+```tsx
+<Enforma.Scope bind="address">
+  <Enforma.TextInput bind="city" label="City" />
+  <Enforma.TextInput bind="zip" label="ZIP" />
+</Enforma.Scope>
+```
+
+Result: `values = { address: { city: '...', zip: '...' } }` — same as `Fieldset`.
+
+{/* StackBlitz: TODO */}
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `bind` | `string` | — | **Required.** The path prefix to apply to all descendant `bind` props. |
+| `children` | `ReactNode` | — | **Required.** Field components. |
+
+## Examples
+
+### Nested address without visual grouping
+
+```tsx
+<Enforma.Scope bind="address">
+  <Enforma.TextInput bind="street" label="Street" />
+  <Enforma.TextInput bind="city" label="City" />
+  <Enforma.TextInput bind="zip" label="ZIP" />
+</Enforma.Scope>
+```
+
+Produces `values = { address: { street: '...', city: '...', zip: '...' } }`.
+
+{/* StackBlitz: TODO */}
+
+## Notes
+
+`Scope` and `Fieldset` produce the same form state structure. Choose `Fieldset` when you want a visual section wrapper; choose `Scope` when you need the scoping behaviour without any rendered element.
