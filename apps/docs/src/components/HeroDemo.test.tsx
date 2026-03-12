@@ -1,6 +1,7 @@
 // apps/docs/src/components/HeroDemo.test.tsx
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { test, expect } from 'vitest';
 import { HeroDemo } from './HeroDemo';
 
 test('renders name and email fields', () => {
