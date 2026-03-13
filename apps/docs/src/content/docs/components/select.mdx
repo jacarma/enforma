@@ -3,6 +3,8 @@ title: Select
 description: Dropdown field for single selection with inline options or a data source.
 ---
 
+import { BasicDemo, DataSourceDemo, CascadingDemo, OpenChoiceDemo } from '../../../demos/SelectDemos';
+
 ## Overview
 
 `Select` renders a dropdown for picking one value from a list. Options can be declared inline as children or loaded from a named data source defined on the parent `Form`.
@@ -16,7 +18,7 @@ description: Dropdown field for single selection with inline options or a data s
 </Enforma.Select>
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -48,7 +50,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.Select>
 ```
 
-{/* StackBlitz: TODO */}
+<DataSourceDemo client:load />
 
 ### Filtered (cascading) data source
 
@@ -66,7 +68,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.Select>
 ```
 
-{/* StackBlitz: TODO */}
+<CascadingDemo client:load />
 
 ### openChoice
 
@@ -77,4 +79,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.Select>
 ```
 
-{/* StackBlitz: TODO */}
+<OpenChoiceDemo client:load />
