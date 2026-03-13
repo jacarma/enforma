@@ -48,7 +48,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 <Enforma.TextInput bind="name" label="Name" placeholder="Enter your name first" />
 <Enforma.TextInput
   bind="email"
-  label={({ name }) => `Email for ${String(name) || 'you'}`}
+  label={({ name }) => `Email for ${name ? String(name) : 'you'}`}
   disabled={({ name }) => !name}
 />
 ```
