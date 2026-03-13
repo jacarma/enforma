@@ -33,7 +33,7 @@ function MyForm() {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `values` | `FormValues` | — | **Required.** The current form state object. |
-| `onChange` | `(values: FormValues, meta: { valid: boolean }) => void` | — | **Required.** Called on every value change. |
+| `onChange` | `(values: FormValues, meta: { isValid: boolean }) => void` | — | **Required.** Called on every value change. |
 | `onSubmit` | `(values: FormValues) => void` | `undefined` | Called when the form is submitted and all validators pass. |
 | `dataSources` | `Record<string, DataSourceDefinition \| unknown[]>` | `undefined` | Data sources available to fields via their `dataSource` prop. |
 | `children` | `ReactNode` | — | **Required.** Field components and other React content. |
