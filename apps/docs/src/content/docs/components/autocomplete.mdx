@@ -3,6 +3,8 @@ title: Autocomplete
 description: Searchable combobox with type-ahead filtering, inline options, or server-side search.
 ---
 
+import { BasicDemo, AsyncSourceDemo } from '../../../demos/AutocompleteDemos';
+
 ## Overview
 
 `Autocomplete` is a combobox that filters options as the user types. Options can be inline (client-side filtered by the UI library) or loaded from an async data source (server-side search). Supports pre-loading a value by key (via the `resolve` function on the data source).
@@ -16,7 +18,7 @@ description: Searchable combobox with type-ahead filtering, inline options, or s
 </Enforma.Autocomplete>
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -52,7 +54,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.Autocomplete>
 ```
 
-{/* StackBlitz: TODO */}
+<AsyncSourceDemo client:load />
 
 ## Notes
 
