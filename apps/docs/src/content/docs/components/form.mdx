@@ -82,9 +82,9 @@ function MyForm() {
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={(newValues, { valid }) => {
+  onChange={(newValues, { isValid }) => {
     setValues(newValues);
-    setIsValid(valid);
+    setIsValid(isValid);
   }}
 >
 ```
