@@ -3,6 +3,8 @@ title: TextInput
 description: Single-line text field with optional mask and length constraints.
 ---
 
+import { BasicDemo, ValidationDemo, ReactiveLabelDemo, MaskDemo, LengthDemo } from '../../../demos/TextInputDemos';
+
 ## Overview
 
 `TextInput` is the most common field. It binds a string value, supports input masking via IMask, and accepts all CommonProps for validation, reactive labels, and conditional visibility.
@@ -13,7 +15,7 @@ description: Single-line text field with optional mask and length constraints.
 <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -38,7 +40,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ValidationDemo client:load />
 
 ### Reactive label and disabled
 
@@ -51,7 +53,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ReactiveLabelDemo client:load />
 
 ### With mask
 
@@ -60,7 +62,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 <Enforma.TextInput bind="dob" label="Date of birth" mask="00/00/0000" placeholder="MM/DD/YYYY" />
 ```
 
-{/* StackBlitz: TODO */}
+<MaskDemo client:load />
 
 ### Length constraints
 
@@ -68,4 +70,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 <Enforma.TextInput bind="username" label="Username" required minLength={3} maxLength={20} />
 ```
 
-{/* StackBlitz: TODO */}
+<LengthDemo client:load />
