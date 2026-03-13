@@ -3,6 +3,8 @@ title: Checkbox & Switch
 description: Boolean fields bound to a true/false value.
 ---
 
+import { BasicDemo, ReactiveDisabledDemo, SwitchLabelDemo, RequiredDemo } from '../../../demos/CheckboxSwitchDemos';
+
 ## Overview
 
 `Checkbox` and `Switch` both bind a boolean value. They are visually different but functionally identical — use whichever fits your UI. Both accept a `labelPlacement` prop to control where the label appears relative to the control.
@@ -14,7 +16,7 @@ description: Boolean fields bound to a true/false value.
 <Enforma.Switch bind="darkMode" label="Dark mode" />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -39,7 +41,7 @@ Both `Checkbox` and `Switch` accept the same props.
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ReactiveDisabledDemo client:load />
 
 ### Switch with label on the left
 
@@ -47,7 +49,7 @@ Both `Checkbox` and `Switch` accept the same props.
 <Enforma.Switch bind="notifications" label="Email notifications" labelPlacement="start" />
 ```
 
-{/* StackBlitz: TODO */}
+<SwitchLabelDemo client:load />
 
 ### Required checkbox
 
@@ -55,4 +57,4 @@ Both `Checkbox` and `Switch` accept the same props.
 <Enforma.Checkbox bind="terms" label="I accept the terms and conditions" required />
 ```
 
-{/* StackBlitz: TODO */}
+<RequiredDemo client:load />
