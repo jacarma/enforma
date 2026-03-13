@@ -2,6 +2,7 @@
 title: Form
 description: The root component that owns form state and provides context to all fields.
 ---
+import { BasicDemo, SubmitDemo, DataSourcesDemo, ValidityDemo } from '../../../demos/FormDemos';
 
 ## Overview
 
@@ -25,7 +26,7 @@ function MyForm() {
 }
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -53,7 +54,7 @@ function MyForm() {
 </Enforma.Form>
 ```
 
-{/* StackBlitz: TODO */}
+<SubmitDemo client:load />
 
 ### With data sources
 
@@ -74,7 +75,7 @@ function MyForm() {
 </Enforma.Form>
 ```
 
-{/* StackBlitz: TODO */}
+<DataSourcesDemo client:load />
 
 ### Reading validity in onChange
 
@@ -88,4 +89,4 @@ function MyForm() {
 >
 ```
 
-{/* StackBlitz: TODO */}
+<ValidityDemo client:load />
