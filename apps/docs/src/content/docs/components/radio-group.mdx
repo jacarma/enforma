@@ -3,6 +3,8 @@ title: RadioGroup
 description: Radio button group for single selection from a list of options.
 ---
 
+import { BasicDemo, HorizontalDataSourceDemo, OpenChoiceDemo } from '../../../demos/RadioGroupDemos';
+
 ## Overview
 
 `RadioGroup` renders a group of radio buttons for selecting one value. Options can be declared inline or loaded from a data source. Supports horizontal layout and the `openChoice` "Other" option.
@@ -17,7 +19,7 @@ description: Radio button group for single selection from a list of options.
 </Enforma.RadioGroup>
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -47,7 +49,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.RadioGroup>
 ```
 
-{/* StackBlitz: TODO */}
+<HorizontalDataSourceDemo client:load />
 
 ### openChoice
 
@@ -59,4 +61,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 </Enforma.RadioGroup>
 ```
 
-{/* StackBlitz: TODO */}
+<OpenChoiceDemo client:load />
