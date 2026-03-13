@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import {
   CircularProgress,
   FormHelperText,
@@ -23,6 +24,8 @@ export function ExclusiveToggle({
   isOtherSelected,
   otherText,
 }: ResolvedExclusiveToggleProps) {
+  const labelId = useId();
+
   if (isLoading) {
     return <CircularProgress size={20} />;
   }
@@ -30,8 +33,9 @@ export function ExclusiveToggle({
   return (
     <>
       <ComponentWrap disabled={disabled} error={showError}>
-        {label !== undefined && <FormLabel>{label}</FormLabel>}
+        {label !== undefined && <FormLabel id={labelId}>{label}</FormLabel>}
         <ToggleButtonGroup
+          aria-labelledby={label !== undefined ? labelId : undefined}
           value={value ?? null}
           exclusive
           disabled={disabled}

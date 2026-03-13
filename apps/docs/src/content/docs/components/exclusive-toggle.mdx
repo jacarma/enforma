@@ -3,6 +3,8 @@ title: ExclusiveToggle
 description: Segmented button group for single selection from a small fixed set.
 ---
 
+import { BasicDemo, OpenChoiceDemo } from '../../../demos/ExclusiveToggleDemos';
+
 ## Overview
 
 `ExclusiveToggle` renders a row of toggle buttons where only one can be active at a time — similar to a segmented control. Best for 2–5 options. For larger sets, use `Select` or `RadioGroup`.
@@ -17,7 +19,7 @@ description: Segmented button group for single selection from a small fixed set.
 </Enforma.ExclusiveToggle>
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -52,4 +54,4 @@ If the form loads with a value not in the option list, "Other" is auto-selected 
 // Renders with "Other" selected and "epub" in the text input
 ```
 
-{/* StackBlitz: TODO */}
+<OpenChoiceDemo client:load />
