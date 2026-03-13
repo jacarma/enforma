@@ -3,6 +3,8 @@ title: Textarea
 description: Multi-line text field for longer string values.
 ---
 
+import { BasicDemo, ValidationDemo, ConditionalDemo } from '../../../demos/TextareaDemos';
+
 ## Overview
 
 `Textarea` works like `TextInput` but renders a multi-line input. It accepts all CommonProps and has no additional props.
@@ -13,7 +15,7 @@ description: Multi-line text field for longer string values.
 <Enforma.Textarea bind="bio" label="Bio" placeholder="Tell us about yourself..." />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -34,7 +36,7 @@ description: Multi-line text field for longer string values.
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ValidationDemo client:load />
 
 ### Conditionally visible with hidden
 
@@ -52,7 +54,7 @@ description: Multi-line text field for longer string values.
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ConditionalDemo client:load />
 
 ## Notes
 

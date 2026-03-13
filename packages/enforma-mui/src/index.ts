@@ -2,6 +2,7 @@ import type { EnformaComponentRegistry } from 'enforma';
 import { Output } from './components/Output';
 import { Calculated } from './components/Calculated';
 import { TextInput } from './components/TextInput';
+import { Textarea } from './components/Textarea';
 import { Checkbox } from './components/Checkbox';
 import { Switch } from './components/Switch';
 import { NumberInput } from './components/NumberInput';
@@ -27,6 +28,7 @@ const muiComponents = {
   Output,
   Calculated,
   TextInput,
+  Textarea,
   Checkbox,
   Switch,
   NumberInput,
@@ -55,6 +57,7 @@ export {
   Output,
   Calculated,
   TextInput,
+  Textarea,
   Checkbox,
   Switch,
   NumberInput,
