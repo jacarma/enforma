@@ -21,6 +21,7 @@ export default defineConfig({
       logo: {
         // Resolved relative to apps/docs/ (the Astro project root)
         src: './public/enforma-logo.svg',
+        replacesTitle: true,
       },
       customCss: ['./src/styles/custom.css'],
       sidebar: [
