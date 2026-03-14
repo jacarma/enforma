@@ -3,6 +3,8 @@ title: Scope
 description: Restricts field bindings to a nested path without writing a nested object to the store.
 ---
 
+import { BasicDemo, NestedAddressDemo } from '../../../demos/ScopeDemos';
+
 ## Overview
 
 `Scope` changes the path prefix for `bind` props of its children — similar to `Fieldset` — but it does **not** affect the stored values structure. Fields inside `<Scope bind="address">` still read from and write to `values.address.city`. The difference from `Fieldset` is that `Scope` has no visual output and does not add a title or grouping element.
@@ -20,7 +22,7 @@ Use `Scope` when you want the logical scoping of `Fieldset` without any visual w
 
 Result: `values = { address: { city: '...', zip: '...' } }` — same as `Fieldset`.
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -43,7 +45,7 @@ Result: `values = { address: { city: '...', zip: '...' } }` — same as `Fieldse
 
 Produces `values = { address: { street: '...', city: '...', zip: '...' } }`.
 
-{/* StackBlitz: TODO */}
+<NestedAddressDemo client:load />
 
 ## Notes
 

@@ -7,9 +7,11 @@ import Enforma, {
 } from 'enforma';
 import muiComponents from 'enforma-mui';
 
+// Register date adapter for live previews (skipped in test env to avoid Suspense mid-type issues)
+const isTest = import.meta.env.MODE === 'test';
 registerComponents(muiComponents as Partial<EnformaComponentRegistry>, {
   variant: 'outlined',
-  dateAdapter: 'dayjs',
+  ...(isTest ? {} : { dateAdapter: 'dayjs' }),
 });
 
 interface PreviewProps {
