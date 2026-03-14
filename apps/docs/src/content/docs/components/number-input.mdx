@@ -3,6 +3,8 @@ title: NumberInput
 description: Numeric field with locale-aware formatting, min/max bounds, and decimal scale control.
 ---
 
+import { BasicDemo, IntegerDemo, PercentageDemo } from '../../../demos/NumberInputDemos';
+
 ## Overview
 
 `NumberInput` stores a `number | undefined` and formats the display value using IMask's Number mask. Separators default to the browser locale via `Intl.NumberFormat`. It has no spinner arrows — use a plain number input, not a stepper.
@@ -13,7 +15,7 @@ description: Numeric field with locale-aware formatting, min/max bounds, and dec
 <Enforma.NumberInput bind="price" label="Price" />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -36,7 +38,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 <Enforma.NumberInput bind="quantity" label="Quantity" decimalScale={0} thousandSeparator={false} allowNegative={false} />
 ```
 
-{/* StackBlitz: TODO */}
+<IntegerDemo client:load />
 
 ### Percentage with bounds
 
@@ -44,4 +46,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 <Enforma.NumberInput bind="rate" label="Rate (0–100%)" decimalScale={2} min={0} max={100} allowNegative={false} />
 ```
 
-{/* StackBlitz: TODO */}
+<PercentageDemo client:load />
