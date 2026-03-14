@@ -23,7 +23,9 @@ import type {
   ResolvedExclusiveToggleProps,
   ResolvedOutputProps,
   ResolvedRadioGroupProps,
+  ResolvedSubmitProps,
   SelectProps,
+  SubmitProps,
   SwitchProps,
   TextareaProps,
   TextInputProps,
@@ -40,6 +42,7 @@ import type {
 } from './types';
 import { useFieldProps, useReactiveProp, useVisibility } from '../hooks/useField';
 import { useScope, joinPath } from '../context/ScopeContext';
+import type { FormValues } from '../store/FormStore';
 import { useFormSettings } from '../context/FormSettingsContext';
 import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
 import { useDataSources } from '../context/DataSourceContext';
@@ -766,6 +769,47 @@ function OutputDispatch({ value, as = 'span', hidden, removed }: OutputProps) {
 }
 
 export const Output = memo(OutputDispatch, stablePropsEqual);
+
+function SubmitDispatch({ children = 'Submit', disabled }: SubmitProps) {
+  const { store, prefix } = useScope();
+
+  const disabledRef = React.useRef(disabled);
+  disabledRef.current = disabled;
+
+  const lastRef = React.useRef<{ disabled: boolean | undefined; formValid: boolean } | null>(null);
+
+  const subscribe = React.useCallback((cb: () => void) => store.subscribe(cb), [store]);
+
+  const snapshot = React.useSyncExternalStore(subscribe, () => {
+    const allValues = store.getSnapshot();
+    const raw = store.getField(prefix);
+    const scopeValues: FormValues =
+      prefix === '' || raw === null || typeof raw !== 'object' ? allValues : (raw as FormValues);
+
+    const fv = store.isValid();
+    const d = disabledRef.current;
+    const resolvedDisabled =
+      typeof d === 'function' ? d(scopeValues, allValues, { formValid: fv }) : d;
+
+    const last = lastRef.current;
+    if (
+      last !== null &&
+      Object.is(last.disabled, resolvedDisabled) &&
+      Object.is(last.formValid, fv)
+    ) {
+      return last;
+    }
+    return (lastRef.current = { disabled: resolvedDisabled, formValid: fv });
+  });
+
+  return dispatchComponent('Submit', {
+    children,
+    disabled: snapshot.disabled,
+    formValid: snapshot.formValid,
+  } as ResolvedSubmitProps);
+}
+
+export const Submit = memo(SubmitDispatch, stablePropsEqual);
 
 export const DatePicker = memo(DatePickerDispatch, stablePropsEqual);
 export const TimePicker = memo(TimePickerDispatch, stablePropsEqual);

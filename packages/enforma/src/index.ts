@@ -89,4 +89,7 @@ export type {
   ResolvedCalculatedProps,
   OutputProps,
   ResolvedOutputProps,
+  SubmitDisabledFn,
+  SubmitProps,
+  ResolvedSubmitProps,
 } from './components/types';

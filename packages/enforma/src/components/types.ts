@@ -160,6 +160,23 @@ export type FormWrapProps = {
   children: ReactNode;
 };
 
+export type SubmitDisabledFn = (
+  scopeValues: FormValues,
+  allValues: FormValues,
+  meta: { formValid: boolean },
+) => boolean;
+
+export type SubmitProps = {
+  children?: ReactNode;
+  disabled?: boolean | SubmitDisabledFn;
+};
+
+export type ResolvedSubmitProps = {
+  children: ReactNode;
+  disabled: boolean | undefined;
+  formValid: boolean;
+};
+
 export type ComponentPropsMap = {
   TextInput: ResolvedTextInputProps;
   Textarea: ResolvedTextareaProps;
@@ -185,6 +202,7 @@ export type ComponentPropsMap = {
   ExclusiveToggleOption: ResolvedExclusiveToggleOptionProps;
   Calculated: ResolvedCalculatedProps;
   Output: ResolvedOutputProps;
+  Submit: ResolvedSubmitProps;
 };
 
 export type ValidationState = {

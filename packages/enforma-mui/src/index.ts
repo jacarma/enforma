@@ -23,6 +23,7 @@ import { ListItem } from './components/ListItem';
 import { AddButton } from './components/AddButton';
 import { FormModal } from './components/FormModal';
 import { MuiFormWrap } from './components/MuiFormWrap';
+import { Submit } from './components/Submit';
 
 const muiComponents = {
   Output,
@@ -49,6 +50,7 @@ const muiComponents = {
   AddButton,
   FormModal,
   FormWrap: MuiFormWrap,
+  Submit,
 } satisfies Partial<EnformaComponentRegistry>;
 
 export default muiComponents;
@@ -78,5 +80,6 @@ export {
   AddButton,
   FormModal,
   MuiFormWrap,
+  Submit,
 };
 export type { MuiVariant } from './context/MuiVariantContext';
