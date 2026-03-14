@@ -57,6 +57,7 @@ export default defineConfig({
             { label: 'List', slug: 'components/list' },
             { label: 'Calculated', slug: 'components/calculated' },
             { label: 'Output', slug: 'components/output' },
+            { label: 'Submit', slug: 'components/submit' },
             { label: 'Scope', slug: 'components/scope' },
           ],
         },

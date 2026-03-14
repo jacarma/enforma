@@ -1,0 +1,45 @@
+---
+title: Submit
+description: A registry-dispatched submit button with optional reactive disabled state.
+---
+
+import { BasicDemo, CustomLabelDemo, DisabledWhenInvalidDemo } from '../../../demos/SubmitDemos';
+
+## Overview
+
+`Enforma.Submit` renders a submit button via the component registry. The MUI adapter renders a `variant="contained"` MUI `Button`. The `disabled` prop accepts either a boolean or a function that receives the current form state, letting you disable the button reactively — for example, when the form is invalid.
+
+## Usage
+
+```tsx
+<Enforma.Submit />
+```
+
+<BasicDemo client:only="react" />
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | `'Submit'` | Button label. |
+| `disabled` | `boolean \| (scopeValues, allValues, { formValid }) => boolean` | — | When `true`, or when the function returns `true`, the button is disabled. |
+
+## Examples
+
+### Custom label
+
+```tsx
+<Enforma.Submit>Save changes</Enforma.Submit>
+```
+
+<CustomLabelDemo client:only="react" />
+
+### Disabled until form is valid
+
+Pass a function to `disabled` to reactively disable the button based on form state. The third argument exposes `formValid`, which is `true` when all required fields pass validation.
+
+```tsx
+<Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />
+```
+
+<DisabledWhenInvalidDemo client:only="react" />
