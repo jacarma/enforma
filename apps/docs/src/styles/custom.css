@@ -6,6 +6,7 @@
   --sl-color-accent-low: hsl(306, 100%, 93%);
   --sl-color-accent: #890079;
   --sl-color-accent-high: hsl(306, 85%, 55%);
+  --sl-color-text-accent: hsl(306, 85%, 55%);
 }
 
 :root[data-theme='dark'] {
