@@ -3,6 +3,8 @@ title: List
 description: Repeating sections driven by an array value — add, edit, and delete items via a modal.
 ---
 
+import { BasicDemo, MinMaxDemo } from '../../../demos/ListDemos';
+
 ## Overview
 
 `List` renders a repeating set of items backed by an array in the form state. Users add items via an "Add" button, edit them in a modal form, and delete them from the list. The modal form is a nested Enforma form scoped to the item's values.
@@ -18,7 +20,7 @@ description: Repeating sections driven by an array value — add, edit, and dele
 </Enforma.List>
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## List props
 
@@ -68,4 +70,4 @@ Defines the modal form for creating and editing items.
 </Enforma.List>
 ```
 
-{/* StackBlitz: TODO */}
+<MinMaxDemo client:load />
