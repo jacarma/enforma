@@ -1,5 +1,6 @@
 // apps/docs/src/components/Preview.tsx
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Enforma, {
   registerComponents,
   type FormValues,
@@ -14,6 +15,31 @@ registerComponents(muiComponents as Partial<EnformaComponentRegistry>, {
   ...(isTest ? {} : { dateAdapter: 'dayjs' }),
 });
 
+function useMuiColorMode(): 'light' | 'dark' {
+  const [mode, setMode] = useState<'light' | 'dark'>(() =>
+    document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setMode(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return mode;
+}
+
+export function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
+  const mode = useMuiColorMode();
+  const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+}
+
 interface PreviewProps {
   children: React.ReactNode;
   initialValues?: FormValues;
@@ -22,10 +48,12 @@ interface PreviewProps {
 export function Preview({ children, initialValues = {} }: PreviewProps) {
   const [values, setValues] = useState<FormValues>(initialValues);
   return (
-    <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues}>
-        {children}
-      </Enforma.Form>
-    </div>
+    <MuiThemeWrapper>
+      <div className="preview-card not-content">
+        <Enforma.Form values={values} onChange={setValues}>
+          {children}
+        </Enforma.Form>
+      </div>
+    </MuiThemeWrapper>
   );
 }

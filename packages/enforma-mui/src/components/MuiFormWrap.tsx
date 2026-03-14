@@ -1,4 +1,5 @@
-import { lazy, Suspense, type ReactNode } from 'react';
+import { lazy, Suspense, useMemo, type ReactNode } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { getRegistryOptions } from 'enforma';
 import { MuiVariantContext } from '../context/MuiVariantContext';
 
@@ -49,11 +50,18 @@ function getLocalizationWrapper(key: AdapterKey): React.LazyExoticComponent<Wrap
 }
 
 export function MuiFormWrap({ children }: { children: ReactNode }) {
-  const { variant = 'outlined', dateAdapter } = getRegistryOptions();
+  const { variant = 'outlined', dateAdapter, colorScheme } = getRegistryOptions();
+
+  const theme = useMemo(
+    () => (colorScheme !== undefined ? createTheme({ palette: { mode: colorScheme } }) : null),
+    [colorScheme],
+  );
 
   const inner = <MuiVariantContext.Provider value={variant}>{children}</MuiVariantContext.Provider>;
 
-  if (dateAdapter === undefined) return inner;
+  const withTheme = theme !== null ? <ThemeProvider theme={theme}>{inner}</ThemeProvider> : inner;
+
+  if (dateAdapter === undefined) return withTheme;
 
   const validKeys: AdapterKey[] = ['dayjs', 'date-fns', 'luxon', 'moment'];
   if (!(validKeys as string[]).includes(dateAdapter)) return inner;
@@ -61,8 +69,8 @@ export function MuiFormWrap({ children }: { children: ReactNode }) {
   const LazyWrapper = getLocalizationWrapper(dateAdapter);
 
   return (
-    <Suspense fallback={inner}>
-      <LazyWrapper>{inner}</LazyWrapper>
+    <Suspense fallback={withTheme}>
+      <LazyWrapper>{withTheme}</LazyWrapper>
     </Suspense>
   );
 }

@@ -8,6 +8,7 @@ export type EnformaComponentRegistry = {
 export type RegisterOptions = {
   variant?: 'classic' | 'outlined' | 'standard';
   dateAdapter?: 'dayjs' | 'date-fns' | 'luxon' | 'moment';
+  colorScheme?: 'light' | 'dark';
 };
 
 let registry: Partial<EnformaComponentRegistry> = {};

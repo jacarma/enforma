@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import { registerComponents, clearRegistry } from 'enforma';
 import { MuiFormWrap } from './MuiFormWrap';
 import { MuiVariantContext } from '../context/MuiVariantContext';
@@ -67,6 +68,38 @@ describe('MuiFormWrap', () => {
       </MuiFormWrap>,
     );
     expect(screen.queryByTestId('localization-provider')).not.toBeInTheDocument();
+  });
+
+  it('applies dark palette when colorScheme is "dark"', () => {
+    registerComponents({}, { variant: 'outlined', colorScheme: 'dark' });
+    let capturedMode: string | undefined;
+    function Consumer() {
+      capturedMode = useTheme().palette.mode;
+      return null;
+    }
+    render(
+      <MuiFormWrap>
+        <Consumer />
+      </MuiFormWrap>,
+    );
+    expect(capturedMode).toBe('dark');
+  });
+
+  it('does not override an outer ThemeProvider when colorScheme is not set', () => {
+    registerComponents({}, { variant: 'outlined' });
+    let capturedMode: string | undefined;
+    function Consumer() {
+      capturedMode = useTheme().palette.mode;
+      return null;
+    }
+    render(
+      <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
+        <MuiFormWrap>
+          <Consumer />
+        </MuiFormWrap>
+      </ThemeProvider>,
+    );
+    expect(capturedMode).toBe('dark');
   });
 
   it('renders LocalizationProvider with correct adapter when dateAdapter is set', async () => {
