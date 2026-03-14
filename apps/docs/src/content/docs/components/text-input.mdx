@@ -15,7 +15,7 @@ import { BasicDemo, ValidationDemo, ReactiveLabelDemo, MaskDemo, LengthDemo } fr
 <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
 ```
 
-<BasicDemo client:load />
+<BasicDemo client:only="react" />
 
 ## Props
 
@@ -40,7 +40,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 />
 ```
 
-<ValidationDemo client:load />
+<ValidationDemo client:only="react" />
 
 ### Reactive label and disabled
 
@@ -53,7 +53,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 />
 ```
 
-<ReactiveLabelDemo client:load />
+<ReactiveLabelDemo client:only="react" />
 
 ### With mask
 
@@ -62,7 +62,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 <Enforma.TextInput bind="dob" label="Date of birth" mask="00/00/0000" placeholder="MM/DD/YYYY" />
 ```
 
-<MaskDemo client:load />
+<MaskDemo client:only="react" />
 
 ### Length constraints
 
@@ -70,4 +70,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `pl
 <Enforma.TextInput bind="username" label="Username" required minLength={3} maxLength={20} />
 ```
 
-<LengthDemo client:load />
+<LengthDemo client:only="react" />

@@ -29,7 +29,7 @@ Supported adapters: `'dayjs'`, `'date-fns'`, `'luxon'`, `'moment'`.
 <Enforma.DateTimePicker bind="deadline" label="Deadline" />
 ```
 
-<BasicDemo client:load />
+<BasicDemo client:only="react" />
 
 ## DatePicker props
 
@@ -64,7 +64,7 @@ Combines all `DatePicker` props plus `ampm` from `TimePicker`.
 <Enforma.DatePicker bind="birthday" label="Birthday" disableFuture />
 ```
 
-<PastOnlyDemo client:load />
+<PastOnlyDemo client:only="react" />
 
 ### 24-hour time picker
 
@@ -72,4 +72,4 @@ Combines all `DatePicker` props plus `ampm` from `TimePicker`.
 <Enforma.TimePicker bind="startTime" label="Start time" ampm={false} />
 ```
 
-<TwentyFourHourDemo client:load />
+<TwentyFourHourDemo client:only="react" />

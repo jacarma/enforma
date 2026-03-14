@@ -15,7 +15,7 @@ import { BasicDemo, IntegerDemo, PercentageDemo } from '../../../demos/NumberInp
 <Enforma.NumberInput bind="price" label="Price" />
 ```
 
-<BasicDemo client:load />
+<BasicDemo client:only="react" />
 
 ## Props
 
@@ -38,7 +38,7 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 <Enforma.NumberInput bind="quantity" label="Quantity" decimalScale={0} thousandSeparator={false} allowNegative={false} />
 ```
 
-<IntegerDemo client:load />
+<IntegerDemo client:only="react" />
 
 ### Percentage with bounds
 
@@ -46,4 +46,4 @@ See [CommonProps](/enforma/docs/reference/common-props) for `bind`, `label`, `di
 <Enforma.NumberInput bind="rate" label="Rate (0–100%)" decimalScale={2} min={0} max={100} allowNegative={false} />
 ```
 
-<PercentageDemo client:load />
+<PercentageDemo client:only="react" />
