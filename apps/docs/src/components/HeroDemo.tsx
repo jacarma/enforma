@@ -21,9 +21,7 @@ export function HeroDemo() {
         placeholder="your@email.com"
         disabled={({ name }) => !name}
       />
-      <button type="submit" style={{ marginTop: '0.5rem' }}>
-        Submit
-      </button>
+      <Enforma.Submit />
     </Enforma.Form>
   );
 }
