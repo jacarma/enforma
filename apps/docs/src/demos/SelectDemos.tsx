@@ -3,6 +3,17 @@ import { useState } from 'react';
 import Enforma, { type FormValues } from 'enforma';
 import { Preview } from '../components/Preview';
 
+const countries = [
+  { code: 'us', name: 'United States' },
+  { code: 'gb', name: 'United Kingdom' },
+];
+
+const cities = [
+  { code: 'nyc', name: 'New York', country: 'us' },
+  { code: 'la', name: 'Los Angeles', country: 'us' },
+  { code: 'lon', name: 'London', country: 'gb' },
+];
+
 export function BasicDemo() {
   return (
     <Preview>
@@ -17,17 +28,8 @@ export function BasicDemo() {
 export function DataSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
-    <div className="preview-card">
-      <Enforma.Form
-        values={values}
-        onChange={setValues}
-        dataSources={{
-          countries: [
-            { code: 'us', name: 'United States' },
-            { code: 'gb', name: 'United Kingdom' },
-          ],
-        }}
-      >
+    <div className="preview-card not-content">
+      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries }}>
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
         </Enforma.Select>
@@ -39,22 +41,8 @@ export function DataSourceDemo() {
 export function CascadingDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
-    <div className="preview-card">
-      <Enforma.Form
-        values={values}
-        onChange={setValues}
-        dataSources={{
-          countries: [
-            { code: 'us', name: 'United States' },
-            { code: 'gb', name: 'United Kingdom' },
-          ],
-          cities: [
-            { code: 'nyc', name: 'New York', country: 'us' },
-            { code: 'la', name: 'Los Angeles', country: 'us' },
-            { code: 'lon', name: 'London', country: 'gb' },
-          ],
-        }}
-      >
+    <div className="preview-card not-content">
+      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries, cities }}>
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
         </Enforma.Select>

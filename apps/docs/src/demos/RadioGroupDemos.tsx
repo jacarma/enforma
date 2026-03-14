@@ -3,6 +3,11 @@ import { useState } from 'react';
 import Enforma, { type FormValues } from 'enforma';
 import { Preview } from '../components/Preview';
 
+const countries = [
+  { code: 'us', name: 'United States' },
+  { code: 'gb', name: 'United Kingdom' },
+];
+
 export function BasicDemo() {
   return (
     <Preview>
@@ -18,17 +23,8 @@ export function BasicDemo() {
 export function HorizontalDataSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
-    <div className="preview-card">
-      <Enforma.Form
-        values={values}
-        onChange={setValues}
-        dataSources={{
-          countries: [
-            { code: 'us', name: 'United States' },
-            { code: 'gb', name: 'United Kingdom' },
-          ],
-        }}
-      >
+    <div className="preview-card not-content">
+      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries }}>
         <Enforma.RadioGroup bind="country" label="Country" dataSource="countries" row>
           <Enforma.RadioGroup.Option label="name" value="code" />
         </Enforma.RadioGroup>

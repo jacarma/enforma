@@ -7,6 +7,14 @@ export default defineConfig({
   site: 'https://jacarma.github.io',
   base: '/enforma/',
   output: 'static',
+  vite: {
+    ssr: {
+      noExternal: [/^@mui\//, /^@emotion\//],
+      resolve: {
+        conditions: ['import', 'module', 'browser', 'default'],
+      },
+    },
+  },
   integrations: [
     starlight({
       title: 'Enforma',

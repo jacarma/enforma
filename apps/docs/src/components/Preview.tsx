@@ -22,7 +22,7 @@ interface PreviewProps {
 export function Preview({ children, initialValues = {} }: PreviewProps) {
   const [values, setValues] = useState<FormValues>(initialValues);
   return (
-    <div className="preview-card">
+    <div className="preview-card not-content">
       <Enforma.Form values={values} onChange={setValues}>
         {children}
       </Enforma.Form>
