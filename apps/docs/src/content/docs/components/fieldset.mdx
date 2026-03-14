@@ -3,6 +3,8 @@ title: Fieldset
 description: Groups fields under a nested key in the form state.
 ---
 
+import { BasicDemo, NestedDemo, ConditionalDemo } from '../../../demos/FieldsetDemos';
+
 ## Overview
 
 `Fieldset` creates a nested scope in the form's values object. Fields inside a `Fieldset` with `bind="address"` write to `values.address.city` instead of `values.city`. Fieldsets can be nested.
@@ -18,7 +20,7 @@ description: Groups fields under a nested key in the form state.
 
 Result: `values = { address: { city: '...', zip: '...' } }`
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -44,7 +46,7 @@ Result: `values = { address: { city: '...', zip: '...' } }`
 </Enforma.Fieldset>
 ```
 
-{/* StackBlitz: TODO */}
+<NestedDemo client:load />
 
 ### Conditional fieldset with removed
 
@@ -56,4 +58,4 @@ Result: `values = { address: { city: '...', zip: '...' } }`
 </Enforma.Fieldset>
 ```
 
-{/* StackBlitz: TODO */}
+<ConditionalDemo client:load />
