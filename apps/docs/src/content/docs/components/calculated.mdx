@@ -3,6 +3,8 @@ title: Calculated
 description: A read-only field whose value is derived from other form values.
 ---
 
+import { BasicDemo, ReactiveDescriptionDemo } from '../../../demos/CalculatedDemos';
+
 ## Overview
 
 `Calculated` computes a value from form state via a reactive `value` function. With `bind`, the result is written back into the store (useful for downstream validation or submission). Without `bind`, it is display-only and does not affect the stored values.
@@ -24,7 +26,7 @@ description: A read-only field whose value is derived from other form values.
 />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -56,4 +58,4 @@ description: A read-only field whose value is derived from other form values.
 />
 ```
 
-{/* StackBlitz: TODO */}
+<ReactiveDescriptionDemo client:load />
