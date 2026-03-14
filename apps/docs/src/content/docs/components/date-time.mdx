@@ -3,6 +3,8 @@ title: Date & Time
 description: Calendar and clock pickers for date, time, and combined date-time values.
 ---
 
+import { BasicDemo, PastOnlyDemo, TwentyFourHourDemo } from '../../../demos/DateTimeDemos';
+
 ## Overview
 
 Three components cover date and time input:
@@ -27,7 +29,7 @@ Supported adapters: `'dayjs'`, `'date-fns'`, `'luxon'`, `'moment'`.
 <Enforma.DateTimePicker bind="deadline" label="Deadline" />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## DatePicker props
 
@@ -62,7 +64,7 @@ Combines all `DatePicker` props plus `ampm` from `TimePicker`.
 <Enforma.DatePicker bind="birthday" label="Birthday" disableFuture />
 ```
 
-{/* StackBlitz: TODO */}
+<PastOnlyDemo client:load />
 
 ### 24-hour time picker
 
@@ -70,4 +72,4 @@ Combines all `DatePicker` props plus `ampm` from `TimePicker`.
 <Enforma.TimePicker bind="startTime" label="Start time" ampm={false} />
 ```
 
-{/* StackBlitz: TODO */}
+<TwentyFourHourDemo client:load />

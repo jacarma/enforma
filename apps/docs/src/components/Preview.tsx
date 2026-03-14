@@ -7,7 +7,10 @@ import Enforma, {
 } from 'enforma';
 import muiComponents from 'enforma-mui';
 
-registerComponents(muiComponents as Partial<EnformaComponentRegistry>, { variant: 'outlined' });
+registerComponents(muiComponents as Partial<EnformaComponentRegistry>, {
+  variant: 'outlined',
+  dateAdapter: 'dayjs',
+});
 
 interface PreviewProps {
   children: React.ReactNode;
