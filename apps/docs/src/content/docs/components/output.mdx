@@ -3,6 +3,8 @@ title: Output
 description: Read-only inline element that renders a reactive value or static text.
 ---
 
+import { BasicDemo, StaticDemo } from '../../../demos/OutputDemos';
+
 ## Overview
 
 `Output` renders a value without connecting to the form store as a field. Use it for inline text that reacts to form state — instructions, computed labels, or interpolated values inside headings.
@@ -14,7 +16,7 @@ description: Read-only inline element that renders a reactive value or static te
 <Enforma.TextInput bind="name" label="Name" />
 ```
 
-{/* StackBlitz: TODO */}
+<BasicDemo client:load />
 
 ## Props
 
@@ -33,4 +35,4 @@ description: Read-only inline element that renders a reactive value or static te
 <Enforma.Output value="All fields marked with * are required." />
 ```
 
-{/* StackBlitz: TODO */}
+<StaticDemo client:load />
