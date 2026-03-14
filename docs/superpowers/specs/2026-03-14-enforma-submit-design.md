@@ -87,6 +87,15 @@ Uses MUI primary color via `variant="contained"` — respects whatever MUI theme
 <Enforma.Submit disabled={true} />
 ```
 
+## Testing
+
+Following the pattern of all other MUI adapter components, add `Submit.test.tsx` in `packages/enforma-mui/src/components/`. Tests should cover:
+
+- `<Enforma.Submit />` with no props — renders a button with text "Submit"
+- `<Enforma.Submit disabled={true} />` — button is disabled
+- `<Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />` — button disabled state reflects form validity
+- `<Enforma.Submit>Save</Enforma.Submit>` — renders custom label
+
 ## Out of Scope
 
 - No automatic disabling on invalid — users must opt in via `disabled` prop
