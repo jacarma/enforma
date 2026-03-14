@@ -1,7 +1,8 @@
 /* apps/docs/src/styles/custom.css */
 /* Brand accent derived from logo: #890079 (deep magenta) */
 
-:root {
+:root,
+:root[data-theme='light'] {
   --sl-color-accent-low: hsl(306, 100%, 93%);
   --sl-color-accent: #890079;
   --sl-color-accent-high: hsl(306, 100%, 18%);
