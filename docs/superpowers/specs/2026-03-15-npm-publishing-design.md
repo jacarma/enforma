@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-15
 **Status:** Approved
-**Scope:** Prepare both packages for first publish to npm
+**Scope:** Prepare both packages for first publish to npm — all fixes applied, packages ready to publish, but not published
 
 ---
 
@@ -91,11 +91,13 @@ Current README is inaccurate. The actual API:
 
 ---
 
-## Publish Order
+## Definition of Done
 
-1. Fix all issues above
-2. Run `pnpm build`, `pnpm lint`, `pnpm test` — all must pass
-3. `pnpm --filter enforma publish --access public`
-4. `pnpm --filter enforma-mui publish --access public`
+All issues above are fixed, `pnpm build`, `pnpm lint`, and `pnpm test` all pass, and a `pnpm pack --dry-run` on each package shows only `dist/`, `README.md`, and `package.json` in the tarball. The packages are ready to publish but publishing itself is out of scope.
+
+## Publish Order (for when the time comes)
+
+1. `pnpm --filter enforma publish --access public`
+2. `pnpm --filter enforma-mui publish --access public`
 
 > **Important:** Always publish via `pnpm publish`, not `npm publish`. pnpm automatically rewrites `workspace:*` to the resolved version (`0.0.1`) in the published tarball. Using `npm publish` directly will leave `workspace:*` in the published `package.json`, breaking installs.
