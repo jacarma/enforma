@@ -23,10 +23,10 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
-        '@mui/material',
+        /^@mui\/material/,
         '@emotion/react',
         '@emotion/styled',
-        '@mui/x-date-pickers',
+        /^@mui\/x-date-pickers/,
         'date-fns',
         /^date-fns\/.*/,
         'dayjs',
@@ -37,6 +37,7 @@ export default defineConfig({
         'imask',
       ],
       output: {
+        exports: 'named',
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
