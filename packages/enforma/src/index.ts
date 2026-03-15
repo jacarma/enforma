@@ -93,3 +93,4 @@ export type {
   SubmitProps,
   ResolvedSubmitProps,
 } from './components/types';
+export { submitDisabled } from './components/helpers';
