@@ -59,7 +59,7 @@ The current external list uses exact strings `'@mui/material'` and `'@mui/x-date
 Both packages are pure — no global side effects at import time. This flag enables bundler tree-shaking so consumers only pay for what they use.
 
 ### enforma README
-Should cover: what enforma is, installation, basic usage, linking to enforma-mui, and TypeScript support. The primary usage example should use the default namespace pattern since that is the intended API:
+The monorepo root `README.md` already contains most of what's needed: tagline, "Why Enforma" rationale, a full usage example, installation instructions, features list, and the packages table. The package-level README should draw from this content rather than starting from scratch. It should cover: what enforma is, installation, basic usage, linking to enforma-mui, and TypeScript support. The primary usage example should use the default namespace pattern since that is the intended API:
 ```tsx
 import Enforma from 'enforma';
 
