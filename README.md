@@ -6,7 +6,7 @@
 
 **Only write what's yours.** No state management, no touched/error tracking, no blur handlers. Declare your fields, validations, and submit logic — enforma handles the plumbing.
 
-**Your form logic doesn't change when your UI does.** Enforma is a facade over your component library. Swap MUI for shadcn, or build your own components — your form code is untouched.
+**Your form logic doesn't change when your UI does.** Switch to a different component library later — your form code is untouched.
 
 ## Example
 
@@ -16,7 +16,6 @@ import Enforma from 'enforma';
 export function CheckoutForm() {
   return (
     <Enforma.Form
-      values={{}}
       onSubmit={(values) => fetch('/api/order', { method: 'POST', body: JSON.stringify(values) })}
     >
       <Enforma.Select bind="method" label="Delivery method">
@@ -38,6 +37,8 @@ export function CheckoutForm() {
 ```
 
 [See the same form in plain React (75 lines)](docs/plain-react-comparison.md)
+
+> **Note:** This example requires a component adapter. See [Installation](#installation) and [Setup](#setup) in the [enforma package README](packages/enforma/README.md).
 
 ## Installation
 
@@ -65,6 +66,8 @@ Requires React 18+.
 ## Extending Enforma
 
 **Adding custom fields** — Use `useFieldProps` and `useListState` to build your own components that integrate with the form store. [Custom components guide →](docs/custom-components.md)
+
+### Advanced
 
 **Publishing an adapter** — For component library authors: wrap your library once and let your users plug it into enforma with a single call. [Adapter authoring guide →](docs/adapting.md)
 
