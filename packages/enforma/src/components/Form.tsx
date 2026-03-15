@@ -12,8 +12,8 @@ const emptyMessages: Partial<Record<string, string>> = {};
 const emptyDataSources: Record<string, DataSourceDefinition<unknown>> = {};
 
 type FormProps = {
-  values: FormValues;
-  onChange: (values: FormValues, state: ValidationState) => void;
+  values?: FormValues;
+  onChange?: (values: FormValues, state: ValidationState) => void;
   onSubmit?: (values: FormValues) => void;
   showErrors?: boolean;
   messages?: Partial<Record<string, string>>;
@@ -32,7 +32,9 @@ export function Form({
   'aria-label': ariaLabel = 'form',
   dataSources = emptyDataSources,
 }: FormProps) {
-  const onChangeRef = useRef(onChange);
+  const onChangeRef = useRef<((values: FormValues, state: ValidationState) => void) | undefined>(
+    onChange,
+  );
   onChangeRef.current = onChange;
 
   const onSubmitRef = useRef(onSubmit);
@@ -40,9 +42,9 @@ export function Form({
 
   const storeRef = useRef<FormStore | null>(null);
   if (storeRef.current === null) {
-    const store = new FormStore(values);
+    const store = new FormStore(values ?? {});
     store.subscribe(() => {
-      onChangeRef.current(store.getSnapshot(), {
+      onChangeRef.current?.(store.getSnapshot(), {
         isValid: store.isValid(),
         errors: store.getErrors(),
       });

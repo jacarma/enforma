@@ -512,3 +512,97 @@ describe('TimePicker typeValidator', () => {
     expect(await screen.findByText('invalidTime')).toBeInTheDocument();
   });
 });
+
+describe('uncontrolled mode (values and onChange omitted)', () => {
+  it('renders without values or onChange props', () => {
+    render(<Form>{null}</Form>);
+    expect(screen.getByRole('form')).toBeInTheDocument();
+  });
+
+  it('initializes store to empty object when values is omitted', async () => {
+    const onSubmit = vi.fn();
+    render(
+      <Form onSubmit={onSubmit}>
+        <button type="submit">Submit</button>
+      </Form>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(onSubmit).toHaveBeenCalledWith({});
+  });
+
+  it('does not throw when a field changes and onChange is omitted', async () => {
+    registerComponents({
+      TextInput: ({ value, setValue, label }: ResolvedTextInputProps) => (
+        <input
+          aria-label={label}
+          value={value ?? ''}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
+      ),
+    });
+    render(
+      <Form>
+        <TextInput bind="name" label="Name" />
+      </Form>,
+    );
+    await userEvent.type(screen.getByLabelText('Name'), 'hello');
+    // No assertion needed — test passes if no exception is thrown
+  });
+
+  it('does not call onChange when it is omitted and a field changes', async () => {
+    // Verify the optional guard works: if onChange were called despite being undefined,
+    // this test would throw "TypeError: undefined is not a function"
+    registerComponents({
+      TextInput: ({ value, setValue, label }: ResolvedTextInputProps) => (
+        <input
+          aria-label={label}
+          value={value ?? ''}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
+      ),
+    });
+    // No onChange provided — the subscription must silently skip
+    render(
+      <Form>
+        <TextInput bind="name" label="Name" />
+      </Form>,
+    );
+    await expect(userEvent.type(screen.getByLabelText('Name'), 'hello')).resolves.toBeUndefined();
+  });
+});
+
+describe('partial props (values only, or onChange only)', () => {
+  it('accepts only values without onChange', () => {
+    render(<Form values={{ name: 'Alice' }}>{null}</Form>);
+    expect(screen.getByRole('form')).toBeInTheDocument();
+  });
+
+  it('accepts only onChange without values', async () => {
+    const onChange = vi.fn();
+    registerComponents({
+      TextInput: ({ value, setValue, label }: ResolvedTextInputProps) => (
+        <input
+          aria-label={label}
+          value={value ?? ''}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
+      ),
+    });
+    render(
+      <Form onChange={onChange}>
+        <TextInput bind="name" label="Name" />
+      </Form>,
+    );
+    await userEvent.type(screen.getByLabelText('Name'), 'A');
+    expect(onChange).toHaveBeenLastCalledWith(
+      { name: 'A' },
+      expect.objectContaining({ isValid: true }),
+    );
+  });
+});
