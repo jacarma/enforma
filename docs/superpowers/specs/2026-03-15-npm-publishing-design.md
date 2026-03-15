@@ -44,27 +44,41 @@ Fix all blocking and important issues identified in the pre-publish audit so tha
 Only `dist/` and `README.md` should be published. Source files, test files, `vite.config.ts`, `tsconfig.json`, and `eslint.config.js` must be excluded.
 
 ### CJS interop (issue #6)
-Both index files use `export default X` alongside named exports. Adding `output.exports: "named"` to the Rollup output config suppresses the Rollup warning. CJS consumers will access the default export via `.default`:
+Both index files use `export default X` alongside named exports. Add `exports: "named"` inside the existing `output: {}` object in `rollupOptions` in each package's `vite.config.ts`. This suppresses the Rollup warning. CJS consumers will access the default export via `.default`:
 ```js
 const { default: Enforma } = require('enforma');
 ```
 This is standard behaviour for dual ESM/CJS packages and should be documented.
 
 ### `@mui/material` externalization (issue #5)
-The current external list uses the exact string `'@mui/material'`, which does not match sub-path imports like `@mui/material/styles`. Replace with a regex `/^@mui\/material/` to cover all sub-paths.
+The current external list uses exact strings `'@mui/material'` and `'@mui/x-date-pickers'`, which do not match sub-path imports like `@mui/material/styles`. Replace both with regexes:
+- `'@mui/material'` → `/^@mui\/material/`
+- `'@mui/x-date-pickers'` → `/^@mui\/x-date-pickers/`
 
 ### `sideEffects: false` (issue #11)
 Both packages are pure — no global side effects at import time. This flag enables bundler tree-shaking so consumers only pay for what they use.
 
 ### enforma README
-Should cover: what enforma is, installation, basic usage (`Form`, `TextInput`, `registerComponents`), linking to enforma-mui, and TypeScript support.
+Should cover: what enforma is, installation, basic usage, linking to enforma-mui, and TypeScript support. The primary usage example should use the default namespace pattern since that is the intended API:
+```tsx
+import Enforma from 'enforma';
+
+<Enforma.Form values={{}} onSubmit={handleSubmit}>
+  <Enforma.TextInput bind="name" label="Name" />
+</Enforma.Form>
+```
+Also document `registerComponents` (required before rendering), `Scope`, `List`, and key hooks (`useFormValue`, `useDataSource`).
 
 ### enforma-mui README
 Current README is inaccurate. The actual API:
-- Default export: `muiComponents` (the full registry object)
-- Named exports: individual components (`TextInput`, `Select`, etc.)
+- Default export: `muiComponents` (the full registry object, satisfies `Partial<EnformaComponentRegistry>`)
+- Named exports: `Output`, `Calculated`, `TextInput`, `Textarea`, `Checkbox`, `Switch`, `NumberInput`, `DatePicker`, `TimePicker`, `DateTimePicker`, `Fieldset`, `Select`, `SelectOption`, `RadioGroup`, `RadioGroupOption`, `Autocomplete`, `AutocompleteOption`, `ExclusiveToggle`, `ExclusiveToggleOption`, `List`, `ListItem`, `AddButton`, `FormModal`, `MuiFormWrap`, `Submit`
 - `registerComponents` is imported from `enforma`, not `enforma-mui`
-- Variant is set via `registerComponents(muiComponents, { variant: 'outlined' })`
+- Variant is set via the second argument to `registerComponents` (defined in `RegisterOptions` in enforma):
+  ```ts
+  registerComponents(muiComponents, { variant: 'outlined' }); // 'classic' | 'outlined' | 'standard'
+  ```
+- Type export: `MuiVariant` (`'classic' | 'outlined' | 'standard'`)
 
 ---
 
@@ -83,3 +97,5 @@ Current README is inaccurate. The actual API:
 2. Run `pnpm build`, `pnpm lint`, `pnpm test` — all must pass
 3. `pnpm --filter enforma publish --access public`
 4. `pnpm --filter enforma-mui publish --access public`
+
+> **Important:** Always publish via `pnpm publish`, not `npm publish`. pnpm automatically rewrites `workspace:*` to the resolved version (`0.0.1`) in the published tarball. Using `npm publish` directly will leave `workspace:*` in the published `package.json`, breaking installs.
