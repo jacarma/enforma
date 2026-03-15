@@ -11,7 +11,10 @@
 ## Example
 
 ```tsx
-import Enforma from 'enforma';
+import Enforma, { registerComponents } from 'enforma';
+import muiComponents from 'enforma-mui';
+
+registerComponents(muiComponents);
 
 export function CheckoutForm() {
   return (
@@ -37,8 +40,6 @@ export function CheckoutForm() {
 ```
 
 [See the same form in plain React (75 lines)](docs/plain-react-comparison.md)
-
-> **Note:** This example requires a component adapter. See [Installation](#installation) and [Setup](#setup) in the [enforma package README](packages/enforma/README.md).
 
 ## Installation
 
