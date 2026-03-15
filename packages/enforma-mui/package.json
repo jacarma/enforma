@@ -1,6 +1,6 @@
 {
   "name": "enforma-mui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Material UI adapter for enforma",
   "private": false,
   "type": "module",
@@ -52,12 +52,9 @@
     "node": ">=20",
     "pnpm": ">=9"
   },
-  "dependencies": {
-    "enforma": "workspace:*"
-  },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
-    "enforma": "^0.0.1",
+    "enforma": "workspace:*",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^6.4.6",
     "@mui/x-date-pickers": "^7 || ^8",
