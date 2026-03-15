@@ -8,7 +8,7 @@
   "sideEffects": false,
   "main": "./dist/enforma-mui.cjs",
   "module": "./dist/enforma-mui.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/enforma-mui/src/index.d.ts",
   "source": "./src/index.ts",
   "files": [
     "dist",
@@ -17,7 +17,7 @@
   "exports": {
     ".": {
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": "./dist/enforma-mui/src/index.d.ts",
       "import": "./dist/enforma-mui.js",
       "require": "./dist/enforma-mui.cjs"
     }

@@ -73,8 +73,8 @@ Use `useFieldProps` to build components that integrate with the form store:
 import { useFieldProps } from 'enforma';
 
 function MyInput({ bind, label }: { bind: string; label: string }) {
-  const { value, onChange, error } = useFieldProps({ bind, label });
-  return <input value={value} onChange={(e) => onChange(e.target.value)} />;
+  const { value, setValue, error } = useFieldProps({ bind, label });
+  return <input value={value} onChange={(e) => setValue(e.target.value)} />;
 }
 ```
 
