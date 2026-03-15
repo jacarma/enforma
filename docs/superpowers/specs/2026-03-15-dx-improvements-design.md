@@ -46,6 +46,10 @@ The "UI-agnostic / adapter-based" messaging is prominent in both READMEs. New us
 
 `values` and `onChange` are required in `FormProps`, but many forms don't need controlled state. Omitting either causes a TypeScript error. The README example also passes `values={{}}` unnecessarily.
 
+### Breaking change assessment
+
+Making required props optional is always a backward-compatible, additive change — existing call sites that already pass both props are unaffected. `FormProps` itself is not exported, but `Form` is exported; any consumer already passing `values` and `onChange` continues to compile and behave identically.
+
 ### Changes
 
 **`packages/enforma/src/components/Form.tsx`**
@@ -59,21 +63,29 @@ The "UI-agnostic / adapter-based" messaging is prominent in both READMEs. New us
 
 **READMEs**
 
-- Drop `values={{}}` from both the root README example and the enforma package README example — it's no longer needed for the common case.
+- Drop `values={{}}` from both the root README example and the enforma package README example — it's no longer needed for the common case. Note: the root README example is also being updated in Item 1 (adding a `registerComponents` note). Both changes apply to the same example block and should be made together.
 
 ### Behavior contract
 
 | `values` | `onChange` | Behavior |
 |----------|------------|----------|
 | provided | provided   | Controlled — store initialized from `values`, changes reported via `onChange` |
-| omitted  | omitted    | Uncontrolled — store initialized to `{}`, changes not reported externally |
-| provided | omitted    | Controlled init, changes not reported (valid for read-only initial state scenarios) |
-| omitted  | provided   | Uncontrolled init, changes reported via `onChange` |
+| omitted  | omitted    | Uncontrolled — store initialized to `{}`, changes not reported externally. `onSubmit` receives only fields that have been set. |
+| provided | omitted    | Controlled init, changes not reported. If `values` changes on re-render it will **not** sync to the store after mount — this is pre-existing behavior for all cases where `values` is provided and is unchanged by this feature. |
+| omitted  | provided   | Uncontrolled init (`{}`), changes reported via `onChange` |
+
+### Implementation notes
+
+- Pass `values ?? {}` to `new FormStore(...)`.
+- `onChangeRef` must be explicitly typed to accommodate both defined and undefined across renders: `useRef<((values: FormValues, state: ValidationState) => void) | undefined>(onChange)`. Without the explicit type annotation, TypeScript infers the ref type from the initial value — if `onChange` is `undefined` on first render, the inferred type is `useRef<undefined>`, and assigning a defined `onChange` on a later render would be a type error. Guard the subscription call: `onChangeRef.current?.(values, state)`.
+- The existing pattern `onChangeRef.current = onChange` runs on every render. Toggling `onChange` between defined and undefined across renders is **not supported** — consumers must not change this prop after mount. This matches existing behavior (it was required before).
+- `onSubmit` fires in all four modes **when the form is valid** (existing `store.isValid()` gate is unchanged). An uncontrolled form with no user interaction and no validation rules will pass validation and submit `{}`. `onSubmit` optionality is unchanged and orthogonal to this feature.
 
 ### Non-goals
 
-- No `defaultValues` prop. Uncontrolled always initializes to `{}`.
-- No two-way sync if `values` prop changes after mount (existing behavior, no change).
+- No `defaultValues` prop. Uncontrolled always initializes to `{}`. The `defaultValues` convention (react-hook-form/formik) is deferred — it can be added non-breakingly later.
+- No two-way sync if `values` prop changes after mount (existing behavior, unchanged).
+- No dev-mode warning for the `values provided / onChange omitted` combination. The behavior is intentional and documented.
 
 ---
 
@@ -85,11 +97,13 @@ To avoid a TypeScript inline type error on the `disabled` prop of `Submit`, user
 
 ### Changes
 
-**`packages/enforma/src/components/types.ts`**
+**`packages/enforma/src/components/helpers.ts`** (new file)
 
-Add a helper function alongside the existing type:
+`types.ts` is types-only (all exports are `type` or `interface`) and must not contain runtime values — this convention is being established here. Add a new `helpers.ts` for runtime value exports:
 
 ```typescript
+import type { SubmitDisabledFn } from './types';
+
 export function submitDisabled(fn: SubmitDisabledFn): SubmitDisabledFn {
   return fn;
 }
@@ -97,7 +111,9 @@ export function submitDisabled(fn: SubmitDisabledFn): SubmitDisabledFn {
 
 **`packages/enforma/src/index.ts`**
 
-Export `submitDisabled` as a named export.
+Add `export { submitDisabled } from './components/helpers'` (no existing import from `helpers.ts`). No naming collision with the existing `SubmitDisabledFn` type export — one is a value, one is a type.
+
+`submitDisabled` is intentionally a named export only — it is **not** added to the `Enforma` default namespace object, which contains only form components (`Form`, `TextInput`, etc.).
 
 **`packages/enforma/README.md`**
 
@@ -122,6 +138,10 @@ import Enforma, { submitDisabled } from 'enforma';
 
 ## Testing
 
-- **Item 2:** Manual review of READMEs — no automated tests.
-- **Item 3:** Unit tests for `Form` with no props (uncontrolled), with only `values`, with only `onChange`, and with both. Ensure existing tests pass unchanged.
-- **Item 5:** A TypeScript type test (using `expectType` or `tsd`) verifying the inline function infers without explicit annotation. Also a unit test confirming the helper returns the function unchanged.
+- **Item 1 (README):** Manual review — no automated tests.
+- **Item 2 (uncontrolled mode):** Unit tests for `Form` covering all four `values`/`onChange` combinations. Explicit cases:
+  - No `onChange`: store subscription must not throw and must not call `onChange` (verify the `?.` guard is exercised, not just that no exception escapes)
+  - No `values`: store initializes to `{}`
+  - `onSubmit` fires correctly in all four modes
+  - All existing tests pass unchanged
+- **Item 3 (`submitDisabled`):** Unit test confirming the helper returns the function unchanged. TypeScript type test (using vitest's `expectTypeOf` or a `// @ts-expect-error`-free assertion) verifying `(_, __, { formValid }) => !formValid` infers correctly as the `disabled` prop without an explicit `SubmitDisabledFn` annotation.
