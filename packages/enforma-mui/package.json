@@ -1,12 +1,19 @@
 {
   "name": "enforma-mui",
   "version": "0.0.1",
+  "description": "Material UI adapter for enforma",
   "private": false,
   "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
   "main": "./dist/enforma-mui.cjs",
   "module": "./dist/enforma-mui.js",
   "types": "./dist/index.d.ts",
   "source": "./src/index.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
     ".": {
       "source": "./src/index.ts",
@@ -15,11 +22,27 @@
       "require": "./dist/enforma-mui.cjs"
     }
   },
+  "keywords": [
+    "react",
+    "form",
+    "forms",
+    "form-library",
+    "mui",
+    "material-ui",
+    "enforma",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jacarma/enforma.git",
+    "directory": "packages/enforma-mui"
+  },
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "coverage": "vitest run --coverage",
     "dev": "vite build --watch",
     "lint": "eslint src",
+    "prepublishOnly": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
