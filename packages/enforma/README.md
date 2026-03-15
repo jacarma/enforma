@@ -6,7 +6,7 @@
 
 **Only write what's yours.** No state management, no touched/error tracking, no blur handlers. Declare your fields, validations, and submit logic — enforma handles the plumbing.
 
-**Your form logic doesn't change when your UI does.** Enforma is a facade over your component library. Swap MUI for shadcn, or build your own components — your form code is untouched.
+**Your form logic doesn't change when your UI does.** Switch to a different component library later — your form code is untouched.
 
 ## Installation
 
@@ -35,7 +35,6 @@ import Enforma from 'enforma';
 export function CheckoutForm() {
   return (
     <Enforma.Form
-      values={{}}
       onSubmit={(values) => fetch('/api/order', { method: 'POST', body: JSON.stringify(values) })}
     >
       <Enforma.Select bind="method" label="Delivery method">
@@ -56,6 +55,18 @@ export function CheckoutForm() {
 }
 ```
 
+## Submit button
+
+Use `submitDisabled` to control when the submit button is enabled based on form state:
+
+```tsx
+import Enforma, { submitDisabled } from 'enforma';
+
+<Enforma.Submit disabled={submitDisabled((_, __, { formValid }) => !formValid)}>
+  Place order
+</Enforma.Submit>
+```
+
 ## Features
 
 - **High performance** — each field re-renders only when its own value changes (powered by `useSyncExternalStore`)
@@ -65,7 +76,9 @@ export function CheckoutForm() {
 - **Dynamic lists** — field arrays with `Enforma.List`
 - **UI library agnostic** — swap your component library without touching form logic
 
-## Custom components
+## Advanced
+
+> For power users building custom components or integrations.
 
 Use `useFieldProps` to build components that integrate with the form store:
 
