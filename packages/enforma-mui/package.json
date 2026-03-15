@@ -1,6 +1,6 @@
 {
   "name": "enforma-mui",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Material UI adapter for enforma",
   "private": false,
   "type": "module",
