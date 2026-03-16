@@ -218,11 +218,6 @@ export type ComponentPropsMap = {
   Submit: ResolvedSubmitProps;
 };
 
-export type ValidationState = {
-  isValid: boolean;
-  errors: Record<string, string | null>;
-};
-
 // Resolved types — what registered adapter components receive.
 // Core dispatch calls hooks and passes these; adapters have no enforma imports.
 
