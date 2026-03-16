@@ -76,7 +76,7 @@ beforeEach(() => {
 });
 
 describe('required on TextInput', () => {
-  it('blocks submit and shows default message when value is empty string', async () => {
+  it('shows default validation message on submit when value is empty string', async () => {
     const onSubmit = vi.fn();
     render(
       <Form values={{ name: '' }} onChange={vi.fn()} onSubmit={onSubmit}>
@@ -85,11 +85,11 @@ describe('required on TextInput', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
     expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
   });
 
-  it('blocks submit when value is undefined', async () => {
+  it('shows validation error on submit when value is undefined', async () => {
     const onSubmit = vi.fn();
     render(
       <Form values={{}} onChange={vi.fn()} onSubmit={onSubmit}>
@@ -98,7 +98,7 @@ describe('required on TextInput', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
   });
 
   it('does not show error when value is provided', () => {
@@ -353,7 +353,7 @@ describe('List constraints', () => {
     });
   });
 
-  it('required blocks submit when list is empty', async () => {
+  it('calls onSubmit with isValid false when required list is empty', async () => {
     const onSubmit = vi.fn();
     render(
       <Form values={{ items: [] }} onChange={vi.fn()} onSubmit={onSubmit}>
@@ -367,7 +367,7 @@ describe('List constraints', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
     expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
   });
 

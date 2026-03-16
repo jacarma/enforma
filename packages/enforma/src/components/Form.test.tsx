@@ -38,10 +38,12 @@ describe('Form', () => {
         </Form>,
       );
       await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-      expect(onSubmit).toHaveBeenCalledWith({ name: 'Alice' });
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ values: { name: 'Alice' }, isValid: true }),
+      );
     });
 
-    it('does not call onSubmit when a field has a validation error', async () => {
+    it('calls onSubmit with isValid false when form has a validation error', async () => {
       const onSubmit = vi.fn();
       render(
         <Form values={{ name: '' }} onChange={vi.fn()} onSubmit={onSubmit}>
@@ -50,7 +52,7 @@ describe('Form', () => {
         </Form>,
       );
       await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-      expect(onSubmit).not.toHaveBeenCalled();
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
     });
 
     it('reveals all validation errors after a failed submit', async () => {
@@ -70,7 +72,7 @@ describe('Form', () => {
   });
 
   describe('onChange with validation state', () => {
-    it('passes isValid and errors as second argument', async () => {
+    it('passes values and isValid as a single object arg', async () => {
       const onChange = vi.fn();
       render(
         <Form values={{ name: '' }} onChange={onChange}>
@@ -78,10 +80,11 @@ describe('Form', () => {
         </Form>,
       );
       await userEvent.type(screen.getByLabelText('Name'), 'A');
-      expect(onChange).toHaveBeenLastCalledWith(
-        { name: 'A' },
-        { isValid: true, errors: { name: null } },
-      );
+      expect(onChange).toHaveBeenLastCalledWith({
+        values: { name: 'A' },
+        isValid: true,
+        errors: { name: null },
+      });
     });
   });
 
@@ -149,7 +152,12 @@ describe('render isolation', () => {
     function App() {
       const [values, setValues] = useState({});
       return (
-        <Form values={values} onChange={setValues}>
+        <Form
+          values={values}
+          onChange={(arg) => {
+            setValues(arg.values as Record<string, unknown>);
+          }}
+        >
           <TextInput bind="name" label="Name" />
           <EmailField />
         </Form>
@@ -188,7 +196,12 @@ describe('render isolation', () => {
       const [values1, setValues1] = useState({});
       return (
         <>
-          <Form values={values1} onChange={setValues1}>
+          <Form
+            values={values1}
+            onChange={(arg) => {
+              setValues1(arg.values as Record<string, unknown>);
+            }}
+          >
             <TextInput bind="name" label="Name" />
           </Form>
           <Form values={{}} onChange={vi.fn()}>
@@ -331,10 +344,7 @@ describe('typeValidator', () => {
     );
 
     // onChange fires on mount for initial value — check it reports invalid
-    expect(onChange).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ isValid: false }),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
   });
 });
 
@@ -443,10 +453,7 @@ describe('DatePicker typeValidator', () => {
       </Form>,
     );
 
-    expect(onChange).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ isValid: false }),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
   });
 });
 
@@ -527,7 +534,7 @@ describe('uncontrolled mode (values and onChange omitted)', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    expect(onSubmit).toHaveBeenCalledWith({});
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ values: {}, isValid: true }));
   });
 
   it('does not throw when a field changes and onChange is omitted', async () => {
@@ -601,8 +608,7 @@ describe('partial props (values only, or onChange only)', () => {
     );
     await userEvent.type(screen.getByLabelText('Name'), 'A');
     expect(onChange).toHaveBeenLastCalledWith(
-      { name: 'A' },
-      expect.objectContaining({ isValid: true }),
+      expect.objectContaining({ values: { name: 'A' }, isValid: true }),
     );
   });
 });

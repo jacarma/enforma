@@ -217,8 +217,7 @@ describe('List — Edit flow', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     await waitFor(() => {
       expect(onChange).toHaveBeenLastCalledWith(
-        expect.objectContaining({ items: [{ name: 'Alicia' }, { name: 'Bob' }] }),
-        expect.anything(),
+        expect.objectContaining({ values: { items: [{ name: 'Alicia' }, { name: 'Bob' }] } }),
       );
     });
   });
@@ -253,9 +252,8 @@ describe('List — Add flow', () => {
     await waitFor(() => {
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          items: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+          values: { items: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }] },
         }),
-        expect.anything(),
       );
     });
   });
@@ -299,8 +297,7 @@ describe('List — Delete', () => {
     if (first === undefined) throw new Error('Expected delete button');
     await userEvent.click(first);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ items: [{ name: 'Bob' }] }),
-      expect.anything(),
+      expect.objectContaining({ values: { items: [{ name: 'Bob' }] } }),
     );
   });
 
@@ -337,8 +334,7 @@ describe('List — Delete', () => {
     await userEvent.click(screen.getByRole('button', { name: /delete/i }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ items: [{ name: 'Bob' }] }),
-      expect.anything(),
+      expect.objectContaining({ values: { items: [{ name: 'Bob' }] } }),
     );
   });
 });

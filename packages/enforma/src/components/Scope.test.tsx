@@ -18,8 +18,7 @@ describe('Scope', () => {
     );
     await userEvent.type(screen.getByLabelText('City'), 'London');
     expect(onChange).toHaveBeenLastCalledWith(
-      { address: { city: 'London' } },
-      { isValid: true, errors: {} },
+      expect.objectContaining({ values: { address: { city: 'London' } }, isValid: true }),
     );
   });
 
@@ -47,8 +46,10 @@ describe('Scope', () => {
     );
     await userEvent.type(screen.getByLabelText('Line 1'), 'Baker St');
     expect(onChange).toHaveBeenLastCalledWith(
-      { address: { street: { line1: 'Baker St' } } },
-      { isValid: true, errors: {} },
+      expect.objectContaining({
+        values: { address: { street: { line1: 'Baker St' } } },
+        isValid: true,
+      }),
     );
   });
 
@@ -113,8 +114,7 @@ describe('Scope', () => {
     );
     await userEvent.type(screen.getByLabelText('Name'), 'Alice');
     expect(onChange).toHaveBeenLastCalledWith(
-      { name: 'Alice', address: { city: '' } },
-      { isValid: true, errors: {} },
+      expect.objectContaining({ values: { name: 'Alice', address: { city: '' } }, isValid: true }),
     );
   });
 });

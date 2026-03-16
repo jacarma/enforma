@@ -6,15 +6,15 @@ import { ScopeContext } from '../context/ScopeContext';
 import { DataSourceContext } from '../context/DataSourceContext';
 import type { DataSourceDefinition } from '../datasource/types';
 import { getComponent } from './registry';
-import type { ValidationState } from './types';
+import type { LooseValues, OnChangeArg } from './types';
 
 const emptyMessages: Partial<Record<string, string>> = {};
 const emptyDataSources: Record<string, DataSourceDefinition<unknown>> = {};
 
-type FormProps = {
-  values?: FormValues;
-  onChange?: (values: FormValues, state: ValidationState) => void;
-  onSubmit?: (values: FormValues) => void;
+type FormProps<TValues extends FormValues = FormValues> = {
+  values?: TValues;
+  onChange?: (arg: OnChangeArg<TValues>) => void;
+  onSubmit?: (arg: OnChangeArg<TValues>) => void;
   showErrors?: boolean;
   messages?: Partial<Record<string, string>>;
   children: ReactNode;
@@ -22,7 +22,7 @@ type FormProps = {
   dataSources?: Record<string, DataSourceDefinition<unknown>>;
 };
 
-export function Form({
+export function Form<TValues extends FormValues = FormValues>({
   values,
   onChange,
   onSubmit,
@@ -31,23 +31,24 @@ export function Form({
   children,
   'aria-label': ariaLabel = 'form',
   dataSources = emptyDataSources,
-}: FormProps) {
-  const onChangeRef = useRef<((values: FormValues, state: ValidationState) => void) | undefined>(
-    onChange,
-  );
+}: FormProps<TValues>) {
+  const onChangeRef = useRef<((arg: OnChangeArg<TValues>) => void) | undefined>(onChange);
   onChangeRef.current = onChange;
 
-  const onSubmitRef = useRef(onSubmit);
+  const onSubmitRef = useRef<((arg: OnChangeArg<TValues>) => void) | undefined>(onSubmit);
   onSubmitRef.current = onSubmit;
 
   const storeRef = useRef<FormStore | null>(null);
   if (storeRef.current === null) {
     const store = new FormStore(values ?? {});
     store.subscribe(() => {
-      onChangeRef.current?.(store.getSnapshot(), {
-        isValid: store.isValid(),
-        errors: store.getErrors(),
-      });
+      const snapshot = store.getSnapshot();
+      const isValid = store.isValid();
+      const errors = store.getErrors();
+      const arg: OnChangeArg<TValues> = isValid
+        ? { values: snapshot as TValues, isValid: true, errors }
+        : { values: snapshot as LooseValues<TValues>, isValid: false, errors };
+      onChangeRef.current?.(arg);
     });
     storeRef.current = store;
   }
@@ -59,9 +60,13 @@ export function Form({
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     store.setSubmitted();
-    if (store.isValid()) {
-      onSubmitRef.current?.(store.getSnapshot());
-    }
+    const snapshot = store.getSnapshot();
+    const isValid = store.isValid();
+    const errors = store.getErrors();
+    const arg: OnChangeArg<TValues> = isValid
+      ? { values: snapshot as TValues, isValid: true, errors }
+      : { values: snapshot as LooseValues<TValues>, isValid: false, errors };
+    onSubmitRef.current?.(arg);
   };
 
   const FormWrap = getComponent('FormWrap');

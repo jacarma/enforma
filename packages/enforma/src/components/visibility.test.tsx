@@ -77,7 +77,7 @@ describe('hidden prop', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <TextInput bind="name" label="Name" hidden={({ hide }) => hide === 'yes'} />
@@ -92,9 +92,9 @@ describe('hidden prop', () => {
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1] as [
-      Record<string, unknown>,
+      { values: Record<string, unknown> },
     ];
-    expect(lastCall[0].name).toBe('Alice');
+    expect(lastCall[0].values.name).toBe('Alice');
   });
 
   it('shows the previously stored value when field becomes visible again', async () => {
@@ -106,7 +106,7 @@ describe('hidden prop', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <TextInput bind="name" label="Name" hidden={({ hide }) => hide === 'yes'} />
@@ -136,7 +136,9 @@ describe('hidden prop', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    expect(onSubmit).toHaveBeenCalledWith({ name: '' });
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ values: { name: '' }, isValid: true }),
+    );
   });
 });
 
@@ -164,8 +166,8 @@ describe('removed prop', () => {
     await act(() => Promise.resolve());
     const calls = onChange.mock.calls;
     if (calls.length > 0) {
-      const lastValues = (calls[calls.length - 1] as [Record<string, unknown>])[0];
-      expect(lastValues.name).toBeUndefined();
+      const lastArg = (calls[calls.length - 1] as [{ values: Record<string, unknown> }])[0];
+      expect(lastArg.values.name).toBeUndefined();
     }
   });
 
@@ -178,7 +180,7 @@ describe('removed prop', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <TextInput bind="name" label="Name" removed={({ remove }) => remove === 'yes'} />
@@ -194,9 +196,9 @@ describe('removed prop', () => {
 
     await act(() => Promise.resolve());
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1] as [
-      Record<string, unknown>,
+      { values: Record<string, unknown> },
     ];
-    expect(lastCall[0].name).toBeUndefined();
+    expect(lastCall[0].values.name).toBeUndefined();
   });
 
   it('removed field with required validator does not block form submission', async () => {
@@ -224,7 +226,7 @@ describe('removed prop', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <TextInput bind="name" label="Name" removed={({ remove }) => remove === 'yes'} />
@@ -262,7 +264,7 @@ describe('Fieldset (no bind) + children share removed expression', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <Fieldset removed={({ remove }) => remove === 'yes'}>
@@ -285,10 +287,10 @@ describe('Fieldset (no bind) + children share removed expression', () => {
     expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1] as [
-      Record<string, unknown>,
+      { values: Record<string, unknown> },
     ];
-    expect(lastCall[0].name).toBeUndefined();
-    expect(lastCall[0].email).toBeUndefined();
+    expect(lastCall[0].values.name).toBeUndefined();
+    expect(lastCall[0].values.email).toBeUndefined();
   });
 
   it('children re-mount with no value after being removed while visible', async () => {
@@ -303,7 +305,7 @@ describe('Fieldset (no bind) + children share removed expression', () => {
           values={values}
           onChange={(v) => {
             onChange(v);
-            setValues(v);
+            setValues(v.values as Record<string, unknown>);
           }}
         >
           <Fieldset removed={({ remove }) => remove === 'yes'}>

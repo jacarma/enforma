@@ -216,7 +216,7 @@ function ListMain({
         <Form
           values={draftValues}
           onChange={(v) => {
-            setDraftValues(v);
+            setDraftValues(v.values as FormValues);
           }}
           aria-label={dialogTitle}
         >
