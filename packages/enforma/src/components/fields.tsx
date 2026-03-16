@@ -42,7 +42,6 @@ import type {
 } from './types';
 import { useFieldProps, useReactiveProp, useVisibility } from '../hooks/useField';
 import { useScope, joinPath } from '../context/ScopeContext';
-import type { FormValues } from '../store/FormStore';
 import { useFormSettings } from '../context/FormSettingsContext';
 import { useDataSource, resolveDefinition } from '../hooks/useDataSource';
 import { useDataSources } from '../context/DataSourceContext';
@@ -771,7 +770,7 @@ function OutputDispatch({ value, as = 'span', hidden, removed }: OutputProps) {
 export const Output = memo(OutputDispatch, stablePropsEqual);
 
 function SubmitDispatch({ children = 'Submit', disabled }: SubmitProps) {
-  const { store, prefix } = useScope();
+  const { store } = useScope();
 
   const disabledRef = React.useRef(disabled);
   disabledRef.current = disabled;
@@ -782,14 +781,9 @@ function SubmitDispatch({ children = 'Submit', disabled }: SubmitProps) {
 
   const snapshot = React.useSyncExternalStore(subscribe, () => {
     const allValues = store.getSnapshot();
-    const raw = store.getField(prefix);
-    const scopeValues: FormValues =
-      prefix === '' || raw === null || typeof raw !== 'object' ? allValues : (raw as FormValues);
-
     const fv = store.isValid();
     const d = disabledRef.current;
-    const resolvedDisabled =
-      typeof d === 'function' ? d(scopeValues, allValues, { formValid: fv }) : d;
+    const resolvedDisabled = typeof d === 'function' ? d(allValues, { formValid: fv }) : d;
 
     const last = lastRef.current;
     if (

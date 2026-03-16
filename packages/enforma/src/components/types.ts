@@ -174,15 +174,14 @@ export type FormWrapProps = {
   children: ReactNode;
 };
 
-export type SubmitDisabledFn = (
-  scopeValues: FormValues,
-  allValues: FormValues,
+export type SubmitDisabledFn<TValues extends FormValues = FormValues> = (
+  values: LooseValues<TValues>,
   meta: { formValid: boolean },
 ) => boolean;
 
-export type SubmitProps = {
+export type SubmitProps<TValues extends FormValues = FormValues> = {
   children?: ReactNode;
-  disabled?: boolean | SubmitDisabledFn;
+  disabled?: boolean | SubmitDisabledFn<TValues>;
 };
 
 export type ResolvedSubmitProps = {
