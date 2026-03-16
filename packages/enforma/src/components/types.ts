@@ -2,6 +2,20 @@ import type { FormValues } from '../store/FormStore';
 import type { ReactNode } from 'react';
 import type { DataSourceProp } from '../datasource/types';
 
+export type LooseValues<T> = {
+  [K in keyof T]?: T[K] extends Date
+    ? Date | string | null | undefined
+    : T[K] extends (infer U)[]
+      ? (U extends Date ? Date | string | null | undefined : LooseValues<U>)[]
+      : T[K] extends object
+        ? LooseValues<T[K]>
+        : T[K] | null | undefined;
+};
+
+export type OnChangeArg<TValues extends FormValues = FormValues> =
+  | { values: TValues; isValid: true; errors: Record<string, string | null> }
+  | { values: LooseValues<TValues>; isValid: false; errors: Record<string, string | null> };
+
 export type Reactive<T> = T | ((scopeValues: FormValues, allValues: FormValues) => T);
 
 // Maps a resolved type back to its component props type.
