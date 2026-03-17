@@ -13,7 +13,7 @@ export function HeroDemo() {
   const [values, setValues] = useState<FormValues>({});
 
   return (
-    <Enforma.Form values={values} onChange={setValues}>
+    <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
       <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
       <Enforma.TextInput
         bind="email"

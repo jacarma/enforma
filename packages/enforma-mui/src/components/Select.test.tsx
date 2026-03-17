@@ -116,8 +116,7 @@ describe('MUI Select — openChoice', () => {
     await userEvent.clear(textbox);
     await userEvent.type(textbox, 'mauve');
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ color: 'mauve' }),
-      expect.anything(),
+      expect.objectContaining({ values: { color: 'mauve' } }),
     );
   });
 });

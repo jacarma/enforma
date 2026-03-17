@@ -63,7 +63,7 @@ describe('MUI Submit', () => {
     render(
       <Form values={{}} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" required />
-        <Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />
+        <Enforma.Submit disabled={(_, { formValid }) => !formValid} />
       </Form>,
     );
     // Empty required field → formValid=false → disabled=true
@@ -75,7 +75,7 @@ describe('MUI Submit', () => {
     render(
       <Form values={{ name: 'Alice' }} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" required />
-        <Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />
+        <Enforma.Submit disabled={(_, { formValid }) => !formValid} />
       </Form>,
     );
     // Filled required field → formValid=true → disabled=false
@@ -87,7 +87,7 @@ describe('MUI Submit', () => {
     render(
       <Form values={{}} onChange={() => undefined}>
         <Enforma.TextInput bind="name" label="Name" required />
-        <Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />
+        <Enforma.Submit disabled={(_, { formValid }) => !formValid} />
       </Form>,
     );
 

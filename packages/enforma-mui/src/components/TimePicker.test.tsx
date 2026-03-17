@@ -102,8 +102,7 @@ describe('MUI TimePicker', () => {
     const input = await screen.findByTestId('time-picker-input');
     await userEvent.type(input, '09:00');
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ time: '09:00' }),
-      expect.anything(),
+      expect.objectContaining({ values: { time: '09:00' } }),
     );
   });
 
@@ -117,8 +116,7 @@ describe('MUI TimePicker', () => {
     const input = await screen.findByTestId('time-picker-input');
     await userEvent.clear(input);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ time: undefined }),
-      expect.anything(),
+      expect.objectContaining({ values: { time: undefined } }),
     );
   });
 
@@ -131,10 +129,7 @@ describe('MUI TimePicker', () => {
     );
     const input = await screen.findByTestId('time-picker-input');
     await userEvent.type(input, '14:');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ time: '14:' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { time: '14:' } }));
   });
 
   it('is disabled when disabled prop is true', async () => {

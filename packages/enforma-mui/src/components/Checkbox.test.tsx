@@ -46,10 +46,7 @@ describe('MUI Checkbox', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Agree' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ agree: true }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { agree: true } }));
   });
 
   it('calls onChange with false when user unchecks the box', async () => {
@@ -60,10 +57,7 @@ describe('MUI Checkbox', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Agree' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ agree: false }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { agree: false } }));
   });
 
   it('is disabled when disabled prop is true', () => {

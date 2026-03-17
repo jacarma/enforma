@@ -82,10 +82,7 @@ describe('MUI NumberInput', () => {
     );
     const input = await screen.findByLabelText('Price');
     await userEvent.type(input, '9');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ price: 9 }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { price: 9 } }));
   });
 
   it('calls onChange with undefined when user clears the field', async () => {
@@ -98,8 +95,7 @@ describe('MUI NumberInput', () => {
     const input = await screen.findByLabelText('Price');
     await userEvent.clear(input);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ price: undefined }),
-      expect.anything(),
+      expect.objectContaining({ values: { price: undefined } }),
     );
   });
 
@@ -180,10 +176,7 @@ describe('MUI NumberInput', () => {
       </Form>,
     );
     await screen.findByLabelText('Price');
-    expect(onChange).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ isValid: false }),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
   });
 });
 

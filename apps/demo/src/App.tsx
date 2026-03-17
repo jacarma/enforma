@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import Enforma, {
   type FormValues,
   type FieldResolved,
+  type OnChangeArg,
   registerComponents,
   useFieldProps,
+  submitDisabled,
   type TextInputProps,
   type DataSourceDefinition,
   type DataSourceParams,
@@ -203,6 +205,19 @@ export function App() {
   const [phq9Values, setPhq9Values] = useState<FormValues>({});
   const [constraintValues, setConstraintValues] = useState<FormValues>({ tags: [] });
 
+  // Typed form values demo
+  interface PersonForm {
+    name: string;
+    email: string;
+    age: number;
+  }
+  const [typedValues, setTypedValues] = useState<PersonForm>({ name: '', email: '', age: 0 });
+  const [typedOnChangeArg, setTypedOnChangeArg] = useState<OnChangeArg<PersonForm> | null>(null);
+  const [typedSubmitArg, setTypedSubmitArg] = useState<OnChangeArg<PersonForm> | null>(null);
+  const isSubmitDisabled = submitDisabled<PersonForm>(
+    (values, { formValid }) => !formValid || !values.name,
+  );
+
   const handleVariantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value as VariantKey;
     registerComponents(muiComponents, { variant: v, dateAdapter: 'dayjs' });
@@ -224,7 +239,13 @@ export function App() {
         </select>
       </div>
 
-      <Enforma.Form values={values} onChange={setValues} aria-label="demo form">
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => {
+          setValues(values);
+        }}
+        aria-label="demo form"
+      >
         <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
         <Enforma.TextInput bind="email" label="Email" placeholder="your@email.com" />
 
@@ -250,7 +271,9 @@ export function App() {
 
       <Enforma.Form
         values={customValues}
-        onChange={setCustomValues}
+        onChange={({ values }) => {
+          setCustomValues(values);
+        }}
         aria-label="custom components demo form"
       >
         <StarRating
@@ -281,7 +304,9 @@ export function App() {
 
       <Enforma.Form
         values={reactiveValues}
-        onChange={setReactiveValues}
+        onChange={({ values }) => {
+          setReactiveValues(values);
+        }}
         aria-label="reactive demo form"
       >
         {/* Reactive disabled: email is locked until name is entered */}
@@ -330,7 +355,9 @@ export function App() {
 
       <Enforma.Form
         values={visibilityValues}
-        onChange={setVisibilityValues}
+        onChange={({ values }) => {
+          setVisibilityValues(values);
+        }}
         aria-label="hidden and removed demo form"
       >
         {/* hidden — value preserved */}
@@ -378,7 +405,9 @@ export function App() {
 
       <Enforma.Form
         values={boolValues}
-        onChange={setBoolValues}
+        onChange={({ values }) => {
+          setBoolValues(values);
+        }}
         aria-label="boolean fields demo form"
       >
         <Enforma.Checkbox
@@ -415,7 +444,9 @@ export function App() {
 
       <Enforma.Form
         values={radioValues}
-        onChange={setRadioValues}
+        onChange={({ values }) => {
+          setRadioValues(values);
+        }}
         aria-label="radio group demo form"
         dataSources={DATASOURCE_DEMO_SOURCES}
       >
@@ -457,7 +488,9 @@ export function App() {
 
       <Enforma.Form
         values={autocompleteValues}
-        onChange={setAutocompleteValues}
+        onChange={({ values }) => {
+          setAutocompleteValues(values);
+        }}
         aria-label="autocomplete demo form"
         dataSources={{ ...DATASOURCE_DEMO_SOURCES, ...OPEN_LIBRARY_DATASOURCES }}
       >
@@ -535,7 +568,9 @@ export function App() {
 
       <Enforma.Form
         values={toggleValues}
-        onChange={setToggleValues}
+        onChange={({ values }) => {
+          setToggleValues(values);
+        }}
         aria-label="exclusive toggle demo form"
         dataSources={DATASOURCE_DEMO_SOURCES}
       >
@@ -565,7 +600,12 @@ export function App() {
         typed value is stored directly as the field value. Pre-loaded values not in the options list
         are auto-detected as "Other".
       </p>
-      <Enforma.Form values={openChoiceValues} onChange={setOpenChoiceValues}>
+      <Enforma.Form
+        values={openChoiceValues}
+        onChange={({ values }) => {
+          setOpenChoiceValues(values);
+        }}
+      >
         <Enforma.Select bind="color" label="Color (openChoice)" openChoice>
           <Enforma.Select.Option value="red" label="Red" />
           <Enforma.Select.Option value="blue" label="Blue" />
@@ -602,7 +642,9 @@ export function App() {
 
       <Enforma.Form
         values={numericValues}
-        onChange={setNumericValues}
+        onChange={({ values }) => {
+          setNumericValues(values);
+        }}
         aria-label="numeric fields demo form"
       >
         <Enforma.NumberInput bind="price" label="Price (locale default)" />
@@ -638,7 +680,9 @@ export function App() {
 
       <Enforma.Form
         values={calculatedValues}
-        onChange={setCalculatedValues}
+        onChange={({ values }) => {
+          setCalculatedValues(values);
+        }}
         aria-label="calculated demo form"
       >
         <Enforma.NumberInput bind="q1" label="Q1 score" decimalScale={0} />
@@ -668,7 +712,13 @@ export function App() {
         function. Use the <code>as</code> prop to control the rendered element.
       </p>
 
-      <Enforma.Form values={outputValues} onChange={setOutputValues} aria-label="output demo form">
+      <Enforma.Form
+        values={outputValues}
+        onChange={({ values }) => {
+          setOutputValues(values);
+        }}
+        aria-label="output demo form"
+      >
         <h3>
           Hello,{' '}
           <Enforma.Output
@@ -692,7 +742,13 @@ export function App() {
         <code>registerComponents(muiComponents, {"{ dateAdapter: 'dayjs' }"})</code>).
       </p>
 
-      <Enforma.Form values={dateValues} onChange={setDateValues} aria-label="date time demo form">
+      <Enforma.Form
+        values={dateValues}
+        onChange={({ values }) => {
+          setDateValues(values);
+        }}
+        aria-label="date time demo form"
+      >
         <Enforma.DatePicker bind="birthday" label="Birthday" />
         <Enforma.TimePicker bind="meetingTime" label="Meeting time" ampm={false} />
         <Enforma.DateTimePicker bind="deadline" label="Deadline" />
@@ -712,7 +768,9 @@ export function App() {
 
       <Enforma.Form
         values={maskedValues}
-        onChange={setMaskedValues}
+        onChange={({ values }) => {
+          setMaskedValues(values);
+        }}
         aria-label="masked input demo form"
       >
         <Enforma.TextInput
@@ -759,8 +817,12 @@ export function App() {
       ) : (
         <Enforma.Form
           values={signupValues}
-          onChange={setSignupValues}
-          onSubmit={setSubmitted}
+          onChange={({ values }) => {
+            setSignupValues(values);
+          }}
+          onSubmit={({ values }) => {
+            setSubmitted(values);
+          }}
           aria-label="signup form"
         >
           <Enforma.TextInput
@@ -802,7 +864,13 @@ export function App() {
         Repeated sections driven by an array. Click a row to edit in a modal.
       </p>
 
-      <Enforma.Form values={listValues} onChange={setListValues} aria-label="list demo form">
+      <Enforma.Form
+        values={listValues}
+        onChange={({ values }) => {
+          setListValues(values);
+        }}
+        aria-label="list demo form"
+      >
         <Enforma.List bind="members" defaultItem={{ name: '' }}>
           <Enforma.List.Item title="name" showDeleteButton />
           <Enforma.List.Form showDeleteButton>
@@ -883,7 +951,13 @@ export function App() {
         <code>Calculated</code> field sums all answers to produce a total severity score.
       </p>
 
-      <Enforma.Form values={phq9Values} onChange={setPhq9Values} aria-label="PHQ-9 form">
+      <Enforma.Form
+        values={phq9Values}
+        onChange={({ values }) => {
+          setPhq9Values(values);
+        }}
+        aria-label="PHQ-9 form"
+      >
         <p style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
           Over the last two weeks, how often have you been bothered by any of the following
           problems?
@@ -1010,7 +1084,9 @@ export function App() {
 
       <Enforma.Form
         values={constraintValues}
-        onChange={setConstraintValues}
+        onChange={({ values }) => {
+          setConstraintValues(values);
+        }}
         aria-label="validation constraints demo form"
       >
         <Enforma.TextInput
@@ -1034,6 +1110,73 @@ export function App() {
       <pre style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
         {JSON.stringify(constraintValues, null, 2)}
       </pre>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <h2>Typed Form Values</h2>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        Pass a type parameter to <code>Form&lt;T&gt;</code> for typed <code>onChange</code> and{' '}
+        <code>onSubmit</code> callbacks. The <code>OnChangeArg</code> discriminated union narrows{' '}
+        <code>values</code> to <code>T</code> when <code>isValid: true</code>, and to{' '}
+        <code>LooseValues&lt;T&gt;</code> (partial, nullable fields) when{' '}
+        <code>isValid: false</code>.
+      </p>
+      <p style={{ color: '#555', marginBottom: '1rem' }}>
+        <code>onSubmit</code> always fires — check <code>isValid</code> before saving.{' '}
+        <code>submitDisabled</code> keeps the button typed to your form shape.
+      </p>
+
+      <Enforma.Form<PersonForm>
+        values={typedValues}
+        onChange={(arg) => {
+          setTypedOnChangeArg(arg);
+          setTypedValues(arg.values as PersonForm);
+        }}
+        onSubmit={(arg) => {
+          setTypedSubmitArg(arg);
+        }}
+        aria-label="typed form values demo"
+      >
+        <Enforma.TextInput bind="name" label="Name" required />
+        <Enforma.TextInput bind="email" label="Email" required />
+        <Enforma.NumberInput bind="age" label="Age" required />
+        <Enforma.Submit disabled={isSubmitDisabled} />
+      </Enforma.Form>
+
+      <div style={{ marginTop: '1rem', display: 'flex', gap: '2rem' }}>
+        <div style={{ flex: 1 }}>
+          <strong>Last onChange arg:</strong>
+          <pre style={{ background: '#f4f4f4', padding: '1rem', marginTop: '0.5rem' }}>
+            {typedOnChangeArg
+              ? JSON.stringify(
+                  {
+                    isValid: typedOnChangeArg.isValid,
+                    values: typedOnChangeArg.values,
+                    errors: typedOnChangeArg.errors,
+                  },
+                  null,
+                  2,
+                )
+              : '(not yet changed)'}
+          </pre>
+        </div>
+        <div style={{ flex: 1 }}>
+          <strong>Last onSubmit arg:</strong>
+          <pre style={{ background: '#f4f4f4', padding: '1rem', marginTop: '0.5rem' }}>
+            {typedSubmitArg
+              ? JSON.stringify(
+                  {
+                    isValid: typedSubmitArg.isValid,
+                    values: typedSubmitArg.values,
+                    errors: typedSubmitArg.errors,
+                  },
+                  null,
+                  2,
+                )
+              : '(not yet submitted)'}
+          </pre>
+        </div>
+      </div>
     </div>
   );
 }

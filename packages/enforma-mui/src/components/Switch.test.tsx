@@ -46,10 +46,7 @@ describe('MUI Switch', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Enable' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ enabled: true }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { enabled: true } }));
   });
 
   it('calls onChange with false when user toggles off', async () => {
@@ -60,10 +57,7 @@ describe('MUI Switch', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Enable' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ enabled: false }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { enabled: false } }));
   });
 
   it('is disabled when disabled prop is true', () => {

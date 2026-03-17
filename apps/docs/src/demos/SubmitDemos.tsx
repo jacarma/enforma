@@ -24,7 +24,7 @@ export function DisabledWhenInvalidDemo() {
   return (
     <Preview>
       <Enforma.TextInput bind="name" label="Name" required />
-      <Enforma.Submit disabled={(_, __, { formValid }) => !formValid} />
+      <Enforma.Submit disabled={(_, { formValid }) => !formValid} />
     </Preview>
   );
 }

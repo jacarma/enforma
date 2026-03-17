@@ -11,7 +11,7 @@ import type { LooseValues, OnChangeArg } from './types';
 const emptyMessages: Partial<Record<string, string>> = {};
 const emptyDataSources: Record<string, DataSourceDefinition<unknown>> = {};
 
-type FormProps<TValues extends FormValues = FormValues> = {
+type FormProps<TValues extends object = FormValues> = {
   values?: TValues;
   onChange?: (arg: OnChangeArg<TValues>) => void;
   onSubmit?: (arg: OnChangeArg<TValues>) => void;
@@ -22,7 +22,7 @@ type FormProps<TValues extends FormValues = FormValues> = {
   dataSources?: Record<string, DataSourceDefinition<unknown>>;
 };
 
-export function Form<TValues extends FormValues = FormValues>({
+export function Form<TValues extends object = FormValues>({
   values,
   onChange,
   onSubmit,

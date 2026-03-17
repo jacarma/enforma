@@ -86,10 +86,9 @@ describe('MUI DateTimePicker', () => {
     );
     const input = await screen.findByTestId('datetime-picker-input');
     await userEvent.type(input, '2026-03-03T14:30');
+    const dateMatcher = expect.any(Date) as unknown as Date;
     expect(onChange).toHaveBeenLastCalledWith(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      expect.objectContaining({ dt: expect.any(Date) }),
-      expect.anything(),
+      expect.objectContaining({ values: { dt: dateMatcher } }),
     );
   });
 
@@ -103,8 +102,7 @@ describe('MUI DateTimePicker', () => {
     const input = await screen.findByTestId('datetime-picker-input');
     await userEvent.clear(input);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ dt: undefined }),
-      expect.anything(),
+      expect.objectContaining({ values: { dt: undefined } }),
     );
   });
 
@@ -117,10 +115,7 @@ describe('MUI DateTimePicker', () => {
     );
     const input = await screen.findByTestId('datetime-picker-input');
     await userEvent.type(input, 'bad');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ dt: 'bad' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { dt: 'bad' } }));
   });
 
   it('shows validate() error after blur', async () => {

@@ -40,10 +40,7 @@ describe('MUI TextInput', () => {
       </Form>,
     );
     await userEvent.type(screen.getByLabelText('Name'), 'Bob');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ name: 'Bob' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { name: 'Bob' } }));
   });
 
   it('shows error message after blur when validate fails', async () => {
@@ -176,10 +173,7 @@ describe('MUI TextInput with mask', () => {
     );
     const input = await screen.findByTestId('imask-input');
     await userEvent.type(input, '5');
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ phone: '5' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { phone: '5' } }));
   });
 
   it('throws a clear error when mask is set but react-imask is not installed', async () => {

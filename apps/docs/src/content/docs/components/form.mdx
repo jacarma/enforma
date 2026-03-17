@@ -18,7 +18,7 @@ function MyForm() {
   const [values, setValues] = useState<FormValues>({});
 
   return (
-    <Enforma.Form values={values} onChange={setValues}>
+    <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
       <Enforma.TextInput bind="name" label="Name" />
       <button type="submit">Submit</button>
     </Enforma.Form>
@@ -33,8 +33,8 @@ function MyForm() {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `values` | `FormValues` | — | **Required.** The current form state object. |
-| `onChange` | `(values: FormValues, meta: { isValid: boolean }) => void` | — | **Required.** Called on every value change. |
-| `onSubmit` | `(values: FormValues) => void` | `undefined` | Called when the form is submitted and all validators pass. |
+| `onChange` | `(arg: OnChangeArg) => void` | — | **Required.** Called on every value change. |
+| `onSubmit` | `(arg: OnChangeArg) => void` | `undefined` | Called on every submit. Check arg.isValid before saving. |
 | `dataSources` | `Record<string, DataSourceDefinition \| unknown[]>` | `undefined` | Data sources available to fields via their `dataSource` prop. |
 | `children` | `ReactNode` | — | **Required.** Field components and other React content. |
 | (HTML form attrs) | — | — | All standard HTML `<form>` attributes (e.g. `aria-label`, `noValidate`) are forwarded. |
@@ -46,8 +46,8 @@ function MyForm() {
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={setValues}
-  onSubmit={(values) => fetch('/api/submit', { method: 'POST', body: JSON.stringify(values) })}
+  onChange={({ values }) => setValues(values)}
+  onSubmit={({ values, isValid }) => { if (isValid) fetch('/api/submit', { method: 'POST', body: JSON.stringify(values) }) }}
 >
   <Enforma.TextInput bind="name" label="Name" required />
   <button type="submit">Submit</button>
@@ -61,7 +61,7 @@ function MyForm() {
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={setValues}
+  onChange={({ values }) => setValues(values)}
   dataSources={{
     countries: [
       { code: 'us', name: 'United States' },
@@ -82,8 +82,8 @@ function MyForm() {
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={(newValues, { isValid }) => {
-    setValues(newValues);
+  onChange={({ values, isValid }) => {
+    setValues(values);
     setIsValid(isValid);
   }}
 >

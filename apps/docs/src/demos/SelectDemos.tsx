@@ -29,7 +29,11 @@ export function DataSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries }}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        dataSources={{ countries }}
+      >
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
         </Enforma.Select>
@@ -42,7 +46,11 @@ export function CascadingDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries, cities }}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        dataSources={{ countries, cities }}
+      >
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
         </Enforma.Select>

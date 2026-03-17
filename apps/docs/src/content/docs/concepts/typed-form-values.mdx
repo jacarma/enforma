@@ -1,0 +1,95 @@
+---
+title: Typed form values
+description: Use Form<TValues> for type-safe onChange and onSubmit callbacks.
+---
+import { OnChangeArgDemo, SubmitArgDemo, SubmitDisabledDemo } from '../../../demos/TypedValuesDemos';
+
+Pass a type parameter to `Form` to get typed `onChange` and `onSubmit` callbacks.
+
+```tsx
+interface ContactForm {
+  name: string;
+  email: string;
+}
+
+<Enforma.Form<ContactForm>
+  values={values}
+  onChange={({ values, isValid, errors }) => {
+    // values is ContactForm when isValid: true
+    // values is LooseValues<ContactForm> when isValid: false
+    setValues(values as ContactForm);
+  }}
+  onSubmit={({ values, isValid }) => {
+    if (!isValid) return;
+    save(values); // values: ContactForm ✓
+  }}
+>
+```
+
+## OnChangeArg
+
+`onChange` and `onSubmit` both receive a single `OnChangeArg<TValues>` object — a discriminated union on `isValid`:
+
+```ts
+type OnChangeArg<TValues> =
+  | { values: TValues;              isValid: true;  errors: Record<string, string | null> }
+  | { values: LooseValues<TValues>; isValid: false; errors: Record<string, string | null> };
+```
+
+When `isValid: true`, TypeScript narrows `values` to your exact type. When `isValid: false`, `values` is `LooseValues<TValues>` — every field is optional and nullable to accommodate partial input.
+
+<OnChangeArgDemo client:only="react" />
+
+## onSubmit always fires
+
+`onSubmit` fires on every submit click, even when the form has errors. Check `isValid` before acting:
+
+```tsx
+onSubmit={({ values, isValid }) => {
+  if (!isValid) {
+    // Show a toast, scroll to first error, etc.
+    return;
+  }
+  save(values); // values is TValues here
+}}
+```
+
+Try submitting below with empty fields to see `isValid: false` in the arg:
+
+<SubmitArgDemo client:only="react" />
+
+## Typed submitDisabled
+
+Use `submitDisabled<TValues>` to get a typed `disabled` function for the `Submit` component:
+
+```tsx
+import { submitDisabled } from 'enforma';
+
+const isDisabled = submitDisabled<ContactForm>(
+  (values, { formValid }) => !formValid || !values.name,
+);
+
+<Enforma.Submit disabled={isDisabled} />
+```
+
+<SubmitDisabledDemo client:only="react" />
+
+## LooseValues
+
+When `isValid: false`, `values` is typed as `LooseValues<TValues>`. This utility type makes every field optional and nullable, recursively — because fields may be empty, partially typed, or invalid mid-edit:
+
+```ts
+type LooseValues<T> = {
+  [K in keyof T]?: T[K] extends Date
+    ? Date | string | null | undefined
+    : T[K] extends object
+    ? LooseValues<T[K]>
+    : T[K] | null | undefined;
+};
+```
+
+This lets you safely read intermediate values without null-checking every field manually.
+
+## Untyped usage
+
+Without a type parameter, `Form` defaults to `Form<FormValues>` (`Record<string, unknown>`). All existing code without type parameters continues to work unchanged.

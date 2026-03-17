@@ -24,7 +24,11 @@ export function HorizontalDataSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries }}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        dataSources={{ countries }}
+      >
         <Enforma.RadioGroup bind="country" label="Country" dataSource="countries" row>
           <Enforma.RadioGroup.Option label="name" value="code" />
         </Enforma.RadioGroup>

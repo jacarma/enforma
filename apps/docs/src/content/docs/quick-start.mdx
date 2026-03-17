@@ -24,7 +24,7 @@ export function ContactForm() {
   const [values, setValues] = useState<FormValues>({});
 
   return (
-    <Enforma.Form values={values} onChange={setValues}>
+    <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
       <Enforma.TextInput bind="name" label="Name" required />
       <Enforma.TextInput
         bind="email"
@@ -43,13 +43,14 @@ export function ContactForm() {
 
 ## 3. Handle submission
 
-Pass `onSubmit` to `Form`. It fires only when all validators pass:
+Pass `onSubmit` to `Form`. It fires on every submit — check `isValid` before acting on the values.
 
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={setValues}
-  onSubmit={(values) => {
+  onChange={({ values }) => setValues(values)}
+  onSubmit={({ values, isValid }) => {
+    if (!isValid) return;
     console.log('Submitted:', values);
   }}
 >

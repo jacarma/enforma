@@ -12,7 +12,7 @@ Pass a `dataSources` map to `Form`:
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={setValues}
+  onChange={({ values }) => setValues(values)}
   dataSources={{
     countries: [
       { code: 'us', name: 'United States' },

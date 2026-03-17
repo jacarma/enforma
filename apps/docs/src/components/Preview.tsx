@@ -50,7 +50,7 @@ export function Preview({ children, initialValues = {} }: PreviewProps) {
   return (
     <MuiThemeWrapper>
       <div className="preview-card not-content">
-        <Enforma.Form values={values} onChange={setValues}>
+        <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
           {children}
         </Enforma.Form>
       </div>

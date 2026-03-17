@@ -48,10 +48,7 @@ describe('MUI Autocomplete', () => {
     );
     await userEvent.type(screen.getByRole('combobox'), 'Aus');
     await userEvent.click(await screen.findByRole('option', { name: 'Australia' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ country: 'au' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { country: 'au' } }));
   });
 
   it('renders with a static array datasource', () => {

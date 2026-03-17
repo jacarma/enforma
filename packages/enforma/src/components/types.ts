@@ -12,7 +12,7 @@ export type LooseValues<T> = {
         : T[K] | null | undefined;
 };
 
-export type OnChangeArg<TValues extends FormValues = FormValues> =
+export type OnChangeArg<TValues extends object = FormValues> =
   | { values: TValues; isValid: true; errors: Record<string, string | null> }
   | { values: LooseValues<TValues>; isValid: false; errors: Record<string, string | null> };
 
@@ -174,12 +174,12 @@ export type FormWrapProps = {
   children: ReactNode;
 };
 
-export type SubmitDisabledFn<TValues extends FormValues = FormValues> = (
+export type SubmitDisabledFn<TValues extends object = FormValues> = (
   values: LooseValues<TValues>,
   meta: { formValid: boolean },
 ) => boolean;
 
-export type SubmitProps<TValues extends FormValues = FormValues> = {
+export type SubmitProps<TValues extends object = FormValues> = {
   children?: ReactNode;
   disabled?: boolean | SubmitDisabledFn<TValues>;
 };

@@ -96,10 +96,9 @@ describe('MUI DatePicker', () => {
     );
     const input = await screen.findByTestId('date-picker-input');
     await userEvent.type(input, '2026-03-03');
+    const dateMatcher = expect.any(Date) as unknown as Date;
     expect(onChange).toHaveBeenLastCalledWith(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      expect.objectContaining({ date: expect.any(Date) }),
-      expect.anything(),
+      expect.objectContaining({ values: { date: dateMatcher } }),
     );
   });
 
@@ -113,8 +112,7 @@ describe('MUI DatePicker', () => {
     const input = await screen.findByTestId('date-picker-input');
     await userEvent.clear(input);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ date: undefined }),
-      expect.anything(),
+      expect.objectContaining({ values: { date: undefined } }),
     );
   });
 
@@ -127,10 +125,7 @@ describe('MUI DatePicker', () => {
     );
     const input = await screen.findByTestId('date-picker-input');
     await userEvent.type(input, 'bad');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ date: 'bad' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { date: 'bad' } }));
   });
 
   it('is disabled when disabled prop is true', async () => {
@@ -196,10 +191,7 @@ describe('MUI DatePicker', () => {
       </Form>,
     );
     await screen.findByTestId('date-picker-input');
-    expect(onChange).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ isValid: false }),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ isValid: false }));
   });
 
   it('throws a clear error when @mui/x-date-pickers is not installed', async () => {

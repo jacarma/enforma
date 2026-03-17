@@ -37,6 +37,7 @@ export default defineConfig({
           items: [
             { label: 'Reactive props', slug: 'concepts/reactive-props' },
             { label: 'Validation', slug: 'concepts/validation' },
+            { label: 'Typed form values', slug: 'concepts/typed-form-values' },
             { label: 'Data sources', slug: 'concepts/datasources' },
           ],
         },

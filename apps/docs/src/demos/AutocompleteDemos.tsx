@@ -31,7 +31,11 @@ export function AsyncSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} dataSources={{ books: booksSource }}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        dataSources={{ books: booksSource }}
+      >
         <Enforma.Autocomplete bind="book" label="Book" dataSource="books" minSearchLength={0}>
           <Enforma.Autocomplete.Option label="label" value="key" />
         </Enforma.Autocomplete>

@@ -109,8 +109,7 @@ describe('MUI List — row delete button', () => {
     if (firstDeleteButton === undefined) throw new Error('Expected at least one delete button');
     await userEvent.click(firstDeleteButton);
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ items: [{ name: 'Bob' }] }),
-      expect.anything(),
+      expect.objectContaining({ values: { items: [{ name: 'Bob' }] } }),
     );
   });
 });
@@ -138,9 +137,8 @@ describe('MUI List — Add flow', () => {
     await waitFor(() => {
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          items: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+          values: { items: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }] },
         }),
-        expect.anything(),
       );
     });
   });
@@ -203,9 +201,8 @@ describe('MUI List — Edit flow', () => {
     await waitFor(() => {
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          items: [{ name: 'Alicia' }, { name: 'Bob' }],
+          values: { items: [{ name: 'Alicia' }, { name: 'Bob' }] },
         }),
-        expect.anything(),
       );
     });
   });
@@ -269,8 +266,7 @@ describe('MUI List — modal delete', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ items: [{ name: 'Bob' }] }),
-      expect.anything(),
+      expect.objectContaining({ values: { items: [{ name: 'Bob' }] } }),
     );
   });
 });

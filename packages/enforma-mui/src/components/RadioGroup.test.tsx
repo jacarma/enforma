@@ -65,10 +65,7 @@ describe('MUI RadioGroup', () => {
       </Form>,
     );
     await userEvent.click(screen.getByRole('radio', { name: 'Small' }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ size: 's' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ values: { size: 's' } }));
   });
 
   it('shows loading spinner when datasource is loading', () => {
@@ -186,9 +183,6 @@ describe('MUI RadioGroup — openChoice', () => {
     const textbox = screen.getByRole('textbox');
     await userEvent.clear(textbox);
     await userEvent.type(textbox, 'xl');
-    expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ size: 'xl' }),
-      expect.anything(),
-    );
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ values: { size: 'xl' } }));
   });
 });

@@ -22,7 +22,11 @@ export function SubmitDemo() {
   const [submitted, setSubmitted] = useState(false);
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} onSubmit={() => setSubmitted(true)}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        onSubmit={() => setSubmitted(true)}
+      >
         <Enforma.TextInput bind="name" label="Name" required />
         <button type="submit">Submit</button>
       </Enforma.Form>
@@ -35,7 +39,11 @@ export function DataSourcesDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
     <div className="preview-card not-content">
-      <Enforma.Form values={values} onChange={setValues} dataSources={{ countries }}>
+      <Enforma.Form
+        values={values}
+        onChange={({ values }) => setValues(values)}
+        dataSources={{ countries }}
+      >
         <Enforma.Select bind="country" label="Country" dataSource="countries">
           <Enforma.Select.Option label="name" value="code" />
         </Enforma.Select>
@@ -51,8 +59,8 @@ export function ValidityDemo() {
     <div className="preview-card not-content">
       <Enforma.Form
         values={values}
-        onChange={(newValues, { isValid }) => {
-          setValues(newValues);
+        onChange={({ values, isValid }) => {
+          setValues(values);
           setIsValid(isValid);
         }}
       >

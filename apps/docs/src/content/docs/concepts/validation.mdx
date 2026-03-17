@@ -56,7 +56,7 @@ For common constraints, use declarative props instead of a custom `validate`:
 ## When errors appear
 
 - **On blur:** error shows after the user leaves the field
-- **On submit:** all remaining errors are revealed; `onSubmit` is not called
+- **On submit:** all remaining errors are revealed; `onSubmit` fires with `isValid: false`
 
 ## Validators on hidden/removed fields
 
@@ -64,14 +64,14 @@ Validators on `hidden` or `removed` fields are automatically skipped — you do 
 
 ## Form-level validity
 
-`onChange` receives a second argument `{ valid: boolean }`:
+`onChange` receives a single `OnChangeArg` object with `values`, `isValid`, and `errors`:
 
 ```tsx
 <Enforma.Form
   values={values}
-  onChange={(values, { valid }) => {
+  onChange={({ values, isValid }) => {
     setValues(values);
-    setCanSubmit(valid);
+    setCanSubmit(isValid);
   }}
 >
 ```

@@ -49,7 +49,9 @@ describe('MUI Calculated', () => {
         />
       </Form>,
     );
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ total: 5 }), expect.anything());
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ values: { a: 2, b: 3, total: 5 } }),
+    );
   });
 
   it('updates displayed value when form state changes', () => {

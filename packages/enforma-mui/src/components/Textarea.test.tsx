@@ -40,8 +40,7 @@ describe('MUI Textarea', () => {
     );
     await userEvent.type(screen.getByLabelText('Bio'), 'Hello');
     expect(onChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ bio: 'Hello' }),
-      expect.anything(),
+      expect.objectContaining({ values: { bio: 'Hello' } }),
     );
   });
 
