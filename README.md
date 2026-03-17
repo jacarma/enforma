@@ -35,7 +35,7 @@ export function CheckoutForm() {
           method === 'delivery' && !value ? 'Address is required' : null
         }
       />
-      <button type="submit">Place order</button>
+      <Enforma.Submit>Place order</Enforma.Submit>
     </Enforma.Form>
   );
 }
