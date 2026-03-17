@@ -6,6 +6,8 @@
 
 **Only write what's yours.** No state management, no touched/error tracking, no blur handlers. Declare your fields, validations, and submit logic — enforma handles the plumbing.
 
+**Obvious markup.** A single `<TextInput>` renders the wrapper, label, input, error message, description, and aria — exactly as your UI library expects.
+
 **Your form logic doesn't change when your UI does.** Switch to a different component library later — your form code is untouched.
 
 ## Example
