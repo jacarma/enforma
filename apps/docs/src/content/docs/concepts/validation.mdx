@@ -3,6 +3,8 @@ title: Validation
 description: Declaring field validators and built-in constraint props.
 ---
 
+import { ValidateDemo, CrossFieldValidationDemo, ConstraintsDemo } from '../../../demos/ValidationDemos';
+
 ## validate prop
 
 Pass a `validate` function to any field. Return a string for an error, or `null` to pass:
@@ -31,6 +33,10 @@ Validators receive `(value, scopeValues, allValues)`. Use `scopeValues` for cros
 />
 ```
 
+<ValidateDemo client:only="react" />
+
+<CrossFieldValidationDemo client:only="react" />
+
 ## Built-in constraint props
 
 For common constraints, use declarative props instead of a custom `validate`:
@@ -52,6 +58,8 @@ For common constraints, use declarative props instead of a custom `validate`:
   maxLength={20}
 />
 ```
+
+<ConstraintsDemo client:only="react" />
 
 ## When errors appear
 
