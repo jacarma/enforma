@@ -1,7 +1,7 @@
 // apps/docs/src/demos/RadioGroupDemos.tsx
 import { useState } from 'react';
 import Enforma, { type FormValues } from 'enforma';
-import { Preview } from '../components/Preview';
+import { Preview, MuiThemeWrapper } from '../components/Preview';
 
 const countries = [
   { code: 'us', name: 'United States' },
@@ -23,17 +23,19 @@ export function BasicDemo() {
 export function HorizontalDataSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
-    <div className="preview-card not-content">
-      <Enforma.Form
-        values={values}
-        onChange={({ values }) => setValues(values)}
-        dataSources={{ countries }}
-      >
-        <Enforma.RadioGroup bind="country" label="Country" dataSource="countries" row>
-          <Enforma.RadioGroup.Option label="name" value="code" />
-        </Enforma.RadioGroup>
-      </Enforma.Form>
-    </div>
+    <MuiThemeWrapper>
+      <div className="preview-card not-content">
+        <Enforma.Form
+          values={values}
+          onChange={({ values }) => setValues(values)}
+          dataSources={{ countries }}
+        >
+          <Enforma.RadioGroup bind="country" label="Country" dataSource="countries" row>
+            <Enforma.RadioGroup.Option label="name" value="code" />
+          </Enforma.RadioGroup>
+        </Enforma.Form>
+      </div>
+    </MuiThemeWrapper>
   );
 }
 

@@ -6,6 +6,7 @@ import Enforma, {
   registerComponents,
 } from 'enforma';
 import muiComponents from 'enforma-mui';
+import { MuiThemeWrapper } from './Preview';
 
 registerComponents(muiComponents as Partial<EnformaComponentRegistry>, { variant: 'outlined' });
 
@@ -13,15 +14,17 @@ export function HeroDemo() {
   const [values, setValues] = useState<FormValues>({});
 
   return (
-    <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
-      <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
-      <Enforma.TextInput
-        bind="email"
-        label="Email"
-        placeholder="your@email.com"
-        disabled={({ name }) => !name}
-      />
-      <Enforma.Submit />
-    </Enforma.Form>
+    <MuiThemeWrapper>
+      <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
+        <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
+        <Enforma.TextInput
+          bind="email"
+          label="Email"
+          placeholder="your@email.com"
+          disabled={({ name }) => !name}
+        />
+        <Enforma.Submit />
+      </Enforma.Form>
+    </MuiThemeWrapper>
   );
 }

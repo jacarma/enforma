@@ -1,7 +1,7 @@
 // apps/docs/src/demos/AutocompleteDemos.tsx
 import { useState } from 'react';
 import Enforma, { type FormValues, type DataSourceParams } from 'enforma';
-import { Preview } from '../components/Preview';
+import { Preview, MuiThemeWrapper } from '../components/Preview';
 
 const BOOKS = [
   { key: '1', label: 'The Great Gatsby' },
@@ -30,16 +30,18 @@ export function BasicDemo() {
 export function AsyncSourceDemo() {
   const [values, setValues] = useState<FormValues>({});
   return (
-    <div className="preview-card not-content">
-      <Enforma.Form
-        values={values}
-        onChange={({ values }) => setValues(values)}
-        dataSources={{ books: booksSource }}
-      >
-        <Enforma.Autocomplete bind="book" label="Book" dataSource="books" minSearchLength={0}>
-          <Enforma.Autocomplete.Option label="label" value="key" />
-        </Enforma.Autocomplete>
-      </Enforma.Form>
-    </div>
+    <MuiThemeWrapper>
+      <div className="preview-card not-content">
+        <Enforma.Form
+          values={values}
+          onChange={({ values }) => setValues(values)}
+          dataSources={{ books: booksSource }}
+        >
+          <Enforma.Autocomplete bind="book" label="Book" dataSource="books" minSearchLength={0}>
+            <Enforma.Autocomplete.Option label="label" value="key" />
+          </Enforma.Autocomplete>
+        </Enforma.Form>
+      </div>
+    </MuiThemeWrapper>
   );
 }
