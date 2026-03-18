@@ -9,6 +9,8 @@ All hooks are exported from `enforma`:
 import { useFieldProps, useFormValue, useReactiveProp, useVisibility, useFieldValidation, useListState, useDataSource } from 'enforma';
 ```
 
+Most adapter authors only need `useFieldProps` (for any field component) and `useListState` (for custom list implementations). The other hooks are used internally by `useFieldProps` and are only needed if you're building something outside the standard field pattern.
+
 ## useFieldProps
 
 The primary hook for building custom field components. Resolves all reactive props and connects the component to the form store.

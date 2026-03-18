@@ -7,6 +7,8 @@ This guide is for component library authors who want to publish an Enforma adapt
 
 An adapter maps Enforma's component types to your library's implementations. Users register it once and their forms render with your components, with no changes to their form logic if they ever switch libraries.
 
+The official MUI adapter ([`enforma-mui` on GitHub](https://github.com/jacarma/enforma/tree/main/packages/enforma-mui/src)) is a complete reference implementation you can use as a starting point.
+
 ## Overview
 
 Your adapter exports an object mapping Enforma's component type keys to your implementations. Each component receives resolved props from the form store and is responsible only for rendering — Enforma handles state, validation, and reactivity.
