@@ -6,16 +6,17 @@ import { Code } from '@astrojs/starlight/components';
 // This string is intentionally hardcoded and kept in sync with HeroDemo.tsx manually.
 // The demo is small and stable — update this if HeroDemo changes.
 const heroCode = `
-<Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
+<Enforma.Form
+  values={values}
+  onChange={({ values }) => setValues(values)}
+>
   <Enforma.TextInput
     bind="name"
     label="Name"
-    placeholder="Your name"
   />
   <Enforma.TextInput
     bind="email"
     label="Email"
-    placeholder="your@email.com"
     disabled={({ name }) => !name}
   />
   <Enforma.Submit />

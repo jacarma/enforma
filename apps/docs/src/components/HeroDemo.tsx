@@ -16,13 +16,8 @@ export function HeroDemo() {
   return (
     <MuiThemeWrapper>
       <Enforma.Form values={values} onChange={({ values }) => setValues(values)}>
-        <Enforma.TextInput bind="name" label="Name" placeholder="Your name" />
-        <Enforma.TextInput
-          bind="email"
-          label="Email"
-          placeholder="your@email.com"
-          disabled={({ name }) => !name}
-        />
+        <Enforma.TextInput bind="name" label="Name" />
+        <Enforma.TextInput bind="email" label="Email" disabled={({ name }) => !name} />
         <Enforma.Submit />
       </Enforma.Form>
     </MuiThemeWrapper>
