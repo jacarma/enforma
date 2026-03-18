@@ -47,6 +47,16 @@ export function ReactivePlaceholderDemo() {
   );
 }
 
+export function ReactiveSubmitDisabledDemo() {
+  return (
+    <Preview>
+      <Enforma.TextInput bind="name" label="Name" required />
+      <Enforma.TextInput bind="email" label="Email" required />
+      <Enforma.Submit disabled={(_, { formValid }) => !formValid} />
+    </Preview>
+  );
+}
+
 export function ReactiveValidationDemo() {
   return (
     <Preview>

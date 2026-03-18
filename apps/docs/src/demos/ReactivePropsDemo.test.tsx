@@ -6,6 +6,7 @@ import {
   ReactiveDisabledDemo,
   ReactiveLabelDemo,
   ReactivePlaceholderDemo,
+  ReactiveSubmitDisabledDemo,
   ReactiveValidationDemo,
 } from './ReactivePropsDemo';
 
@@ -29,6 +30,15 @@ test('ReactiveLabelDemo: label changes based on contact type', async () => {
 test('ReactivePlaceholderDemo: renders handle input', () => {
   render(<ReactivePlaceholderDemo />);
   expect(screen.getByLabelText(/handle/i)).toBeInTheDocument();
+});
+
+test('ReactiveSubmitDisabledDemo: submit disabled when form invalid', async () => {
+  const user = userEvent.setup();
+  render(<ReactiveSubmitDisabledDemo />);
+  expect(screen.getByRole('button', { name: /submit/i })).toBeDisabled();
+  await user.type(screen.getByLabelText(/name/i), 'Alice');
+  await user.type(screen.getByLabelText(/email/i), 'alice@example.com');
+  expect(screen.getByRole('button', { name: /submit/i })).toBeEnabled();
 });
 
 test('ReactiveValidationDemo: shows error when delivery selected without address', async () => {

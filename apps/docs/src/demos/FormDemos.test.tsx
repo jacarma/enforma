@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { test, expect } from 'vitest';
-import { BasicDemo, SubmitDemo, DataSourcesDemo, ValidityDemo } from './FormDemos';
+import { BasicDemo, SubmitArgDemo, SubmitDemo, DataSourcesDemo, ValidityDemo } from './FormDemos';
 
 test('BasicDemo renders a name input', () => {
   render(<BasicDemo />);
@@ -25,4 +25,9 @@ test('DataSourcesDemo renders a country select', () => {
 test('ValidityDemo shows validity state', () => {
   render(<ValidityDemo />);
   expect(screen.getByText(/form valid/i)).toBeInTheDocument();
+});
+
+test('SubmitArgDemo renders with a submit button', () => {
+  render(<SubmitArgDemo />);
+  expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
 });

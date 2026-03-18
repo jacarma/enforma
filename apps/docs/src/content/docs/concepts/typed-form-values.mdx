@@ -2,7 +2,7 @@
 title: Typed form values
 description: Use Form<TValues> for type-safe onChange and onSubmit callbacks.
 ---
-import { OnChangeArgDemo, SubmitArgDemo, SubmitDisabledDemo } from '../../../demos/TypedValuesDemos';
+import { OnChangeArgDemo } from '../../../demos/TypedValuesDemos';
 
 Pass a type parameter to `Form` to get typed `onChange` and `onSubmit` callbacks.
 
@@ -39,40 +39,6 @@ type OnChangeArg<TValues> =
 When `isValid: true`, TypeScript narrows `values` to your exact type. When `isValid: false`, `values` is `LooseValues<TValues>` — every field is optional and nullable to accommodate partial input.
 
 <OnChangeArgDemo client:only="react" />
-
-## onSubmit always fires
-
-`onSubmit` fires on every submit click, even when the form has errors. Check `isValid` before acting:
-
-```tsx
-onSubmit={({ values, isValid }) => {
-  if (!isValid) {
-    // Show a toast, scroll to first error, etc.
-    return;
-  }
-  save(values); // values is TValues here
-}}
-```
-
-Try submitting below with empty fields to see `isValid: false` in the arg:
-
-<SubmitArgDemo client:only="react" />
-
-## Typed submitDisabled
-
-Use `submitDisabled<TValues>` to get a typed `disabled` function for the `Submit` component:
-
-```tsx
-import { submitDisabled } from 'enforma';
-
-const isDisabled = submitDisabled<ContactForm>(
-  (values, { formValid }) => !formValid || !values.name,
-);
-
-<Enforma.Submit disabled={isDisabled} />
-```
-
-<SubmitDisabledDemo client:only="react" />
 
 ## LooseValues
 

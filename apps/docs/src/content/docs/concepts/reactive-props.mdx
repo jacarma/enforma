@@ -3,7 +3,7 @@ title: Reactive props
 description: How any prop can be a function that responds to live form state.
 ---
 
-import { ReactiveDisabledDemo, ReactiveLabelDemo, ReactivePlaceholderDemo, ReactiveValidationDemo } from '../../../demos/ReactivePropsDemo';
+import { ReactiveDisabledDemo, ReactiveLabelDemo, ReactivePlaceholderDemo, ReactiveSubmitDisabledDemo, ReactiveValidationDemo } from '../../../demos/ReactivePropsDemo';
 
 Most props on Enforma field components accept either a static value or a **reactive function**:
 
@@ -64,6 +64,16 @@ The email field is disabled until `name` has a value.
 ```
 
 <ReactivePlaceholderDemo client:only="react" />
+
+### Reactive submit disabled
+
+```tsx
+<Enforma.Submit disabled={(_, { formValid }) => !formValid} />
+```
+
+The submit button is disabled until all required fields are valid.
+
+<ReactiveSubmitDisabledDemo client:only="react" />
 
 ### Reactive validation
 
