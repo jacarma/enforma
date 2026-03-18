@@ -30,6 +30,13 @@ const heroCode = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enforma — Healthy forms for React</title>
     <link rel="icon" type="image/svg+xml" href="/enforma/enforma-logo.svg" />
+    <script is:inline>
+      (function () {
+        var theme = localStorage.getItem('starlight-theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <style>
       *, *::before, *::after { box-sizing: border-box; }
 
@@ -106,6 +113,9 @@ const heroCode = `
         overflow: auto;
       }
       .hero-right pre { margin: 0; font-size: 0.85rem; line-height: 1.6; }
+      .hero-right .expressive-code { border: none; box-shadow: none; }
+      .hero-right .expressive-code .frame { border: none; box-shadow: none; }
+      .hero-right .expressive-code pre { background: transparent !important; }
 
       .hero-ctas {
         display: flex;
@@ -212,7 +222,7 @@ const heroCode = `
           <HeroDemo client:only="react" />
         </div>
         <div class="hero-right">
-          <Code code={heroCode} lang="tsx" />
+          <Code code={heroCode} lang="tsx" frame="none" />
         </div>
       </div>
 
