@@ -1,6 +1,6 @@
 {
   "name": "enforma",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Healthy forms for React — declare your fields, enforma handles the rest",
   "private": false,
   "type": "module",

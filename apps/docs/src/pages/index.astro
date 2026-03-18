@@ -11,12 +11,10 @@ const heroCode = `
   onChange={({ values }) => setValues(values)}
 >
   <Enforma.TextInput
-    bind="name"
-    label="Name"
+    bind="name" label="Name"
   />
   <Enforma.TextInput
-    bind="email"
-    label="Email"
+    bind="email" label="Email"
     disabled={({ name }) => !name}
   />
   <Enforma.Submit />
