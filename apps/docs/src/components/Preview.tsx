@@ -17,12 +17,12 @@ registerComponents(muiComponents as Partial<EnformaComponentRegistry>, {
 
 function useMuiColorMode(): 'light' | 'dark' {
   const [mode, setMode] = useState<'light' | 'dark'>(() =>
-    document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
+    document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light',
   );
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setMode(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+      setMode(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
     });
     observer.observe(document.documentElement, {
       attributes: true,
