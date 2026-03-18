@@ -17,6 +17,9 @@ export default defineConfig({
   },
   integrations: [
     starlight({
+      expressiveCode: {
+        themes: ['github-dark'],
+      },
       title: 'Enforma',
       logo: {
         // Resolved relative to apps/docs/ (the Astro project root)
